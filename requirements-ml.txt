@@ -1,0 +1,12 @@
+torch
+torchvision
+torchaudio
+
+tensorflow
+
+opencv-python
+scikit-image
+
+xgboost
+lightgbm
+catboost
