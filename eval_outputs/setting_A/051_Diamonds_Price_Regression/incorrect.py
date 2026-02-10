@@ -1,0 +1,89 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the diamonds dataset from seaborn
+diamonds = sns.load_dataset('diamonds')
+
+# Display basic information about the dataset
+print("Dataset shape:", diamonds.shape)
+print("\nFirst few rows:")
+print(diamonds.head())
+print("\nDataset info:")
+print(diamonds.info())
+print("\nMissing values:")
+print(diamonds.isnull().sum())
+
+# Separate features and target
+X = diamonds.drop('price', axis=1)
+y = diamonds['price']
+
+# Identify categorical columns
+categorical_cols = X.select_dtypes(include=['object', 'category']).columns.tolist()
+print("\nCategorical columns:", categorical_cols)
+
+# One-hot encode categorical variables
+X_encoded = pd.get_dummies(X, columns=categorical_cols, drop_first=True)
+
+print("\nShape after one-hot encoding:", X_encoded.shape)
+print("\nEncoded feature names:")
+print(X_encoded.columns.tolist())
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_encoded, y, test_size=0.2, random_state=42
+)
+
+print("\nTraining set size:", X_train.shape[0])
+print("Testing set size:", X_test.shape[0])
+
+# Create and train the linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+print("\nModel trained successfully.")
+
+# Make predictions on the test set
+y_pred = mdl.predict(X_test)
+
+# Calculate R² score
+r2 = r2_score(y_test, y_pred)
+print(f"\nR² Score: {r2:.4f}")
+
+# Plot predicted versus actual prices
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, y_pred, alpha=0.5, s=10)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2, label='Perfect Prediction')
+plt.xlabel('Actual Price', fontsize=12)
+plt.ylabel('Predicted Price', fontsize=12)
+plt.title(f'Predicted vs Actual Diamond Prices\nR² = {r2:.4f}', fontsize=14)
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Display some sample predictions
+print("\nSample predictions (first 10):")
+comparison_df = pd.DataFrame({
+    'Actual Price': y_test.values[:10],
+    'Predicted Price': y_pred[:10],
+    'Difference': y_test.values[:10] - y_pred[:10]
+})
+print(comparison_df)
+
+# Display model coefficients for the top features
+coefficients = pd.DataFrame({
+    'Feature': X_encoded.columns,
+    'Coefficient': model.coef_
+})
+coefficients = coefficients.sort_values('Coefficient', key=abs, ascending=False)
+print("\nTop 10 features by absolute coefficient value:")
+print(coefficients.head(10))
+print(f"\nIntercept: {model.intercept_:.4f}")

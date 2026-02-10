@@ -1,0 +1,91 @@
+<correct_code>
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from collections import Counter
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the digits dataset
+digits = load_digits()
+X = digits.data
+y = digits.target
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# Train a KNN classifier
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = knn.predict(X_test)
+
+# Identify misclassified samples
+misclassified_indices = np.where(y_test != y_pred)[0]
+misclassified_pairs = [(y_test[i], y_pred[i]) for i in misclassified_indices]
+
+# Count the frequency of each misclassified pair
+pair_counts = Counter(misclassified_pairs)
+
+# Get the most frequent misclassified pairs
+most_frequent_pairs = pair_counts.most_common(5)
+
+print("Misclassification Report")
+print("=" * 50)
+print(f"Total test samples: {len(y_test)}")
+print(f"Total misclassified: {len(misclassified_indices)}")
+print(f"Accuracy: {knn.score(X_test, y_test):.4f}")
+print("\nMost Frequent Misclassified Digit Pairs:")
+print("(True Label, Predicted Label): Count")
+for pair, count in most_frequent_pairs:
+    print(f"  ({pair[0]}, {pair[1]}): {count}")
+
+# Display example images for each frequent misclassified pair
+if most_frequent_pairs:
+    num_pairs = min(3, len(most_frequent_pairs))
+    fig, axes = plt.subplots(num_pairs, 3, figsize=(9, 3 * num_pairs))
+    
+    # Handle case where there's only one pair
+    if num_pairs == 1:
+        axes = axes.reshape(1, -1)
+    
+    for idx, (pair, count) in enumerate(most_frequent_pairs[:num_pairs]):
+        true_label, pred_label = pair
+        
+        # Find indices of this specific misclassification
+        pair_indices = [
+            misclassified_indices[i] for i in range(len(misclassified_indices))
+            if misclassified_pairs[i] == pair
+        ]
+        
+        # Display up to 3 examples for this pair
+        for j in range(min(3, len(pair_indices))):
+            test_idx = pair_indices[j]
+            image = X_test[test_idx].reshape(8, 8)
+            
+            axes[idx, j].imshow(image, cmap='gray')
+            axes[idx, j].set_title(
+                f"True: {true_label}, Pred: {pred_label}",
+                fontsize=10
+            )
+            axes[idx, j].axis('off')
+        
+        # Hide unused subplots if fewer than 3 examples
+        for j in range(len(pair_indices), 3):
+            axes[idx, j].axis('off')
+    
+    plt.tight_layout()
+    plt.suptitle("Examples of Most Frequent Misclassifications", y=1.02, fontsize=14)
+    plt.show()
+else:
+    print("\nNo misclassifications found!")
+</correct_code>
+<error_type>
+LogicError
+</error_type>

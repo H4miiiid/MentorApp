@@ -1,0 +1,105 @@
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the Titanic dataset from seaborn
+titanic = sns.load_dataset('titanic')
+
+# Display basic information about the dataset
+print("Titanic Dataset Shape:", titanic.shape)
+print("\nFirst few rows:")
+print(titanic.head())
+print("\nColumn names and types:")
+print(titanic.dtypes)
+print("\nMissing values:")
+print(titanic.isnull().sum())
+
+# Select relevant features for prediction
+# We'll use: pclass, sex, age, sibsp, parch, fare, embarked
+features = ['pclass', 'sex', 'agee', 'sibsp', 'parch', 'fare', 'embarked']
+target = 'survived'
+
+# Create a working dataframe with selected features and target
+df = titanic[features + [target]].copy()
+
+# Handle missing values
+# Fill missing age with median
+df['age'].fillna(df['age'].median(), inplace=True)
+
+# Fill missing fare with median
+df['fare'].fillna(df['fare'].median(), inplace=True)
+
+# Fill missing embarked with mode (most common value)
+df['embarked'].fillna(df['embarked'].mode()[0], inplace=True)
+
+# Drop any remaining rows with missing values (if any)
+df.dropna(inplace=True)
+
+print("\nAfter handling missing values:")
+print("Dataset shape:", df.shape)
+print("Missing values:", df.isnull().sum().sum())
+
+# Separate features and target
+X = df[features]
+y = df[target]
+
+# Identify categorical columns for one-hot encoding
+categorical_columns = ['sex', 'embarked']
+
+# Apply one-hot encoding to categorical columns
+X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
+
+print("\nFeatures after one-hot encoding:")
+print(X_encoded.head())
+print("\nEncoded feature names:")
+print(X_encoded.columns.tolist())
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_encoded, y, test_size=0.2, random_state=42
+)
+
+print("\nTraining set size:", X_train.shape[0])
+print("Test set size:", X_test.shape[0])
+
+# Build a Decision Tree Classifier
+dt_classifier = DecisionTreeClassifier(random_state=42)
+
+# Train the model
+print("\nTraining the Decision Tree Classifier...")
+dt_classifier.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = dt_classifier.predict(X_test)
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\n" + "="*50)
+print("MODEL EVALUATION RESULTS")
+print("="*50)
+print(f"Test Set Accuracy: {accuracy:.4f}")
+print(f"Test Set Accuracy (%): {accuracy * 100:.2f}%")
+
+# Display some sample predictions
+print("\nSample Predictions (first 10 test samples):")
+comparison_df = pd.DataFrame({
+    'Actual': y_test.values[:10],
+    'Predicted': y_pred[:10]
+})
+print(comparison_df)
+
+# Feature importance
+feature_importance = pd.DataFrame({
+    'Feature': X_encoded.columns,
+    'Importance': dt_classifier.feature_importances_
+}).sort_values('Importance', ascending=False)
+
+print("\nTop 5 Most Important Features:")
+print(feature_importance.head())

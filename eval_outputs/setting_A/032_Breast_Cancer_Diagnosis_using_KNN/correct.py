@@ -1,0 +1,105 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, roc_curve, auc, classification_report, confusion_matrix
+
+# Load the breast cancer dataset
+data = load_breast_cancer()
+X = data.data
+y = data.target
+
+print("Dataset loaded successfully!")
+print(f"Number of samples: {X.shape[0]}")
+print(f"Number of features: {X.shape[1]}")
+print(f"Target classes: {data.target_names}")
+print()
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# Apply feature scaling
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+print("Feature scaling applied.")
+print()
+
+# Choose k via cross-validation
+k_values = range(1, 31)
+cv_scores = []
+
+print("Performing cross-validation to find optimal k...")
+for k in k_values:
+    knn = KNeighborsClassifier(n_neighbors=k)
+    scores = cross_val_score(knn, X_train_scaled, y_train, cv=5, scoring='accuracy')
+    cv_scores.append(scores.mean())
+
+# Find the best k
+best_k = k_values[np.argmax(cv_scores)]
+best_cv_score = max(cv_scores)
+
+print(f"Best k found: {best_k}")
+print(f"Best cross-validation accuracy: {best_cv_score:.4f}")
+print()
+
+# Train the final KNN model with the best k
+knn_final = KNeighborsClassifier(n_neighbors=best_k)
+knn_final.fit(X_train_scaled, y_train)
+
+# Make predictions on the test set
+y_pred = knn_final.predict(X_test_scaled)
+y_pred_proba = knn_final.predict_proba(X_test_scaled)[:, 1]
+
+# Measure accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Test Accuracy: {accuracy:.4f}")
+print()
+
+# Display classification report
+print("Classification Report:")
+print(classification_report(y_test, y_pred, target_names=data.target_names))
+
+# Display confusion matrix
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+print()
+
+# Compute ROC curve and AUC
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+roc_auc = auc(fpr, tpr)
+
+print(f"ROC AUC Score: {roc_auc:.4f}")
+print()
+
+# Plot cross-validation scores for different k values
+plt.figure(figsize=(14, 5))
+
+plt.subplot(1, 2, 1)
+plt.plot(k_values, cv_scores, marker='o', linestyle='-', color='blue')
+plt.axvline(x=best_k, color='red', linestyle='--', label=f'Best k={best_k}')
+plt.xlabel('Number of Neighbors (k)')
+plt.ylabel('Cross-Validation Accuracy')
+plt.title('KNN: Cross-Validation Accuracy vs. k')
+plt.grid(True, alpha=0.3)
+plt.legend()
+
+# Plot ROC curve
+plt.subplot(1, 2, 2)
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.4f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Classifier')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc='lower right')
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print("Breast Cancer Diagnosis using KNN completed successfully!")
