@@ -1,0 +1,127 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import VotingClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.base import BaseEstimator, ClassifierMixin
+
+# Set random seeds for reproducibility
+np.random.seed(42)
+tf.random.set_seed(42)
+
+# Load MNIST dataset
+(X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
+
+# Preprocess data for traditional ML models (flatten and normalize)
+X_train_flat = X_train.reshape(X_train.shape[0], -1) / 255.0
+X_test_flat = X_test.reshape(X_test.shape[0], -1) / 255.0
+
+# Use a subset of training data for faster runtime
+train_size = 10000
+X_train_flat_subset = X_train_flat[:train_size]
+y_train_subset = y_train[:train_size]
+
+# Preprocess data for CNN (reshape and normalize)
+X_train_cnn = X_train[:train_size].reshape(-1, 28, 28, 1) / 255.0
+X_test_cnn = X_test.reshape(-1, 28, 28, 1) / 255.0
+
+print("Training Logistic Regression...")
+# Train Logistic Regression
+lr_model = LogisticRegression(max_iter=100, random_state=42, solver='lbfgs')
+lr_model.fit(X_train_flat_subset, y_train_subset)
+lr_pred = lr_model.predict(X_test_flat)
+lr_accuracy = accuracy_score(y_test, lr_pred)
+print(f"Logistic Regression Accuracy: {lr_accuracy:.4f}")
+
+print("\nTraining KNN...")
+# Train KNN
+knn_model = KNeighborsClassifier(n_neighbors=5)
+knn_model.fit(X_train_flat_subset, y_train_subset)
+knn_pred = knn_model.predict(X_test_flat)
+knn_accuracy = accuracy_score(y_test, knn_pred)
+print(f"KNN Accuracy: {knn_accuracy:.4f}")
+
+print("\nTraining CNN...")
+# Build and train a simple CNN
+cnn_model = keras.Sequential([
+    keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    keras.layers.MaxPooling2D((2, 2)),
+    keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    keras.layers.MaxPooling2D((2, 2)),
+    keras.layers.Flatten(),
+    keras.layers.Dense(64, activation='relu'),
+    keras.layers.Dense(10, activation='softmax')
+])
+
+cnn_model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+
+cnn_model.fit(X_train_cnn, y_train_subset, epochs=1, batch_size=128, verbose=0)
+cnn_pred = np.argmax(cnn_model.predict(X_test_cnn, verbose=0), axis=0)
+cnn_accuracy = accuracy_score(y_test, cnn_pred)
+print(f"CNN Accuracy: {cnn_accuracy:.4f}")
+
+# Wrapper class for CNN to make it compatible with sklearn's VotingClassifier
+class KerasClassifierWrapper(BaseEstimator, ClassifierMixin):
+    def __init__(self, model, input_shape):
+        self.model = model
+        self.input_shape = input_shape
+    
+    def fit(self, X, y):
+        # Reshape if needed
+        if len(X.shape) == 2:
+            X = X.reshape(-1, *self.input_shape)
+        return self
+    
+    def predict(self, X):
+        # Reshape if needed
+        if len(X.shape) == 2:
+            X = X.reshape(-1, *self.input_shape)
+        predictions = self.model.predict(X, verbose=0)
+        return np.argmax(predictions, axis=1)
+
+# Wrap the CNN model
+cnn_wrapper = KerasClassifierWrapper(cnn_model, (28, 28, 1))
+
+print("\nCreating Voting Ensemble...")
+# Create voting ensemble
+voting_clf = VotingClassifier(
+    estimators=[
+        ('lr', lr_model),
+        ('knn', knn_model),
+        ('cnn', cnn_wrapper)
+    ],
+    voting='hard'
+)
+
+# The ensemble is already "fitted" since individual models are trained
+# We just need to make predictions
+ensemble_pred = voting_clf.predict(X_test_flat)
+ensemble_accuracy = accuracy_score(y_test, ensemble_pred)
+
+print("\n" + "="*50)
+print("RESULTS SUMMARY")
+print("="*50)
+print(f"Logistic Regression Accuracy: {lr_accuracy:.4f}")
+print(f"KNN Accuracy:                 {knn_accuracy:.4f}")
+print(f"CNN Accuracy:                 {cnn_accuracy:.4f}")
+print(f"Voting Ensemble Accuracy:     {ensemble_accuracy:.4f}")
+print("="*50)
+
+# Verify that ensemble accuracy is reasonable
+individual_accuracies = [lr_accuracy, knn_accuracy, cnn_accuracy]
+max_individual = max(individual_accuracies)
+print(f"\nEnsemble vs Best Individual: {ensemble_accuracy:.4f} vs {max_individual:.4f}")
+if ensemble_accuracy >= max_individual - 0.05:
+    print("Ensemble performs competitively with or better than individual models.")
+else:
+    print("Note: Ensemble performance may vary due to voting dynamics.")

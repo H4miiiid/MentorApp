@@ -1,0 +1,618 @@
+[
+  {
+    "idx": 1,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\000_Titanic_Missing_Age_Imputation_using_Sim\\prediction.py",
+    "ok": true,
+    "seconds": 0.0235,
+    "error": ""
+  },
+  {
+    "idx": 2,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\001_CIFAR-10_Deep_CNN_Data_Augmentation\\prediction.py",
+    "ok": true,
+    "seconds": 0.018,
+    "error": ""
+  },
+  {
+    "idx": 3,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\002_Digits_Misclassification_Report\\prediction.py",
+    "ok": true,
+    "seconds": 0.0066,
+    "error": ""
+  },
+  {
+    "idx": 4,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\003_Titanic_Age_Imputation_Test\\prediction.py",
+    "ok": true,
+    "seconds": 0.0046,
+    "error": ""
+  },
+  {
+    "idx": 5,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\004_Penguins_Domain_Adaptation_Evaluation\\prediction.py",
+    "ok": true,
+    "seconds": 0.009,
+    "error": ""
+  },
+  {
+    "idx": 6,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\005_Reuters_Topic_Frequency_Plot\\prediction.py",
+    "ok": true,
+    "seconds": 0.005,
+    "error": ""
+  },
+  {
+    "idx": 7,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\006_Wine_Dataset_Outlier_Detection\\prediction.py",
+    "ok": true,
+    "seconds": 0.032,
+    "error": ""
+  },
+  {
+    "idx": 8,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\007_Wine_Alcohol_Content_Decision_Tree\\prediction.py",
+    "ok": true,
+    "seconds": 0.0057,
+    "error": ""
+  },
+  {
+    "idx": 9,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\008_Breast_Cancer_SVM_Classifier\\prediction.py",
+    "ok": true,
+    "seconds": 0.0065,
+    "error": ""
+  },
+  {
+    "idx": 10,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\009_MNIST_Pixel_Intensity_Histogram_Feature_\\prediction.py",
+    "ok": true,
+    "seconds": 0.008,
+    "error": ""
+  },
+  {
+    "idx": 11,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\010_MNIST_Digit_Distribution_Check\\prediction.py",
+    "ok": true,
+    "seconds": 0.0208,
+    "error": ""
+  },
+  {
+    "idx": 12,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\011_Tips_Dataset_Tip_Amount_Forecast\\prediction.py",
+    "ok": true,
+    "seconds": 0.0247,
+    "error": ""
+  },
+  {
+    "idx": 13,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\012_Fashion_MNIST_CNN_Early_Stopping\\prediction.py",
+    "ok": true,
+    "seconds": 0.0075,
+    "error": ""
+  },
+  {
+    "idx": 14,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\013_Digits_Classification_using_Convolutiona\\prediction.py",
+    "ok": true,
+    "seconds": 0.0082,
+    "error": ""
+  },
+  {
+    "idx": 15,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py",
+    "ok": true,
+    "seconds": 0.0053,
+    "error": ""
+  },
+  {
+    "idx": 16,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\015_Fashion_MNIST_Class_Balance_Check\\prediction.py",
+    "ok": true,
+    "seconds": 0.0052,
+    "error": ""
+  },
+  {
+    "idx": 17,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\016_IMDB_Sentiment_Analysis_Naive_Bayes\\prediction.py",
+    "ok": true,
+    "seconds": 0.0049,
+    "error": ""
+  },
+  {
+    "idx": 18,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\017_Reuters_News_Topic_Classification\\prediction.py",
+    "ok": true,
+    "seconds": 0.0058,
+    "error": ""
+  },
+  {
+    "idx": 19,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\018_Digits_CNN_with_Data_Augmentation\\prediction.py",
+    "ok": true,
+    "seconds": 0.0032,
+    "error": ""
+  },
+  {
+    "idx": 20,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\019_Titanic_Survival_Ensemble_Stacking\\prediction.py",
+    "ok": true,
+    "seconds": 0.0051,
+    "error": ""
+  },
+  {
+    "idx": 21,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\020_Breast_Cancer_Feature_Selection\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 22,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\021_Breast_Cancer_Neural_Network\\prediction.py",
+    "ok": true,
+    "seconds": 0.0058,
+    "error": ""
+  },
+  {
+    "idx": 23,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\022_Titanic_Survival_Prediction_Simple\\prediction.py",
+    "ok": true,
+    "seconds": 0.0049,
+    "error": ""
+  },
+  {
+    "idx": 24,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\023_IMDB_Sentiment_Analysis_with_Naive_Bayes\\prediction.py",
+    "ok": true,
+    "seconds": 0.0044,
+    "error": ""
+  },
+  {
+    "idx": 25,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\024_California_Scaling_Impact_Study\\prediction.py",
+    "ok": true,
+    "seconds": 0.0183,
+    "error": ""
+  },
+  {
+    "idx": 26,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\025_Diabetes_Progression_LightGBM_Regression\\prediction.py",
+    "ok": true,
+    "seconds": 0.0056,
+    "error": ""
+  },
+  {
+    "idx": 27,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\026_Titanic_Survival_ROC_Curve\\prediction.py",
+    "ok": true,
+    "seconds": 0.0064,
+    "error": ""
+  },
+  {
+    "idx": 28,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\027_Iris_Multi-Class_SVM_with_Hyperparameter\\prediction.py",
+    "ok": true,
+    "seconds": 0.0045,
+    "error": ""
+  },
+  {
+    "idx": 29,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\028_Tips_Dataset_Spend_Prediction\\prediction.py",
+    "ok": true,
+    "seconds": 0.006,
+    "error": ""
+  },
+  {
+    "idx": 30,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\029_Fashion_MNIST_Dropout_Eval\\prediction.py",
+    "ok": true,
+    "seconds": 0.0062,
+    "error": ""
+  },
+  {
+    "idx": 31,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\030_Breast_Cancer_Confusion_Matrix_Study\\prediction.py",
+    "ok": true,
+    "seconds": 0.0057,
+    "error": ""
+  },
+  {
+    "idx": 32,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\031_California_Counterfactual_Explainability\\prediction.py",
+    "ok": true,
+    "seconds": 0.0226,
+    "error": ""
+  },
+  {
+    "idx": 33,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\032_Breast_Cancer_Diagnosis_using_KNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0055,
+    "error": ""
+  },
+  {
+    "idx": 34,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\033_Digits_Autoencoder_Reconstruction\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 35,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\034_Iris_Clustering_Agglomerative_Hierarchy\\prediction.py",
+    "ok": true,
+    "seconds": 0.0068,
+    "error": ""
+  },
+  {
+    "idx": 36,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\035_IMDB_Sentiment_Classification_Naive_Baye\\prediction.py",
+    "ok": true,
+    "seconds": 0.0063,
+    "error": ""
+  },
+  {
+    "idx": 37,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\036_Wine_Quality_Binary_Classification_with_\\prediction.py",
+    "ok": true,
+    "seconds": 0.0053,
+    "error": ""
+  },
+  {
+    "idx": 38,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\037_Penguins_Gender_Error_Analysis\\prediction.py",
+    "ok": true,
+    "seconds": 0.005,
+    "error": ""
+  },
+  {
+    "idx": 39,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\038_Titanic_Decision_Tree_Survival\\prediction.py",
+    "ok": true,
+    "seconds": 0.0055,
+    "error": ""
+  },
+  {
+    "idx": 40,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\039_California_Feature_Importance_Summary\\prediction.py",
+    "ok": true,
+    "seconds": 0.0202,
+    "error": ""
+  },
+  {
+    "idx": 41,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\040_Wine_Stacking_Ensemble_Evaluation\\prediction.py",
+    "ok": true,
+    "seconds": 0.0055,
+    "error": ""
+  },
+  {
+    "idx": 42,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\041_IMDB_Sentiment_Ensemble_Stacking\\prediction.py",
+    "ok": true,
+    "seconds": 0.0044,
+    "error": ""
+  },
+  {
+    "idx": 43,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\042_Digits_Classification_with_CNN_and_Dropo\\prediction.py",
+    "ok": true,
+    "seconds": 0.0054,
+    "error": ""
+  },
+  {
+    "idx": 44,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\043_Titanic_Survival_Random_Forest_GridSearc\\prediction.py",
+    "ok": true,
+    "seconds": 0.0054,
+    "error": ""
+  },
+  {
+    "idx": 45,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\044_IMDB_Review_Length_Feature_Engineering\\prediction.py",
+    "ok": true,
+    "seconds": 0.0055,
+    "error": ""
+  },
+  {
+    "idx": 46,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\045_Credit_Card_Anomaly_Detection_VAE\\prediction.py",
+    "ok": true,
+    "seconds": 0.0023,
+    "error": ""
+  },
+  {
+    "idx": 47,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py",
+    "ok": true,
+    "seconds": 0.0053,
+    "error": ""
+  },
+  {
+    "idx": 48,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\047_Heart_Model_Calibration_Plot\\prediction.py",
+    "ok": true,
+    "seconds": 0.0045,
+    "error": ""
+  },
+  {
+    "idx": 49,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py",
+    "ok": true,
+    "seconds": 0.0051,
+    "error": ""
+  },
+  {
+    "idx": 50,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\049_Linnerud_Dimensionality_Reduction\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 51,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\050_California_Housing_Price_Estimate\\prediction.py",
+    "ok": true,
+    "seconds": 0.0047,
+    "error": ""
+  },
+  {
+    "idx": 52,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\051_Diamonds_Price_Regression\\prediction.py",
+    "ok": true,
+    "seconds": 0.0047,
+    "error": ""
+  },
+  {
+    "idx": 53,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\052_Wine_Quality_XGBoost_Model\\prediction.py",
+    "ok": true,
+    "seconds": 0.0041,
+    "error": ""
+  },
+  {
+    "idx": 54,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\053_California_Housing_Boosting_with_Hyperpa\\prediction.py",
+    "ok": true,
+    "seconds": 0.0208,
+    "error": ""
+  },
+  {
+    "idx": 55,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\054_Fashion_MNIST_Simple_CNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0054,
+    "error": ""
+  },
+  {
+    "idx": 56,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\055_Reuters_MultiLabel_Hierarchical_Metrics\\prediction.py",
+    "ok": true,
+    "seconds": 0.0031,
+    "error": ""
+  },
+  {
+    "idx": 57,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\056_Tips_Bill_Amount_Forecast\\prediction.py",
+    "ok": true,
+    "seconds": 0.0052,
+    "error": ""
+  },
+  {
+    "idx": 58,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\057_MNIST_Voting_Ensemble_Classification\\prediction.py",
+    "ok": true,
+    "seconds": 0.0053,
+    "error": ""
+  },
+  {
+    "idx": 59,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py",
+    "ok": true,
+    "seconds": 0.0059,
+    "error": ""
+  },
+  {
+    "idx": 60,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\059_Penguins_Size_Clustering_with_KMeans\\prediction.py",
+    "ok": true,
+    "seconds": 0.0046,
+    "error": ""
+  },
+  {
+    "idx": 61,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\060_Breast_Cancer_Tree_Ensemble\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 62,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\061_Digits_Classification_using_KNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0044,
+    "error": ""
+  },
+  {
+    "idx": 63,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\062_Fashion_MNIST_CNN_Baseline\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 64,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\063_Penguins_Gender_Prediction_Naive_Bayes\\prediction.py",
+    "ok": true,
+    "seconds": 0.0043,
+    "error": ""
+  },
+  {
+    "idx": 65,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\064_Tips_Simple_Linear_Regression\\prediction.py",
+    "ok": true,
+    "seconds": 0.0042,
+    "error": ""
+  },
+  {
+    "idx": 66,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\065_MNIST_Digit_Normalization_KNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.005,
+    "error": ""
+  },
+  {
+    "idx": 67,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\066_Penguins_Species_Classification_with_Ran\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 68,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\067_Iris_Feature_Importance_Analysis\\prediction.py",
+    "ok": true,
+    "seconds": 0.0038,
+    "error": ""
+  },
+  {
+    "idx": 69,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\068_CIFAR10_Simple_CNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0046,
+    "error": ""
+  },
+  {
+    "idx": 70,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\069_California_Housing_LightGBM_Regressor\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 71,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\070_Wine_Quality_Gradient_Boosting\\prediction.py",
+    "ok": true,
+    "seconds": 0.0107,
+    "error": ""
+  },
+  {
+    "idx": 72,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py",
+    "ok": true,
+    "seconds": 0.0056,
+    "error": ""
+  },
+  {
+    "idx": 73,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\072_California_Residual_Distribution_Across_\\prediction.py",
+    "ok": true,
+    "seconds": 0.0052,
+    "error": ""
+  },
+  {
+    "idx": 74,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\073_California_Housing_Random_Forest_Regress\\prediction.py",
+    "ok": true,
+    "seconds": 0.0051,
+    "error": ""
+  },
+  {
+    "idx": 75,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\074_Fashion_MNIST_Hyperparameter_Search\\prediction.py",
+    "ok": true,
+    "seconds": 0.0028,
+    "error": ""
+  },
+  {
+    "idx": 76,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\075_Breast_Cancer_Diagnosis_with_LightGBM\\prediction.py",
+    "ok": true,
+    "seconds": 0.0066,
+    "error": ""
+  },
+  {
+    "idx": 77,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py",
+    "ok": true,
+    "seconds": 0.0063,
+    "error": ""
+  },
+  {
+    "idx": 78,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\077_Iris_tSNE_Cluster_Visualization\\prediction.py",
+    "ok": true,
+    "seconds": 0.0051,
+    "error": ""
+  },
+  {
+    "idx": 79,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\078_Digits_Confusion_Matrix_Visualization\\prediction.py",
+    "ok": true,
+    "seconds": 0.0053,
+    "error": ""
+  },
+  {
+    "idx": 80,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\079_Breast_Cancer_Gradient_Boosting_Classifi\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 81,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py",
+    "ok": true,
+    "seconds": 0.0046,
+    "error": ""
+  },
+  {
+    "idx": 82,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\081_CIFAR10_Simple_CNN_Tracker\\prediction.py",
+    "ok": true,
+    "seconds": 0.0384,
+    "error": ""
+  },
+  {
+    "idx": 83,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\082_Breast_Cancer_Neural_Network\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 84,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\083_Adult_Income_CatBoost_Classifier\\prediction.py",
+    "ok": true,
+    "seconds": 0.0057,
+    "error": ""
+  },
+  {
+    "idx": 85,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\084_Wine_Alcohol_Content_Prediction\\prediction.py",
+    "ok": true,
+    "seconds": 0.0049,
+    "error": ""
+  },
+  {
+    "idx": 86,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\085_CIFAR10_Epoch_Accuracy_Plot\\prediction.py",
+    "ok": true,
+    "seconds": 0.0047,
+    "error": ""
+  },
+  {
+    "idx": 87,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py",
+    "ok": true,
+    "seconds": 0.0066,
+    "error": ""
+  },
+  {
+    "idx": 88,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\eval_outputs\\setting_A\\087_Digits_PCA_Explained_Variance\\prediction.py",
+    "ok": true,
+    "seconds": 0.0038,
+    "error": ""
+  }
+]

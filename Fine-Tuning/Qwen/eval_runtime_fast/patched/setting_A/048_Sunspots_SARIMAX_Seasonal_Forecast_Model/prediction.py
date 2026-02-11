@@ -1,0 +1,146 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.datasets import sunspots
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.graphics.tsaplots import plot_acf
+import warnings
+warnings.filterwarnings('ignore')
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the sunspots dataset from statsmodels
+data = sunspots.load_pandas().data
+
+# The sunspots dataset has a 'YEAR' column and 'SUNACTIVITY' column
+# Convert YEAR to datetime for time series analysis
+data['YEAR'] = pd.to_datetime(data['YEAR'], format='%Y')
+data.set_index('YEAR', inplace=True)
+
+# Use the SUNACTIVITY column as our time series
+ts_data = data['SUNACTIVITY']
+
+# Split data into train and test sets
+# Reserve the last 24 months (2 years) for testing
+train_size = len(ts_data) - 24
+train = ts_data[:train_size]
+test = ts_data[train_size:]
+
+print(f"Total observations: {len(ts_data)}")
+print(f"Training observations: {len(train)}")
+print(f"Test observations: {len(test)}")
+print(f"Training period: {train.index[0]} to {train.index[-1]}")
+print(f"Test period: {test.index[0]} to {test.index[-1]}")
+
+# Fit SARIMAX model
+# SARIMAX parameters: (p, d, q) x (P, D, Q, s)
+# For sunspots, we use seasonal parameters with s=12 (annual cycle)
+# Based on domain knowledge and ACF/PACF analysis, we use:
+# order=(2, 1, 2) and seasonal_order=(1, 1, 1, 12)
+order = (2, 1, 2)
+seasonal_order = (1, 1, 1, 12)
+
+print(f"\nFitting SARIMAX model with order={order} and seasonal_order={seasonal_order}...")
+
+# Fit the SARIMAX model on training data
+model = SARIMAX(train, order=order, seasonal_order=seasonal_order, enforce_stationarity=False, enforce_invertibility=False)
+model_fit = model.fit(disp=False)
+
+print("Model fitted successfully.")
+print("\nModel Summary:")
+print(model_fit.summary())
+
+# Make predictions on the test set (next 24 months)
+forecast_steps = len(test)
+forecast = model_fit.forecast(steps=forecast_steps)
+
+# Calculate MAPE (Mean Absolute Percentage Error)
+def calculate_mape(actual, predicted):
+    """
+    Calculate Mean Absolute Percentage Error.
+    
+    Parameters:
+    -----------
+    actual : array-like
+        Actual observed values
+    predicted : array-like
+        Predicted values
+    
+    Returns:
+    --------
+    mape : float
+        Mean Absolute Percentage Error as a percentage
+    """
+    actual = np.array(actual)
+    predicted = np.array(predicted)
+    # Avoid division by zero
+    mask = actual != 0
+    mape = np.mean(np.abs((actual[mask] - predicted[mask]) / actual[mask])) * 100
+    return mape
+
+mape = calculate_mape(test.values, forecast.values)
+print(f"\nMean Absolute Percentage Error (MAPE): {mape:.2f}%")
+
+# Plot observed versus predicted values
+plt.figure(figsize=(14, 6))
+
+# Plot the entire training data
+plt.plot(train.index, train.values, label='Training Data', color='blue', linewidth=1.5)
+
+# Plot the test data (observed)
+plt.plot(test.index, test.values, label='Observed (Test)', color='green', linewidth=2, marker='o', markersize=4)
+
+# Plot the forecast
+plt.plot(test.index, forecast.values, label='Forecast', color='red', linewidth=2, linestyle='--', marker='x', markersize=4)
+
+plt.xlabel('Year', fontsize=12)
+plt.ylabel('Sunspot Activity', fontsize=12)
+plt.title('Sunspots SARIMAX Forecast: Observed vs Predicted', fontsize=14, fontweight='bold')
+plt.legend(loc='best', fontsize=10)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+# Additional plot: Residuals analysis
+residuals = model_fit.resid
+
+fig, axes = plt.subplots(2, 2, figsize=(14, 8))
+
+# Residuals over time
+axes[0, 0].plot(residuals)
+axes[0, 0].set_title('Residuals Over Time')
+axes[0, 0].set_xlabel('Time')
+axes[0, 0].set_ylabel('Residuals')
+axes[0, 0].grid(True, alpha=0.3)
+
+# Histogram of residuals
+axes[0, 1].hist(residuals, bins=30, edgecolor='black')
+axes[0, 1].set_title('Histogram of Residuals')
+axes[0, 1].set_xlabel('Residuals')
+axes[0, 1].set_ylabel('Frequency')
+axes[0, 1].grid(True, alpha=0.3)
+
+# ACF of residuals
+plot_acf(residuals, lags=40, ax=axes[1, 0])
+axes[1, 0].set_title('ACF of Residuals')
+
+# Q-Q plot
+from scipy import stats
+stats.probplot(residuals, dist="norm", plot=axes[1, 1])
+axes[1, 1].set_title('Q-Q Plot')
+axes[1, 1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+print("\n=== Sunspots SARIMAX Forecast Complete ===")
+print(f"Forecast period: {test.index[0]} to {test.index[-1]}")
+print(f"MAPE: {mape:.2f}%")
+print(f"Number of forecasted points: {len(forecast)}")

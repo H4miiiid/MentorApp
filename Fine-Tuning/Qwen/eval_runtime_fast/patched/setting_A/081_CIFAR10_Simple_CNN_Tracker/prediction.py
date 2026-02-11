@@ -1,0 +1,96 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import json
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.utils import to_categorical
+
+# Load CIFAR-10 dataset
+(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
+
+
+if FAST_EVAL:
+    try:
+        x_train = x_train[:512]; y_train = y_train[:512]
+        x_test  = x_test[:128]; y_test  = y_test[:128]
+    except Exception:
+        pass
+
+# Normalize pixel values to [0, 1]
+x_train = x_train.astype('float32') / 255.0
+x_test = x_test.astype('float32') / 255.0
+
+# Convert labels to one-hot encoding
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
+
+# Build a simple CNN model
+model = keras.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.Flatten(),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(10, activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Train the model and capture history
+print("Training the CNN model on CIFAR-10...")
+history = model.fit(x_train, y_train,
+                    epochs=1,
+                    batch_size=64,
+                    validation_data=(x_test, y_test),
+                    verbose=1)
+
+# Extract epoch-wise metrics
+epoch_metrics = []
+for epoch in range(len(history.history['accuracy'])):
+    epoch_data = {
+        'epoch': epoch + 1,
+        'train_accuracy': float(history.history['accuracy'][epoch]),
+        'train_loss': float(history.history['loss'][epoch]),
+        'val_accuracy': float(history.history['val_accuracy'][epoch]),
+        'val_loss': float(history.history['val_loss'][epoch])
+    }
+    epoch_metrics.append(epoch_data)
+
+# Save metrics to JSON file
+with open('cifar10_metrics.json', 'w') as f:
+    json.dump(epoch_metrics, f, indent=2)
+
+print("\nMetrics saved to cifar10_metrics.json")
+
+# Generate line plot of accuracy over epochs
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['accuracy'], label='Training Accuracy', marker='o')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy', marker='s')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.title('CIFAR-10 CNN Training: Accuracy over Epochs')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.savefig('cifar10_accuracy_plot.png')
+print('[FAST_EVAL] plt.show() skipped')
+
+print("Accuracy plot saved to cifar10_accuracy_plot.png")
+
+# Evaluate final model performance
+test_loss, test_accuracy = model.evaluate(x_test, y_test, verbose=0)
+print(f"\nFinal Test Accuracy: {test_accuracy:.4f}")
+print(f"Final Test Loss: {test_loss:.4f}")

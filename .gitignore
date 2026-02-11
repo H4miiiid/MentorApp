@@ -6,8 +6,6 @@ outputs/
 *.gguf
 *.safetensors
 
-Qwen/
-unsloth_compiled_cache
 
 # local model artifacts (do not commit)
 lora_adapter/

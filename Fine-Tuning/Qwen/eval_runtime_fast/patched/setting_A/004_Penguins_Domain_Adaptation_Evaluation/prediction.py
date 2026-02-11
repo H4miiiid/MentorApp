@@ -1,0 +1,153 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load penguins dataset (using seaborn's built-in dataset via URL)
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+df = pd.read_csv(url)
+
+# Drop rows with missing values
+df = df.dropna()
+
+# Select features and target
+# Features: bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g
+# Target: species
+feature_cols = ['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']
+X = df[feature_cols].values
+y = df['species'].values
+islands = df['island'].values
+
+# Encode species labels
+le = LabelEncoder()
+y_encoded = le.fit_transform(y)
+
+# Split data into two domains based on island
+# Domain 1 (source): Biscoe island
+# Domain 2 (target): Torgersen and Dream islands combined
+source_mask = islands == 'Biscoe'
+target_mask = (islands == 'Torgersen') | (islands == 'Dream')
+
+X_source = X[source_mask]
+y_source = y_encoded[source_mask]
+
+X_target = X[target_mask]
+y_target = y_encoded[target_mask]
+
+print(f"Source domain (Biscoe) samples: {len(X_source)}")
+print(f"Target domain (Torgersen+Dream) samples: {len(X_target)}")
+
+# Standardize features
+scaler = StandardScaler()
+X_source_scaled = scaler.fit_transform(X_source)
+X_target_scaled = scaler.transform(X_target)
+
+# Train classifier on source domain without adaptation
+clf_no_adapt = LogisticRegression(random_state=42, max_iter=1000)
+clf_no_adapt.fit(X_source_scaled, y_source)
+
+# Evaluate on target domain without adaptation
+y_pred_no_adapt = clf_no_adapt.predict(X_target_scaled)
+accuracy_no_adapt = accuracy_score(y_target, y_pred_no_adapt)
+print(f"\nAccuracy without domain adaptation: {accuracy_no_adapt:.4f}")
+
+# Domain adaptation via importance weighting
+# Estimate density ratio: p_target(x) / p_source(x)
+# We'll use a simple approach: train a domain classifier to distinguish source from target
+# Then use predicted probabilities to compute importance weights
+
+# Create domain labels: 0 for source, 1 for target
+X_combined = np.vstack([X_source_scaled, X_target_scaled])
+domain_labels = np.hstack([np.zeros(len(X_source_scaled)), np.ones(len(X_target_scaled))])
+
+# Train domain classifier
+domain_clf = LogisticRegression(random_state=42, max_iter=1000)
+domain_clf.fit(X_combined, domain_labels)
+
+# Predict probability of being from target domain for source samples
+prob_target_given_source = domain_clf.predict_proba(X_source_scaled)[:, 1]
+prob_source_given_source = domain_clf.predict_proba(X_source_scaled)[:, 0]
+
+# Compute importance weights: w(x) = p_target(x) / p_source(x)
+# Using the domain classifier probabilities:
+# w(x) ≈ P(D=1|x) / P(D=0|x) where D is domain label
+epsilon = 1e-10  # Small constant to avoid division by zero
+importance_weights = (prob_target_given_source + epsilon) / (prob_source_given_source + epsilon)
+
+# Clip weights to avoid extreme values
+importance_weights = np.clip(importance_weights, 0.1, 10.0)
+
+# Normalize weights
+importance_weights = importance_weights / importance_weights.sum() * len(importance_weights)
+
+print(f"\nImportance weights - min: {importance_weights.min():.4f}, max: {importance_weights.max():.4f}, mean: {importance_weights.mean():.4f}")
+
+# Train classifier on source domain with importance weighting
+clf_adapt = LogisticRegression(random_state=42, max_iter=1000)
+clf_adapt.fit(X_source_scaled, y_source, sample_weight=importance_weights)
+
+# Evaluate on target domain with adaptation
+y_pred_adapt = clf_adapt.predict(X_target_scaled)
+accuracy_adapt = accuracy_score(y_target, y_pred_adapt)
+print(f"Accuracy with domain adaptation: {accuracy_adapt:.4f}")
+
+# Compare results
+print(f"\n=== Domain Adaptation Results ===")
+print(f"Accuracy improvement: {accuracy_adapt - accuracy_no_adapt:.4f}")
+print(f"Relative improvement: {((accuracy_adapt - accuracy_no_adapt) / accuracy_no_adapt * 100):.2f}%")
+
+# Visualization: Compare accuracies
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Plot 1: Accuracy comparison
+ax1 = axes[0]
+methods = ['No Adaptation', 'With Adaptation']
+accuracies = [accuracy_no_adapt, accuracy_adapt]
+colors = ['#FF6B6B', '#4ECDC4']
+bars = ax1.bar(methods, accuracies, color=colors, alpha=0.7, edgecolor='black')
+ax1.set_ylabel('Accuracy', fontsize=12)
+ax1.set_title('Domain Adaptation Performance Comparison', fontsize=14, fontweight='bold')
+ax1.set_ylim([0, 1])
+ax1.grid(axis='y', alpha=0.3)
+
+# Add value labels on bars
+for bar, acc in zip(bars, accuracies):
+    height = bar.get_height()
+    ax1.text(bar.get_x() + bar.get_width()/2., height,
+             f'{acc:.4f}',
+             ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+# Plot 2: Importance weights distribution
+ax2 = axes[1]
+ax2.hist(importance_weights, bins=20, color='#95E1D3', alpha=0.7, edgecolor='black')
+ax2.set_xlabel('Importance Weight', fontsize=12)
+ax2.set_ylabel('Frequency', fontsize=12)
+ax2.set_title('Distribution of Importance Weights', fontsize=14, fontweight='bold')
+ax2.axvline(importance_weights.mean(), color='red', linestyle='--', linewidth=2, label=f'Mean: {importance_weights.mean():.2f}')
+ax2.legend()
+ax2.grid(axis='y', alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('domain_adaptation_results.png', dpi=100, bbox_inches='tight')
+print("\nVisualization saved as 'domain_adaptation_results.png'")
+print('[FAST_EVAL] plt.show() skipped')
+
+# Summary
+print("\n=== Summary ===")
+print(f"Source domain: Biscoe island ({len(X_source)} samples)")
+print(f"Target domain: Torgersen + Dream islands ({len(X_target)} samples)")
+print(f"Baseline accuracy (no adaptation): {accuracy_no_adapt:.4f}")
+print(f"Adapted accuracy (importance weighting): {accuracy_adapt:.4f}")
+print(f"Improvement: {accuracy_adapt - accuracy_no_adapt:.4f}")
+print("\nDomain adaptation via importance weighting completed successfully!")
