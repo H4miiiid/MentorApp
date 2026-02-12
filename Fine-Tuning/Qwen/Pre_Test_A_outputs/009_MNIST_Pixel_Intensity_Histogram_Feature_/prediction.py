@@ -1,0 +1,144 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load MNIST dataset
+print("Loading MNIST dataset...")
+mnist = fetch_openml('mnist_784', version=1, parser='auto')
+X = mnist.data.to_numpy() if hasattr(mnist.data, 'to_numpy') else np.array(mnist.data)
+y = mnist.target.to_numpy() if hasattr(mnist.target, 'to_numpy') else np.array(mnist.target)
+
+# Convert labels to integers
+y = y.astype(int)
+
+# Use a subset for faster runtime
+subset_size = 10000
+indices = np.random.choice(len(X), subset_size, replace=False)
+X_subset = X[indices]
+y_subset = y[indices]
+
+print(f"Using subset of {subset_size} samples")
+print(f"Original feature shape: {X_subset.shape}")
+
+# Function to create histogram features
+def create_histogram_features(X, num_bins=10):
+    """
+    Create histogram features from pixel intensity values.
+    
+    Parameters:
+    -----------
+    X : array-like, shape (n_samples, n_features)
+        Input pixel data (values typically 0-255)
+    num_bins : int
+        Number of histogram bins
+    
+    Returns:
+    --------
+    hist_features : array, shape (n_samples, num_bins)
+        Histogram features for each image
+    """
+    n_samples = X.shape[0]
+    hist_features = np.zeros((n_samples, num_bins))
+    
+    # Define bin edges from 0 to 255
+    bin_edges = np.linspace(0, 256, num_bins + 1)
+    
+    for i in range(n_samples):
+        # Compute histogram for each image
+        hist, _ = np.histogram(X[i], bins=bin_edges)
+        # Normalize histogram to get frequency distribution
+        hist_features[i] = hist / hist.sum()
+    
+    return hist_features
+
+# Create histogram features
+num_bins = 10
+print(f"\nCreating histogram features with {num_bins} bins...")
+hist_features = create_histogram_features(X_subset, num_bins=num_bins)
+print(f"Histogram features shape: {hist_features.shape}")
+
+# Combine original features with histogram features
+X_combined = np.hstack([X_subset, hist_features])
+print(f"Combined features shape: {X_combined.shape}")
+
+# Split data into train and test sets
+X_train_raw, X_test_raw, y_train, y_test = train_test_split(
+    X_subset, y_subset, test_size=0.2, random_state=42
+)
+
+X_train_combined, X_test_combined, _, _ = train_test_split(
+    X_combined, y_subset, test_size=0.2, random_state=42
+)
+
+print("\nTraining baseline model (raw pixels only)...")
+# Baseline model: Random Forest with raw pixels only
+baseline_model = RandomForestClassifier(
+    n_estimators=50, max_depth=20, random_state=42, n_jobs=-1
+)
+baseline_model.fit(X_train_raw, y_train)
+y_pred_baseline = baseline_model.predict(X_test_raw)
+baseline_accuracy = accuracy_score(y_test, y_pred_baseline)
+print(f"Baseline model accuracy: {baseline_accuracy:.4f}")
+
+print("\nTraining enhanced model (raw pixels + histogram features)...")
+# Enhanced model: Random Forest with combined features
+enhanced_model = RandomForestClassifier(
+    n_estimators=50, max_depth=2, random_state=42, n_jobs=-1
+)
+enhanced_model.fit(X_train_combined, y_train)
+y_pred_enhanced = enhanced_model.predict(X_test_combined)
+enhanced_accuracy = accuracy_score(y_test, y_pred_enhanced)
+print(f"Enhanced model accuracy: {enhanced_accuracy:.4f}")
+
+# Compare accuracies
+print(f"\nAccuracy improvement: {enhanced_accuracy - baseline_accuracy:.4f}")
+
+# Extract feature importance for histogram bins
+# The last num_bins features correspond to histogram bins
+feature_importances = enhanced_model.feature_importances_
+histogram_importances = feature_importances[-num_bins:]
+
+print(f"\nHistogram feature importances:")
+for i, importance in enumerate(histogram_importances):
+    print(f"  Bin {i}: {importance:.6f}")
+
+# Visualize feature importance of histogram bins
+plt.figure(figsize=(10, 6))
+plt.bar(range(num_bins), histogram_importances, color='steelblue', edgecolor='black')
+plt.xlabel('Histogram Bin', fontsize=12)
+plt.ylabel('Feature Importance', fontsize=12)
+plt.title('Feature Importance of Pixel Intensity Histogram Bins', fontsize=14)
+plt.xticks(range(num_bins))
+plt.grid(axis='y', alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Visualize comparison of model accuracies
+plt.figure(figsize=(8, 6))
+models = ['Baseline\n(Raw Pixels)', 'Enhanced\n(Raw + Histogram)']
+accuracies = [baseline_accuracy, enhanced_accuracy]
+colors = ['coral', 'mediumseagreen']
+
+plt.bar(models, accuracies, color=colors, edgecolor='black', alpha=0.8)
+plt.ylabel('Accuracy', fontsize=12)
+plt.title('Model Accuracy Comparison', fontsize=14)
+plt.ylim([0, 1])
+plt.grid(axis='y', alpha=0.3)
+
+# Add accuracy values on top of bars
+for i, (model, acc) in enumerate(zip(models, accuracies)):
+    plt.text(i, acc + 0.01, f'{acc:.4f}', ha='center', fontsize=11, fontweight='bold')
+
+plt.tight_layout()
+plt.show()
+
+print("\nFeature engineering complete!")
+print(f"Total features in enhanced model: {X_combined.shape[1]}")
+print(f"  - Raw pixel features: {X_subset.shape[1]}")
+print(f"  - Histogram features: {num_bins}")

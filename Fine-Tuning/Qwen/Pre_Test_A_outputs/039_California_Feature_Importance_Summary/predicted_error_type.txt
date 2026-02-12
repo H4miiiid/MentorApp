@@ -1,0 +1,1 @@
+The bug in the original code was that the test size was set to 1.5, which is not a valid value for the test_size parameter in train_test_split. The test size should be a float between 0 and 1, representing the proportion of the dataset to include in the test split. The corrected code sets the test size to 0.2, which is a valid value.

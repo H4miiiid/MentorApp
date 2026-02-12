@@ -1,0 +1,1 @@
+The original bug type was that the training set size was printed as `X_train.shape[5]` instead of `X_train.shape[0]`.

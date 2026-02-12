@@ -1,4 +1,5 @@
 .venv
+.env
 
 # local model artifacts (do not commit)
 lora_adapter/

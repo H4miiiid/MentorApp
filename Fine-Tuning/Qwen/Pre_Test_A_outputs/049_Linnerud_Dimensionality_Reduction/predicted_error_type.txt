@@ -1,0 +1,1 @@
+Incorrect use of `scattter` instead of `scatter` in the visualization step.

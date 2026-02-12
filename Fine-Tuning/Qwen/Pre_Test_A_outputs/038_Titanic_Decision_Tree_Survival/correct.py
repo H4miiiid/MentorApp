@@ -1,0 +1,131 @@
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, classification_report
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the Titanic dataset from seaborn
+titanic = sns.load_dataset('titanic')
+
+# Display basic information about the dataset
+print("Dataset shape:", titanic.shape)
+print("\nFirst few rows:")
+print(titanic.head())
+print("\nDataset info:")
+print(titanic.info())
+print("\nMissing values:")
+print(titanic.isnull().sum())
+
+# Select relevant features for prediction
+# We'll use: pclass, sex, age, sibsp, parch, fare, embarked
+features = ['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'embarked']
+target = 'survived'
+
+# Create a copy of the dataset with selected features
+df = titanic[features + [target]].copy()
+
+# Handle missing values
+# Fill missing age with median
+df['age'].fillna(df['age'].median(), inplace=True)
+# Fill missing fare with median
+df['fare'].fillna(df['fare'].median(), inplace=True)
+# Fill missing embarked with mode
+df['embarked'].fillna(df['embarked'].mode()[0], inplace=True)
+
+# Verify no missing values remain
+print("\nMissing values after imputation:")
+print(df.isnull().sum())
+
+# Encode categorical variables
+label_encoders = {}
+for col in ['sex', 'embarked']:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+
+print("\nEncoded dataset:")
+print(df.head())
+
+# Prepare features and target
+X = df[features]
+y = df[target]
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print("\nTraining set size:", X_train.shape)
+print("Testing set size:", X_test.shape)
+
+# Create and train the decision tree classifier
+dt_classifier = DecisionTreeClassifier(
+    max_depth=5,
+    min_samples_split=10,
+    min_samples_leaf=5,
+    random_state=42
+)
+
+dt_classifier.fit(X_train, y_train)
+
+# Make predictions
+y_train_pred = dt_classifier.predict(X_train)
+y_test_pred = dt_classifier.predict(X_test)
+
+# Evaluate the model
+train_accuracy = accuracy_score(y_train, y_train_pred)
+test_accuracy = accuracy_score(y_test, y_test_pred)
+
+print("\n" + "="*50)
+print("Model Performance")
+print("="*50)
+print(f"Training Accuracy: {train_accuracy:.4f}")
+print(f"Testing Accuracy: {test_accuracy:.4f}")
+print("\nClassification Report (Test Set):")
+print(classification_report(y_test, y_test_pred, target_names=['Not Survived', 'Survived']))
+
+# Get feature importances
+feature_importances = pd.DataFrame({
+    'feature': features,
+    'importance': dt_classifier.feature_importances_
+}).sort_values('importance', ascending=False)
+
+print("\nFeature Importances:")
+print(feature_importances)
+
+# Visualize the decision tree structure
+fig, ax = plt.subplots(figsize=(20, 10))
+plot_tree(
+    dt_classifier,
+    feature_names=features,
+    class_names=['Not Survived', 'Survived'],
+    filled=True,
+    rounded=True,
+    ax=ax,
+    fontsize=10
+)
+plt.title('Decision Tree Structure for Titanic Survival Prediction', fontsize=16, pad=20)
+plt.tight_layout()
+plt.savefig('decision_tree_structure.png', dpi=150, bbox_inches='tight')
+plt.show()
+
+# Visualize feature importances
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.barh(feature_importances['feature'], feature_importances['importance'], color='steelblue')
+ax.set_xlabel('Importance', fontsize=12)
+ax.set_ylabel('Feature', fontsize=12)
+ax.set_title('Feature Importance in Decision Tree', fontsize=14, pad=15)
+ax.invert_yaxis()
+for i, v in enumerate(feature_importances['importance']):
+    ax.text(v + 0.01, i, f'{v:.3f}', va='center', fontsize=10)
+plt.tight_layout()
+plt.savefig('feature_importance.png', dpi=150, bbox_inches='tight')
+plt.show()
+
+print("\nVisualization complete. Decision tree structure and feature importance plots saved.")

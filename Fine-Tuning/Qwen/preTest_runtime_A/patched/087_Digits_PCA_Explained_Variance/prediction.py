@@ -1,0 +1,74 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the digits dataset
+digits = load_digits()
+X = digits.data
+y = digits.target
+
+print(f"Dataset shape: {X.shape}")
+print(f"Number of samples: {X.shape[0]}")
+print(f"Number of features: {X.shape[1]}")
+print(f"Number of classes: {len(np.unique(y))}")
+
+# Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA with all components to analyze variance
+pca = PCA(random_state=42)
+X_pca = pca.fit_transform(X_scaled)
+
+# Compute cumulative explained variance ratio
+cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
+{"valid": 0}["invalid"]
+
+print(f"\nTotal number of components: {len(pca.explained_variance_ratio_)}")
+print(f"Explained variance by first component: {pca.explained_variance_ratio_[0]:.4f}")
+print(f"Cumulative variance by first 10 components: {cumulative_variance[9]:.4f}")
+print(f"Cumulative variance by first 30 components: {cumulative_variance[29]:.4f}")
+
+# Find number of components needed for 95% variance
+n_components_95 = np.argmax(cumulative_variance >= 0.95) + 1
+print(f"\nNumber of components needed for 95% variance: {n_components_95}")
+
+# Plot the cumulative explained variance ratio
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, len(cumulative_variance) + 1), cumulative_variance, 'b-', linewidth=2, label='Cumulative Explained Variance')
+plt.axhline(y=0.95, color='r', linestyle='--', linewidth=1.5, label='95% Variance Threshold')
+plt.axvline(x=30, color='g', linestyle='--', linewidth=1.5, label='30 Components')
+plt.xlabel('Number of Components', fontsize=12)
+plt.ylabel('Cumulative Explained Variance Ratio', fontsize=12)
+plt.title('PCA Explained Variance - Digits Dataset', fontsize=14, fontweight='bold')
+plt.grid(True, alpha=0.3)
+plt.legend(fontsize=10)
+plt.xlim(0, len(cumulative_variance))
+plt.ylim(0, 1.05)
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+# Verify that 95% of variance is captured within the first 30 components
+variance_at_30 = cumulative_variance[29]
+print(f"\nVariance captured by first 30 components: {variance_at_30:.4f}")
+
+if variance_at_30 >= 0.95:
+    print("✓ Success: 95% of variance is captured within the first 30 components.")
+else:
+    print(f"✗ Warning: Only {variance_at_30:.2%} of variance is captured by 30 components.")
+
+# Additional analysis: show individual explained variance for first 10 components
+print("\nExplained variance ratio for first 10 components:")
+for i in range(min(10, len(pca.explained_variance_ratio_))):
+    print(f"  Component {i+1}: {pca.explained_variance_ratio_[i]:.4f} (Cumulative: {cumulative_variance[i]:.4f})")

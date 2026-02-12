@@ -1,0 +1,1 @@
+The original bug type was that the code was not properly formatted and contained unnecessary comments and print statements.

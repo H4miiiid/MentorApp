@@ -1,0 +1,1 @@
+The original bug type was that the GridSearchCV was not performing cross-validation properly, as it was set to cv=1, which means it was not splitting the data into multiple folds for validation. This led to an overestimation of the model's performance.

@@ -1,0 +1,97 @@
+Corrected code:
+```python
+import numpy as np
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the California housing dataset
+print("Loading California housing dataset...")
+housing = fetch_california_housing()
+X = housing.data
+y = housing.target
+
+print(f"Dataset shape: {X.shape}")
+print(f"Target shape: {y.shape}")
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print(f"Training set size: {X_train.shape[0]}")
+print(f"Test set size: {X_test.shape[0]}")
+
+# Define the parameter distribution for RandomizedSearchCV
+param_distributions = {
+    'learning_rate': [0.01, 0.05, 0.1, 0.2],
+    'n_estimators': [50, 100, 150, 200],
+    'max_depth': [3, 4, 5, 6, 7]
+}
+
+print("\nSetting up RandomizedSearchCV...")
+
+# Create the base model
+base_model = GradientBoostingRegressor(random_state=42)
+
+# Set up RandomizedSearchCV
+# Using a modest number of iterations to keep runtime reasonable
+random_search = RandomizedSearchCV(
+    estimator=base_model,
+    param_distributions=param_distributions,
+    n_iter=10,  # Number of parameter settings sampled
+    cv=3,  # 3-fold cross-validation
+    scoring='neg_mean_squared_error',
+    random_state=42,
+    n_jobs=-1,  # Use all available cores
+    verbose=1
+)
+
+# Fit the random search
+print("\nPerforming hyperparameter search...")
+random_search.fit(X_train, y_train)
+
+# Get the best hyperparameters
+best_params = random_search.best_params_
+print("\n" + "="*50)
+print("Best Hyperparameters:")
+print("="*50)
+for param, value in best_params.items():
+    print(f"{param}: {value}")
+
+# Get the best model
+best_model = random_search.best_estimator_
+
+# Make predictions on the test set
+y_pred = best_model.predict(X_test)
+
+# Calculate test RMSE
+test_mse = mean_squared_error(y_test, y_pred)
+test_rmse = np.sqrt(test_mse)
+
+print("\n" + "="*50)
+print("Model Performance:")
+print("="*50)
+print(f"Test RMSE: {test_rmse:.4f}")
+print(f"Best CV Score (neg MSE): {random_search.best_score_:.4f}")
+print(f"Best CV RMSE: {np.sqrt(-random_search.best_score_):.4f}")
+
+# Display feature importances (optional but informative)
+feature_names = housing.feature_names
+feature_importances = best_model.feature_importances_
+
+print("\n" + "="*50)
+print("Feature Importances:")
+print("="*50)
+for name, importance in sorted(zip(feature_names, feature_importances), 
+                               key=lambda x: x[1], reverse=True):
+    print(f"{name}: {importance:.4f}")
+
+print("\nHyperparameter search and model evaluation complete!")
+```
+Error type:
+The original bug type was that the code was trying to access the 10000th element of the test set (`X_test[9999]`) which does not exist. The corrected code uses `X_test` instead of `X_test[9999]` to make predictions on the entire test set.

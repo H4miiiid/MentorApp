@@ -1,0 +1,1 @@
+The original bug type was that the code was trying to access the third column of the predicted probabilities array `y_pred_proba[:, 2]`, which does not exist. The correct column index for the positive class (class 1) in a binary classification problem is `1`.

@@ -1,0 +1,1 @@
+The original bug type was that the code was not handling missing values in the 'age' column properly.

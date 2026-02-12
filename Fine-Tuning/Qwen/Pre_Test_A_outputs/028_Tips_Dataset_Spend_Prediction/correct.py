@@ -1,0 +1,101 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the tips dataset from seaborn
+tips = sns.load_dataset('tips')
+
+# Display basic information about the dataset
+print("Tips Dataset Shape:", tips.shape)
+print("\nFirst few rows:")
+print(tips.head())
+print("\nDataset Info:")
+print(tips.info())
+print("\nMissing values:")
+print(tips.isnull().sum())
+
+# Separate features and target
+# Target: tip
+# Features: total_bill and other features (sex, smoker, day, time, size)
+X = tips.drop('tip', axis=1)
+y = tips['tip']
+
+print("\nFeatures before encoding:")
+print(X.head())
+
+# Perform one-hot encoding for categorical variables
+# Categorical columns: sex, smoker, day, time
+categorical_cols = ['sex', 'smoker', 'day', 'time']
+X_encoded = pd.get_dummies(X, columns=categorical_cols, drop_first=True)
+
+print("\nFeatures after one-hot encoding:")
+print(X_encoded.head())
+print("\nEncoded feature columns:", X_encoded.columns.tolist())
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_encoded, y, test_size=0.2, random_state=42
+)
+
+print("\nTraining set size:", X_train.shape[0])
+print("Testing set size:", X_test.shape[0])
+
+# Build and train the linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+print("\nModel trained successfully.")
+print("Model coefficients:", model.coef_)
+print("Model intercept:", model.intercept_)
+
+# Make predictions on the test set
+y_pred = model.predict(X_test)
+
+# Calculate and report Mean Absolute Error (MAE)
+mae = mean_absolute_error(y_test, y_pred)
+print("\nMean Absolute Error (MAE) on test set:", mae)
+
+# Calculate residuals
+residuals = y_test - y_pred
+
+# Plot residuals
+plt.figure(figsize=(10, 6))
+
+# Residual plot: residuals vs predicted values
+plt.subplot(1, 2, 1)
+plt.scatter(y_pred, residuals, alpha=0.6, edgecolors='k')
+plt.axhline(y=0, color='r', linestyle='--', linewidth=2)
+plt.xlabel('Predicted Tip Amount')
+plt.ylabel('Residuals')
+plt.title('Residual Plot')
+plt.grid(True, alpha=0.3)
+
+# Histogram of residuals
+plt.subplot(1, 2, 2)
+plt.hist(residuals, bins=20, edgecolor='black', alpha=0.7)
+plt.xlabel('Residuals')
+plt.ylabel('Frequency')
+plt.title('Distribution of Residuals')
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# Additional visualization: Actual vs Predicted
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred, alpha=0.6, edgecolors='k')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+plt.xlabel('Actual Tip Amount')
+plt.ylabel('Predicted Tip Amount')
+plt.title('Actual vs Predicted Tip Amount')
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print("\nModel evaluation complete. Residual plots generated.")

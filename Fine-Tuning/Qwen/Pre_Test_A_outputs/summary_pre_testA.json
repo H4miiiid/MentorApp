@@ -1,0 +1,882 @@
+[
+  {
+    "sid": "000_Titanic_Missing_Age_Imputation_using_Sim",
+    "error_type": "NameError: The variable 'accuracy_no_imput' is referenced but not defined. || line: print(f\"\\nAccuracy WITHOUT imputation: {accuracy_no_imput:.4f}\")",
+    "status": "OK",
+    "latency_s": 9.075,
+    "A_len": 5493,
+    "incorrect_len": 5492,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "001_CIFAR-10_Deep_CNN_Data_Augmentation",
+    "error_type": "NameError: This occurs because 'histroy' is referenced but not defined. || line: ax1.plot(histroy.history['accuracy'], label='Train Accuracy')",
+    "status": "OK",
+    "latency_s": 5.74,
+    "A_len": 32,
+    "incorrect_len": 4905,
+    "A_sim_to_ref": 0.0,
+    "predicted_error_type": "...one short line describing the original bug type..."
+  },
+  {
+    "sid": "002_Digits_Misclassification_Report",
+    "error_type": "LogicError: The script reports training accuracy instead of test accuracy, misleading the evaluation. || line: print(f\"Accuracy: {knn.score(X_train, y_train):.4f}\")",
+    "status": "OK",
+    "latency_s": 5.33,
+    "A_len": 2845,
+    "incorrect_len": 2847,
+    "A_sim_to_ref": 0.9994728518713759,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "003_Titanic_Age_Imputation_Test",
+    "error_type": "SyntaxError: Missing colon after if statement causes a syntax error. || line: if accuracy_diff < 0.01",
+    "status": "OK",
+    "latency_s": 4.636,
+    "A_len": 3171,
+    "incorrect_len": 3170,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "The original bug type was that the code was not handling missing values in the 'age' column properly."
+  },
+  {
+    "sid": "004_Penguins_Domain_Adaptation_Evaluation",
+    "error_type": "KeyError: Accessing a non-existent column in the DataFrame raises a KeyError. || line: feature_cols = ['bill_length', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']",
+    "status": "OK",
+    "latency_s": 7.317,
+    "A_len": 5948,
+    "incorrect_len": 5945,
+    "A_sim_to_ref": 0.9999159451962679,
+    "predicted_error_type": "The original bug type was a typo in the feature column names. The corrected code uses the correct column names for the features."
+  },
+  {
+    "sid": "005_Reuters_Topic_Frequency_Plot",
+    "error_type": "NameError: The variable 'total_articls' is not defined. || line: print(f\"Total number of articles: {total_articls}\")",
+    "status": "OK",
+    "latency_s": 3.425,
+    "A_len": 2156,
+    "incorrect_len": 2155,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "006_Wine_Dataset_Outlier_Detection",
+    "error_type": "ValueError: The contamination value is out of the allowed range (0, 0.5]. || line: isolation_forest = IsolationForest(contamination=1.5, random_state=42)",
+    "status": "OK",
+    "latency_s": 6.091,
+    "A_len": 2629,
+    "incorrect_len": 2629,
+    "A_sim_to_ref": 0.9998098497813273,
+    "predicted_error_type": "The bug in the original code was that the contamination parameter was set to 1.5, which is not a valid value. The contamination parameter should be a float between 0 and 1, representing the proportion of outliers expected in the dataset. The corrected code sets the contamination parameter to 0.1, which is a valid value."
+  },
+  {
+    "sid": "007_Wine_Alcohol_Content_Decision_Tree",
+    "error_type": "SyntaxError: Missing closing parenthesis causes a syntax error. || line: plt.scatter(y_test, y_pred, alpha=0.7, edgecolors='k'",
+    "status": "OK",
+    "latency_s": 2.466,
+    "A_len": 1718,
+    "incorrect_len": 1717,
+    "A_sim_to_ref": 0.9997090485888857,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "008_Breast_Cancer_SVM_Classifier",
+    "error_type": "IndexError: Accessing column index 2 which is out of bounds for the 2-column array. || line: plt.scatter(X_train_2d[:, 0], X_train_2d[:, 2], c=y_train, cmap='RdYlBu', edgecolors='k', s=50, alpha=0.7)",
+    "status": "OK",
+    "latency_s": 5.987,
+    "A_len": 4340,
+    "incorrect_len": 4340,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "Incorrect use of `plt.scatter` in the visualization section."
+  },
+  {
+    "sid": "009_MNIST_Pixel_Intensity_Histogram_Feature_",
+    "error_type": "ImportError: The import fails because the sklearn module path is misspelled. || line: from sklearn.ensembl import RandomForestClassifier",
+    "status": "OK",
+    "latency_s": 9.592,
+    "A_len": 5112,
+    "incorrect_len": 5112,
+    "A_sim_to_ref": 0.9999022004889976,
+    "predicted_error_type": "The original bug type was that the `RandomForestClassifier` was not imported correctly. The correct import statement should be `from sklearn.ensemble import RandomForestClassifier`."
+  },
+  {
+    "sid": "010_MNIST_Digit_Distribution_Check",
+    "error_type": "SyntaxError: Missing closing parenthesis causes a syntax error. || line: plt.show(",
+    "status": "OK",
+    "latency_s": 2.349,
+    "A_len": 1905,
+    "incorrect_len": 1905,
+    "A_sim_to_ref": 0.9997376016793492,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "011_Tips_Dataset_Tip_Amount_Forecast",
+    "error_type": "AttributeError: LinearRegression object has no attribute 'coefs_' || line: print(\"Model coefficients shape:\", model.coefs_.shape)",
+    "status": "OK",
+    "latency_s": 3.708,
+    "A_len": 2548,
+    "incorrect_len": 2549,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "012_Fashion_MNIST_CNN_Early_Stopping",
+    "error_type": "ValueError: Keras raises a ValueError because batch_size must be a positive integer. || line:     batch_size=0,",
+    "status": "OK",
+    "latency_s": 4.891,
+    "A_len": 3763,
+    "incorrect_len": 3737,
+    "A_sim_to_ref": 0.982138096507598,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "013_Digits_Classification_using_Convolutiona",
+    "error_type": "NameError: The variable 'encodr' is not defined, causing a NameError. || line: X_train_encoded = encodr.predict(X_train, verbose=0)",
+    "status": "OK",
+    "latency_s": 8.752,
+    "A_len": 6207,
+    "incorrect_len": 6207,
+    "A_sim_to_ref": 0.9999194522754732,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "014_IMDB_Sentiment_Analysis_using_LSTM",
+    "error_type": "NameError: The variable 'roc_au' is not defined. || line: print(f\"ROC AUC Score: {roc_au:.4f}\")",
+    "status": "OK",
+    "latency_s": 4.53,
+    "A_len": 3735,
+    "incorrect_len": 3734,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "015_Fashion_MNIST_Class_Balance_Check",
+    "error_type": "AttributeError: The call fails because 'matplotlib.pyplot' has no attribute 'barr'. || line: plt.barr(unique_classes, class_percentages, color='steelblue', edgecolor='black')",
+    "status": "OK",
+    "latency_s": 2.727,
+    "A_len": 2158,
+    "incorrect_len": 2159,
+    "A_sim_to_ref": 0.9997683576557794,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "016_IMDB_Sentiment_Analysis_Naive_Bayes",
+    "error_type": "KeyError: Accessing reverse_word_index with a missing key raises a KeyError. || line: return ' '.join([reverse_word_index[i - 3] for i in encoded_review])",
+    "status": "OK",
+    "latency_s": 7.531,
+    "A_len": 3221,
+    "incorrect_len": 3212,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "017_Reuters_News_Topic_Classification",
+    "error_type": "TypeError: model.fit missing required positional argument 'y' || line: history = model.fit(",
+    "status": "OK",
+    "latency_s": 4.1,
+    "A_len": 3129,
+    "incorrect_len": 3112,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "018_Digits_CNN_with_Data_Augmentation",
+    "error_type": "SyntaxError: Missing colon in function definition causes invalid syntax || line: def create_dense_model()",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 8.734,
+    "A_len": 0,
+    "incorrect_len": 7339,
+    "A_sim_to_ref": null,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "019_Titanic_Survival_Ensemble_Stacking",
+    "error_type": "ValueError: test_size must be between 0 and 1. || line:         X, y, test_size=1.5, random_state=42, stratify=y",
+    "status": "OK",
+    "latency_s": 5.57,
+    "A_len": 3873,
+    "incorrect_len": 3873,
+    "A_sim_to_ref": 0.9998709177746224,
+    "predicted_error_type": "Incorrect test_size value"
+  },
+  {
+    "sid": "020_Breast_Cancer_Feature_Selection",
+    "error_type": "AttributeError: Attempted to call a non\u2011existent attribute on matplotlib.pyplot. || line: plt.shwo()",
+    "status": "OK",
+    "latency_s": 9.489,
+    "A_len": 5148,
+    "incorrect_len": 5148,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "021_Breast_Cancer_Neural_Network",
+    "error_type": "TypeError: Keras expects an integer for batch_size but got a string || line:     batch_size='32',",
+    "status": "OK",
+    "latency_s": 4.018,
+    "A_len": 3468,
+    "incorrect_len": 3470,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "022_Titanic_Survival_Prediction_Simple",
+    "error_type": "KeyError: Attempting to access a missing column in the DataFrame raises a KeyError. || line: X = df[features]",
+    "status": "OK",
+    "latency_s": 3.468,
+    "A_len": 3060,
+    "incorrect_len": 3061,
+    "A_sim_to_ref": 0.9998366280019605,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "023_IMDB_Sentiment_Analysis_with_Naive_Bayes",
+    "error_type": "SyntaxError: Missing closing parenthesis causes a syntax error. || line: plt.show(",
+    "status": "OK",
+    "latency_s": 4.31,
+    "A_len": 3249,
+    "incorrect_len": 3248,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "024_California_Scaling_Impact_Study",
+    "error_type": "KeyError: Accessing a non-existent key in a dictionary raises a KeyError. || line: {\"dummy_key\": 0}[\"missing_key\"]",
+    "status": "OK",
+    "latency_s": 5.705,
+    "A_len": 2785,
+    "incorrect_len": 2817,
+    "A_sim_to_ref": 0.9998204990127446,
+    "predicted_error_type": "SyntaxError: invalid syntax"
+  },
+  {
+    "sid": "025_Diabetes_Progression_LightGBM_Regression",
+    "error_type": "AttributeError: The code attempts to call a non\u2011existent attribute 'barhh' on the matplotlib.pyplot module. || line: plt.barhh(feature_importance_df['feature'], feature_importance_df['importance'])",
+    "status": "OK",
+    "latency_s": 5.461,
+    "A_len": 4449,
+    "incorrect_len": 4450,
+    "A_sim_to_ref": 0.9998876278233509,
+    "predicted_error_type": "The original bug type was that the code was not properly formatted and contained unnecessary comments and print statements."
+  },
+  {
+    "sid": "026_Titanic_Survival_ROC_Curve",
+    "error_type": "NameError: Variable 'roc_au' is not defined when referenced. || line: print(f\"\\nAUC Score: {roc_au:.4f}\")",
+    "status": "OK",
+    "latency_s": 7.714,
+    "A_len": 5042,
+    "incorrect_len": 5041,
+    "A_sim_to_ref": 0.9999008428358949,
+    "predicted_error_type": "Missing import of `roc_auc_score` from `sklearn.metrics`."
+  },
+  {
+    "sid": "027_Iris_Multi-Class_SVM_with_Hyperparameter",
+    "error_type": "ValueError: test_size must be between 0 and 1. || line:     X, y, test_size=1.5, random_state=42, stratify=y",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 9.505,
+    "A_len": 0,
+    "incorrect_len": 2280,
+    "A_sim_to_ref": null,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "028_Tips_Dataset_Spend_Prediction",
+    "error_type": "IndexError: Accessing a tuple index that does not exist causes an IndexError. || line: print(\"\\nTraining set size:\", X_train.shape[5])",
+    "status": "OK",
+    "latency_s": 8.405,
+    "A_len": 2936,
+    "incorrect_len": 2936,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "The original bug type was that the training set size was printed as `X_train.shape[5]` instead of `X_train.shape[0]`."
+  },
+  {
+    "sid": "029_Fashion_MNIST_Dropout_Eval",
+    "error_type": "NameError: The variable 'model_no_dropuot' is not defined, causing a NameError. || line: history_no_dropout = model_no_dropuot.fit(",
+    "status": "OK",
+    "latency_s": 7.813,
+    "A_len": 4899,
+    "incorrect_len": 4899,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "030_Breast_Cancer_Confusion_Matrix_Study",
+    "error_type": "ValueError: train_test_split receives a test_size > 1, causing a ValueError. || line: X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1.5, random_state=42)",
+    "status": "OK",
+    "latency_s": 3.728,
+    "A_len": 2501,
+    "incorrect_len": 2501,
+    "A_sim_to_ref": 0.9996001599360256,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "031_California_Counterfactual_Explainability",
+    "error_type": "SyntaxError: Missing colon after function definition causes a syntax error. || line:                            scaler, learning_rate=0.01, max_iterations=1000)",
+    "status": "OK",
+    "latency_s": 8.649,
+    "A_len": 7910,
+    "incorrect_len": 7910,
+    "A_sim_to_ref": 0.999873593730249,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "032_Breast_Cancer_Diagnosis_using_KNN",
+    "error_type": "KeyError: Accessing a non-existent key in a dictionary triggers a KeyError. || line: print({\"msg\": \"Dataset loaded successfully!\"}[\"missing_key\"])",
+    "status": "OK",
+    "latency_s": 4.09,
+    "A_len": 3226,
+    "incorrect_len": 3250,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "033_Digits_Autoencoder_Reconstruction",
+    "error_type": "AttributeError: The call fails because the Model object has no attribute 'fitt'. || line: history = autoencoder.fitt(",
+    "status": "OK",
+    "latency_s": 3.554,
+    "A_len": 2711,
+    "incorrect_len": 2712,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "034_Iris_Clustering_Agglomerative_Hierarchy",
+    "error_type": "ValueError: n_components=5 exceeds the number of features, causing a ValueError. || line: pca = PCA(n_components=5, random_state=42)",
+    "status": "OK",
+    "latency_s": 4.371,
+    "A_len": 3520,
+    "incorrect_len": 3520,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "035_IMDB_Sentiment_Classification_Naive_Baye",
+    "error_type": "SyntaxError: Missing closing parenthesis causes a syntax error. || line: print(f\"Training samples: {X_train.shape[0]}\")",
+    "status": "OK",
+    "latency_s": 4.195,
+    "A_len": 3405,
+    "incorrect_len": 3404,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "036_Wine_Quality_Binary_Classification_with_",
+    "error_type": "ImportError: The import fails because the sklearn module path is misspelled. || line: from sklearn.metrcs import accuracy_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay",
+    "status": "OK",
+    "latency_s": 2.717,
+    "A_len": 2069,
+    "incorrect_len": 2068,
+    "A_sim_to_ref": 0.9997583957477651,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "037_Penguins_Gender_Error_Analysis",
+    "error_type": "IndexError: Accessing a non-existent column index in the probability array. || line: proba_class_1 = y_pred_proba[:, 2]",
+    "status": "OK",
+    "latency_s": 7.627,
+    "A_len": 3112,
+    "incorrect_len": 3112,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "The original bug type was that the code was trying to access the third column of the predicted probabilities array `y_pred_proba[:, 2]`, which does not exist. The correct column index for the positive class (class 1) in a binary classification problem is `1`."
+  },
+  {
+    "sid": "038_Titanic_Decision_Tree_Survival",
+    "error_type": "LogicError: Using a test_size of 0.9 leaves insufficient training data, leading to poor model performance. || line:     X, y, test_size=0.9, random_state=42, stratify=y",
+    "status": "OK",
+    "latency_s": 4.642,
+    "A_len": 4004,
+    "incorrect_len": 4004,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "Missing values in the testing set"
+  },
+  {
+    "sid": "039_California_Feature_Importance_Summary",
+    "error_type": "ValueError: test_size is set outside the valid range (0, 1) causing a ValueError || line: X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1.5, random_state=42)",
+    "status": "OK",
+    "latency_s": 2.555,
+    "A_len": 1682,
+    "incorrect_len": 1682,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "The bug in the original code was that the test size was set to 1.5, which is not a valid value for the test_size parameter in train_test_split. The test size should be a float between 0 and 1, representing the proportion of the dataset to include in the test split. The corrected code sets the test size to 0.2, which is a valid value."
+  },
+  {
+    "sid": "040_Wine_Stacking_Ensemble_Evaluation",
+    "error_type": "NameError: The variable 'stackingclf' is not defined. || line: stackingclf.fit(X_train, y_train)",
+    "status": "OK",
+    "latency_s": 6.404,
+    "A_len": 2854,
+    "incorrect_len": 2853,
+    "A_sim_to_ref": 0.999824837975127,
+    "predicted_error_type": "Incorrect indentation of the `stacking_clf.fit(X_train, y_train)` line."
+  },
+  {
+    "sid": "041_IMDB_Sentiment_Ensemble_Stacking",
+    "error_type": "NameError: This occurs because 'y_predt' is not defined. || line: print(f\"Review {i+1}: True={y_test[i]}, Predicted={y_predt[i]}\")",
+    "status": "OK",
+    "latency_s": 4.393,
+    "A_len": 3550,
+    "incorrect_len": 3551,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "042_Digits_Classification_with_CNN_and_Dropo",
+    "error_type": "ValueError: test_size is set outside the (0, 1) range causing train_test_split to raise ValueError. || line: X_train, X_test, y_train, y_test = train_test_split(",
+    "status": "OK",
+    "latency_s": 5.889,
+    "A_len": 3916,
+    "incorrect_len": 3915,
+    "A_sim_to_ref": 0.999616907163836,
+    "predicted_error_type": "Incorrect test_size value in train_test_split"
+  },
+  {
+    "sid": "043_Titanic_Survival_Random_Forest_GridSearc",
+    "error_type": "ValueError: cv must be at least 2 for cross-validation || line: cv=1,",
+    "status": "OK",
+    "latency_s": 8.73,
+    "A_len": 4304,
+    "incorrect_len": 4253,
+    "A_sim_to_ref": 0.9939238139752279,
+    "predicted_error_type": "The original bug type was that the GridSearchCV was not performing cross-validation properly, as it was set to cv=1, which means it was not splitting the data into multiple folds for validation. This led to an overestimation of the model's performance."
+  },
+  {
+    "sid": "044_IMDB_Review_Length_Feature_Engineering",
+    "error_type": "NameError: The variable 'y_trian' is not defined, causing a NameError when fitting the model. || line: model_bow_only.fit(train_bow, y_trian)",
+    "status": "OK",
+    "latency_s": 9.141,
+    "A_len": 4818,
+    "incorrect_len": 4818,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "The bug in the original code was a typo in the variable name `y_trian` in the line `model_bow_only.fit(train_bow, y_trian)`. It should be `y_train`."
+  },
+  {
+    "sid": "045_Credit_Card_Anomaly_Detection_VAE",
+    "error_type": "NameError: 'precision' is not defined because the variable was misspelled. || line: print(f\"Precision: {precision:.4f}\")",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 9.869,
+    "A_len": 0,
+    "incorrect_len": 8953,
+    "A_sim_to_ref": null,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "046_Penguins_Migration_Time_Series_ARIMA",
+    "error_type": "ValueError: alpha parameter out of bounds causing ValueError || line: forecast_ci = forecast_df.conf_int(alpha=1.5)",
+    "status": "OK",
+    "latency_s": 8.737,
+    "A_len": 4352,
+    "incorrect_len": 4351,
+    "A_sim_to_ref": 0.9998851234922458,
+    "predicted_error_type": "The original bug type was that the confidence interval was calculated with alpha=1.5 instead of alpha=0.05, which is the correct value for a 95% confidence interval."
+  },
+  {
+    "sid": "047_Heart_Model_Calibration_Plot",
+    "error_type": "AttributeError: The plt module has no attribute 'plott' || line: plt.plott(mean_predicted_value, fraction_of_positives, marker='o', label='Logistic Regression')",
+    "status": "OK",
+    "latency_s": 2.475,
+    "A_len": 1802,
+    "incorrect_len": 1803,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "048_Sunspots_SARIMAX_Seasonal_Forecast_Model",
+    "error_type": "SyntaxError: Missing closing parenthesis in function call. || line: warnings.filterwarnings('ignore'",
+    "status": "OK",
+    "latency_s": 6.0,
+    "A_len": 4455,
+    "incorrect_len": 4454,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "049_Linnerud_Dimensionality_Reduction",
+    "error_type": "AttributeError: The call fails because 'scattter' is not a valid attribute of matplotlib.pyplot. || line: plt.scattter(X_reduced[:, 0], X_reduced[:, 1], c='blue', edgecolors='k', s=100, alpha=0.7)",
+    "status": "OK",
+    "latency_s": 9.248,
+    "A_len": 2418,
+    "incorrect_len": 2419,
+    "A_sim_to_ref": 0.9997932602853008,
+    "predicted_error_type": "Incorrect use of `scattter` instead of `scatter` in the visualization step."
+  },
+  {
+    "sid": "050_California_Housing_Price_Estimate",
+    "error_type": "LogicError: R2 score is computed with arguments swapped, yielding an incorrect metric. || line: r2 = r2_score(y_pred, y_test)",
+    "status": "OK",
+    "latency_s": 8.981,
+    "A_len": 3607,
+    "incorrect_len": 3607,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "Incorrect use of `r2_score` function"
+  },
+  {
+    "sid": "051_Diamonds_Price_Regression",
+    "error_type": "NameError: The variable 'mdl' is referenced but not defined. || line: y_pred = mdl.predict(X_test)",
+    "status": "OK",
+    "latency_s": 4.025,
+    "A_len": 2722,
+    "incorrect_len": 2720,
+    "A_sim_to_ref": 0.9998163452708907,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "052_Wine_Quality_XGBoost_Model",
+    "error_type": "AttributeError: XGBRegressor has no attribute 'best_iteraton' || line: print(f\"\\nBest iteration: {model.best_iteraton}\")",
+    "status": "OK",
+    "latency_s": 3.518,
+    "A_len": 2332,
+    "incorrect_len": 2331,
+    "A_sim_to_ref": 0.99978563772776,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "053_California_Housing_Boosting_with_Hyperpa",
+    "error_type": "IndexError: Accessing an out-of-range index of the test set causes an IndexError. || line: y_pred = best_model.predict(X_test[9999])",
+    "status": "OK",
+    "latency_s": 3.582,
+    "A_len": 2757,
+    "incorrect_len": 2763,
+    "A_sim_to_ref": 0.999818676337262,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "054_Fashion_MNIST_Simple_CNN",
+    "error_type": "SyntaxError: Missing colon in for loop header causes invalid syntax. || line: for i, idx in enumerate(indices)",
+    "status": "OK",
+    "latency_s": 5.027,
+    "A_len": 3650,
+    "incorrect_len": 3649,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "055_Reuters_MultiLabel_Hierarchical_Metrics",
+    "error_type": "NameError: This occurs because 'br_modell' is referenced but not defined. || line: y_pred = br_modell.predict(x_test_vec)",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 9.007,
+    "A_len": 0,
+    "incorrect_len": 8578,
+    "A_sim_to_ref": null,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "056_Tips_Bill_Amount_Forecast",
+    "error_type": "LogicError: RMSE is computed using y_test for both arguments, always yielding zero error. || line: rmse = np.sqrt(mean_squared_error(y_test, y_test))",
+    "status": "OK",
+    "latency_s": 6.111,
+    "A_len": 2676,
+    "incorrect_len": 2676,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "The original bug type was a typo in the `plt.scatter` function call, where `y_test` was used instead of `y_pred` for the predicted values."
+  },
+  {
+    "sid": "057_MNIST_Voting_Ensemble_Classification",
+    "error_type": "LogicError: Using the wrong axis for argmax produces incorrect CNN predictions || line: cnn_pred = np.argmax(cnn_model.predict(X_test_cnn, verbose=0), axis=0)",
+    "status": "OK",
+    "latency_s": 6.117,
+    "A_len": 4368,
+    "incorrect_len": 4368,
+    "A_sim_to_ref": 0.999656632711457,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "058_Diabetes_Progression_Neural_Network_Regr",
+    "error_type": "NameError: The variable 'y_trian' is referenced but not defined. || line:         X_train_scaled, y_trian,",
+    "status": "OK",
+    "latency_s": 4.601,
+    "A_len": 4074,
+    "incorrect_len": 4074,
+    "A_sim_to_ref": 0.99987728555651,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "059_Penguins_Size_Clustering_with_KMeans",
+    "error_type": "KeyError: Accessing a non-existent column 'clusterr' in the DataFrame raises a KeyError. || line: print(penguins_clean['clusterr'].value_counts().sort_index())",
+    "status": "OK",
+    "latency_s": 3.908,
+    "A_len": 2872,
+    "incorrect_len": 2912,
+    "A_sim_to_ref": 0.9930843706777317,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "060_Breast_Cancer_Tree_Ensemble",
+    "error_type": "ImportError: The seaborn module name is misspelled, causing import to fail. || line: import seabornn as sns",
+    "status": "OK",
+    "latency_s": 5.916,
+    "A_len": 4522,
+    "incorrect_len": 4523,
+    "A_sim_to_ref": 0.9994474527572107,
+    "predicted_error_type": "ImportError: No module named 'seabornn'"
+  },
+  {
+    "sid": "061_Digits_Classification_using_KNN",
+    "error_type": "ValueError: test_size must be between 0 and 1. || line:     X, y, test_size=1.5, random_state=42, stratify=y",
+    "status": "OK",
+    "latency_s": 6.296,
+    "A_len": 2579,
+    "incorrect_len": 2579,
+    "A_sim_to_ref": 0.9988367584335014,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "062_Fashion_MNIST_CNN_Baseline",
+    "error_type": "SyntaxError: Missing colon after if statement || line: if test_accuracy >= 0.85",
+    "status": "OK",
+    "latency_s": 4.407,
+    "A_len": 2102,
+    "incorrect_len": 2101,
+    "A_sim_to_ref": 0.9997621878715814,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "063_Penguins_Gender_Prediction_Naive_Bayes",
+    "error_type": "NameError: X_trian is not defined || line: gnb.fit(X_trian, y_train)",
+    "status": "OK",
+    "latency_s": 5.773,
+    "A_len": 5183,
+    "incorrect_len": 5183,
+    "A_sim_to_ref": 0.9998070615473664,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "064_Tips_Simple_Linear_Regression",
+    "error_type": "NameError: The variable 'slop' is not defined when referenced. || line: print(f\"Slope (coefficient): {slop:.4f}\")",
+    "status": "OK",
+    "latency_s": 2.345,
+    "A_len": 1639,
+    "incorrect_len": 1638,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "065_MNIST_Digit_Normalization_KNN",
+    "error_type": "NameError: This occurs because 'knn_classifier' is referenced but not defined. || line: knn_classifier.fit(X_train, y_train)",
+    "status": "OK",
+    "latency_s": 4.634,
+    "A_len": 2959,
+    "incorrect_len": 2970,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "066_Penguins_Species_Classification_with_Ran",
+    "error_type": "AttributeError: RandomForestClassifier object has no attribute 'predic' || line: y_pred = rf_classifier.predic(X_test)",
+    "status": "OK",
+    "latency_s": 3.48,
+    "A_len": 2104,
+    "incorrect_len": 2103,
+    "A_sim_to_ref": 0.9997624138750297,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "067_Iris_Feature_Importance_Analysis",
+    "error_type": "IndexError: Accessing axes[2] which is out of range for the axes array || line: axes[2].barh(y_pos, dt_importances, align='center', color='lightcoral')",
+    "status": "OK",
+    "latency_s": 3.723,
+    "A_len": 2513,
+    "incorrect_len": 2513,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "068_CIFAR10_Simple_CNN",
+    "error_type": "LogicError: Using sigmoid activation for multi-class classification leads to incorrect probability interpretation. || line: layers.Dense(10, activation='sigmoid')",
+    "status": "OK",
+    "latency_s": 6.216,
+    "A_len": 3451,
+    "incorrect_len": 3451,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "069_California_Housing_LightGBM_Regressor",
+    "error_type": "SyntaxError: Missing closing parenthesis causes a syntax error. || line: plt.savefig('california_housing_lightgbm_predictions.png', dpi=100, bbox_inches='tight'",
+    "status": "OK",
+    "latency_s": 5.093,
+    "A_len": 3318,
+    "incorrect_len": 3317,
+    "A_sim_to_ref": 0.9998493295163478,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "070_Wine_Quality_Gradient_Boosting",
+    "error_type": "AttributeError: Attempting to access a non-existent attribute 'feature_importances' on the model. || line: feature_importance = final_model.feature_importances",
+    "status": "OK",
+    "latency_s": 5.294,
+    "A_len": 3550,
+    "incorrect_len": 3549,
+    "A_sim_to_ref": 0.9998591747641177,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "071_Reuters_Topic_Classification_with_LSTM",
+    "error_type": "IndexError: Accessing an out-of-range index in y_test triggers an IndexError. || line: print(f\"Sample {i+1}: True label = {y_test[1000000]}, Predicted label = {y_pred[i]}\")",
+    "status": "OK",
+    "latency_s": 5.177,
+    "A_len": 3278,
+    "incorrect_len": 3284,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": "The original bug type was that the code was not properly handling the test data for evaluation and prediction."
+  },
+  {
+    "sid": "072_California_Residual_Distribution_Across_",
+    "error_type": "TypeError: Passing a string instead of a tuple for figsize causes a TypeError. || line: fig, axes = plt.subplots(1, 5, figsize=\"20,4\")",
+    "status": "OK",
+    "latency_s": 3.364,
+    "A_len": 1894,
+    "incorrect_len": 1893,
+    "A_sim_to_ref": 0.9997360781208762,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "073_California_Housing_Random_Forest_Regress",
+    "error_type": "NameError: Variable 'rff_model' is not defined. || line: y_pred_rf = rff_model.predict(X_test)",
+    "status": "OK",
+    "latency_s": 4.702,
+    "A_len": 3784,
+    "incorrect_len": 3785,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "074_Fashion_MNIST_Hyperparameter_Search",
+    "error_type": "AttributeError: Attempted to call a non-existent function on matplotlib.pyplot, causing an AttributeError. || line: plt.shwo()",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 8.742,
+    "A_len": 0,
+    "incorrect_len": 8087,
+    "A_sim_to_ref": null,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "075_Breast_Cancer_Diagnosis_with_LightGBM",
+    "error_type": "NameError: This occurs because 'modle' is referenced but not defined. || line: y_pred_proba = modle.predict(X_test, num_iteration=modle.best_iteration)",
+    "status": "OK",
+    "latency_s": 7.836,
+    "A_len": 3191,
+    "incorrect_len": 3194,
+    "A_sim_to_ref": 0.9978077043532728,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "076_Fashion_MNIST_Transfer_Learning_with_Mob",
+    "error_type": "TypeError: tf.repeat expects an integer repeat count but receives a string. || line: rgb = tf.repeat(resized, '3', axis=-1)",
+    "status": "OK",
+    "latency_s": 9.142,
+    "A_len": 5069,
+    "incorrect_len": 5071,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "077_Iris_tSNE_Cluster_Visualization",
+    "error_type": "ValueError: perplexity must be less than number of samples || line: tsne = TSNE(n_components=2, random_state=42, perplexity=200, n_iter=1000)",
+    "status": "OK",
+    "latency_s": 3.207,
+    "A_len": 2672,
+    "incorrect_len": 2672,
+    "A_sim_to_ref": 0.999251497005988,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "078_Digits_Confusion_Matrix_Visualization",
+    "error_type": "SyntaxError: Missing closing parenthesis causes a syntax error. || line: svm_classifier = SVC(kernel='rbf', gamma='scale', random_state=42",
+    "status": "OK",
+    "latency_s": 3.98,
+    "A_len": 2903,
+    "incorrect_len": 2902,
+    "A_sim_to_ref": 0.9998277940416739,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "079_Breast_Cancer_Gradient_Boosting_Classifi",
+    "error_type": "ValueError: cross_val_score raises ValueError because cv=1 is less than the required minimum of 2 || line: roc_auc_scores = cross_val_score(gb_classifier, X, y, cv=1, scoring='roc_auc')",
+    "status": "OK",
+    "latency_s": 3.22,
+    "A_len": 2169,
+    "incorrect_len": 2169,
+    "A_sim_to_ref": 0.999769532150265,
+    "predicted_error_type": "Incorrect number of folds in cross-validation"
+  },
+  {
+    "sid": "080_IMDB_Sentiment_Bidirectional_LSTM_Embedd",
+    "error_type": "ImportError: The import fails because the module name is misspelled. || line: import tensorflowe as tf",
+    "status": "OK",
+    "latency_s": 4.219,
+    "A_len": 3650,
+    "incorrect_len": 3651,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "081_CIFAR10_Simple_CNN_Tracker",
+    "error_type": "AttributeError: The Sequential model has no attribute 'compile' due to a typo. || line: model.compile(optimizer='adam',",
+    "status": "OK",
+    "latency_s": 3.46,
+    "A_len": 2672,
+    "incorrect_len": 2672,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "082_Breast_Cancer_Neural_Network",
+    "error_type": "TypeError: Keras expects an integer for batch_size but got a string || line:     batch_size='32',",
+    "status": "OK",
+    "latency_s": 4.039,
+    "A_len": 3468,
+    "incorrect_len": 3470,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "083_Adult_Income_CatBoost_Classifier",
+    "error_type": "NameError: This occurs because 'gridsearch' is referenced but not defined. || line: gridsearch.fit(X_train, y_train)",
+    "status": "OK",
+    "latency_s": 8.288,
+    "A_len": 3746,
+    "incorrect_len": 3746,
+    "A_sim_to_ref": 0.9997331198291967,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "084_Wine_Alcohol_Content_Prediction",
+    "error_type": "LogicError: Using classification labels instead of the alcohol feature leads to incorrect regression results || line: y = wine.target  # Using class labels instead of alcohol content",
+    "status": "OK",
+    "latency_s": 2.574,
+    "A_len": 1804,
+    "incorrect_len": 1857,
+    "A_sim_to_ref": 0.9599345870809485,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "085_CIFAR10_Epoch_Accuracy_Plot",
+    "error_type": "KeyError: Accessing a missing key in a dictionary raises KeyError. || line: {'foo': 1}['bar']",
+    "status": "OK",
+    "latency_s": 4.056,
+    "A_len": 2307,
+    "incorrect_len": 2326,
+    "A_sim_to_ref": 1.0,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "086_IMDB_Sentiment_BERT_Fine-Tuning",
+    "error_type": "ValueError: DataLoader batch_size must be a positive integer || line: batch_size = 0",
+    "status": "OK",
+    "latency_s": 8.864,
+    "A_len": 6510,
+    "incorrect_len": 6510,
+    "A_sim_to_ref": 0.9997696029490822,
+    "predicted_error_type": null
+  },
+  {
+    "sid": "087_Digits_PCA_Explained_Variance",
+    "error_type": "KeyError: Accessing a non-existent key in a dictionary triggers a KeyError. || line: {\"valid\": 0}[\"invalid\"]",
+    "status": "OK",
+    "latency_s": 6.933,
+    "A_len": 2786,
+    "incorrect_len": 2786,
+    "A_sim_to_ref": 0.9954946837267976,
+    "predicted_error_type": null
+  }
+]

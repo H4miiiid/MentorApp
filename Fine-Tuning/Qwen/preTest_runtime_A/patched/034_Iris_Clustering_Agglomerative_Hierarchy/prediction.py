@@ -1,0 +1,117 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+from sklearn.metrics import adjusted_rand_score, confusion_matrix
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the iris dataset
+iris = load_iris()
+X = iris.data
+y_true = iris.target
+feature_names = iris.feature_names
+target_names = iris.target_names
+
+# Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Perform hierarchical agglomerative clustering
+# First, compute the linkage matrix for dendrogram visualization
+linkage_matrix = linkage(X_scaled, method='ward')
+
+# Visualize the dendrogram
+plt.figure(figsize=(12, 6))
+dendrogram(linkage_matrix, truncate_mode='level', p=5)
+plt.title('Hierarchical Clustering Dendrogram (Iris Dataset)')
+plt.xlabel('Sample Index or (Cluster Size)')
+plt.ylabel('Distance')
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+# Cut the dendrogram to obtain three clusters
+agg_clustering = AgglomerativeClustering(n_clusters=3, linkage='ward')
+y_pred = agg_clustering.fit_predict(X_scaled)
+
+# Compare cluster assignments with true species labels
+print("Cluster Assignments vs True Labels:")
+print("====================================\n")
+
+# Create a DataFrame for better visualization
+results_df = pd.DataFrame({
+    'True Species': [target_names[label] for label in y_true],
+    'Cluster': y_pred
+})
+
+print(results_df.head(10))
+print("\n...\n")
+print(results_df.tail(10))
+
+# Compute confusion matrix
+conf_matrix = confusion_matrix(y_true, y_pred)
+print("\nConfusion Matrix:")
+print("==================")
+print("Rows: True Species, Columns: Predicted Clusters")
+print(conf_matrix)
+
+# Compute Adjusted Rand Index to measure clustering quality
+ari = adjusted_rand_score(y_true, y_pred)
+print(f"\nAdjusted Rand Index: {ari:.4f}")
+print("(ARI ranges from -1 to 1, where 1 indicates perfect agreement)")
+
+# Visualize cluster assignments in 2D (using first two principal components)
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=2, random_state=42)
+X_pca = pca.fit_transform(X_scaled)
+
+plt.figure(figsize=(14, 6))
+
+# Plot true labels
+plt.subplot(1, 2, 1)
+for i, target_name in enumerate(target_names):
+    mask = y_true == i
+    plt.scatter(X_pca[mask, 0], X_pca[mask, 1], label=target_name, alpha=0.7, edgecolors='k')
+plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.2%} variance)')
+plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.2%} variance)')
+plt.title('True Species Labels (PCA Projection)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+# Plot predicted clusters
+plt.subplot(1, 2, 2)
+for i in range(3):
+    mask = y_pred == i
+    plt.scatter(X_pca[mask, 0], X_pca[mask, 1], label=f'Cluster {i}', alpha=0.7, edgecolors='k')
+plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.2%} variance)')
+plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.2%} variance)')
+plt.title('Predicted Clusters (PCA Projection)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+# Summary statistics
+print("\nCluster Sizes:")
+print("==============")
+for i in range(3):
+    cluster_size = np.sum(y_pred == i)
+    print(f"Cluster {i}: {cluster_size} samples")
+
+print("\nTrue Species Counts:")
+print("====================")
+for i, target_name in enumerate(target_names):
+    species_count = np.sum(y_true == i)
+    print(f"{target_name}: {species_count} samples")

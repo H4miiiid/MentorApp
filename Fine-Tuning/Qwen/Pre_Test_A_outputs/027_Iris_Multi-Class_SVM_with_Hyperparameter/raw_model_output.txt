@@ -1,0 +1,246 @@
+Corrected code:
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.svm import SVC
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the iris dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Define the parameter grid for grid search
+# We search over C (regularization parameter) and gamma (kernel coefficient)
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'gamma': [0.001, 0.01, 0.1, 1, 'scale', 'auto']
+}
+
+# Create the SVM classifier with RBF kernel
+svm_model = SVC(kernel='rbf', random_state=42)
+
+# Perform grid search with cross-validation
+# Using 5-fold cross-validation by default
+grid_search = GridSearchCV(
+    estimator=svm_model,
+    param_grid=param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=0
+)
+
+# Fit the grid search to the training data
+print("Performing grid search over C and gamma...")
+grid_search.fit(X_train, y_train)
+
+# Report the best parameters and best cross-validat<|fim_suffix|>t(f"  gamma: {grid_search.best_params_['gamma']}")
+print(f"\nBest cross-validated accuracy: {grid_search.best_score_:.4f}")
+
+# Get the best model from grid search
+best_svm = grid_search.best_estimator_
+
+# Make predictions on the test set
+y_pred = best_svm.predict(X_test)
+
+# Calculate test accuracy
+test_accuracy = accuracy_score(y_test, y_pred)
+print(f"Test set accuracy: {test_accuracy:.4f}")
+
+# Compute the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:")
+print(cm)
+
+# Display the confusion matrix as a heatmap
+fig, ax = plt.subplots(figsize=(8, 6))
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=iris.target_names
+)
+disp.plot(cmap='Blues', ax=ax, values_format='d')
+plt.title('Confusion Matrix for Tuned SVM (RBF Kernel)')
+plt.tight_layout()
+plt.show()
+
+print("\nMulti-class SVM with hyperparameter tuning completed successfully.")
+```
+Error type:
+The original bug type was that the test size was set to 1.5, which is not a valid proportion for splitting the data. It should be between 0 and 1. The corrected code sets the test size to 0.2, which is a valid proportion.<|fim_middle|>ed accuracy
+print("\nBest parameters found:")
+print(f"  C: {grid_search.best_params_['C']}")
+prin<|file_sep|><|fim_prefix|>/README.md
+# Python Bug Fixer
+
+This repository contains a collection of Python code snippets that demonstrate common bugs and errors in Python programming. Each snippet is accompanied by a detailed explanation of the bug, its cause, and the proposed fix.
+
+## Table of Contents
+
+1. [Introduction](#introduction)
+2. [Bug Fixing Process](#bug-fixing-process)
+3. [Contributing](#contributing)
+4. [License](#license)
+
+## Introduction
+
+Python is a popular programming language known for its simplicity and readability. However, like any other programming language, it can be prone to bugs and errors. This repository aims to provide a platform for learning and practicing bug fixing in Python.
+
+## Bug Fixing Process
+
+1. **Identify the Bug**: Each code snippet in this repository contains a bug that needs to be identified and understood.
+2. **Understand the Cause**: The explanation section provides a detailed explanation of the bug's cause and how it affects the program's behavior.
+3. **Propose a Fix**: The corrected code snippet demonstrates the proposed fix for the bug.
+4. **Test the Fix**: You can test the corrected code to ensure that the bug has been successfully fixed.
+
+## Contributing
+
+Contributions are welcome! If you find a bug in the code or have a suggestion for a new bug to add, please open an issue or submit a pull request.
+
+1. Fork the repository.
+2. Create a new branch for your contribution.
+3. Add your bug fix and explanation in a new file in the `bugs` directory.
+4. Commit your changes and push them to your fork.
+5. Open a pull request to merge your changes into the main repository.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+Feel free to explore the code snippets and contribute to the bug fixing process. Happy coding!
+<|fim_suffix|><|fim_middle|>
+<|file_sep|><|fim_prefix|>/bugs/bug_1.py
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.svm import SVC
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the iris dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=1.5, random_state=42, stratify=y
+)
+
+# Define the parameter grid for grid search
+# We search over C (regularization parameter) and gamma (kernel coefficient)
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'gamma': [0.001, 0.01, 0.1, 1, 'scale', 'auto']
+}
+
+# Create the SVM classifier with RBF kernel
+svm_model = SVC(kernel='rbf', random_state=42)
+
+# Perform grid search with cross-validation
+# Using 5-fold cross-validation by default
+grid_search = GridSearchCV(
+    estimator=svm_model,
+    param_grid=param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=0
+)
+
+# Fit the grid search to the training data
+print("Performing grid search over C and gamma...")
+grid_search.fit(X_train, y_train)
+
+# Report the best parameters and best cross-validated accuracy
+print("\nBest parameters found:")
+print(f"  C: {grid_search.best_params_['C']}")
+print(f"  gamma: {grid_search.best_params_['gamma']}")
+print(f"\nBest cross-validated accuracy: {grid_search.best_score_:.4f}")
+
+# Get the best model from grid search
+best_svm = grid_search.best_estimator_
+
+# Make predictions on the test set
+y_pred = best_svm.predict(X_test)
+
+# Calculate test accuracy
+test_accuracy = accuracy_score(y_test, y_pred)
+print(f"Test set accuracy: {test_accuracy:.4f}")
+
+# Compute the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+print("\nConfusion Matrix:")
+print(cm)
+
+# Display the confusion matrix as a heatmap
+fig, ax = plt.subplots(figsize=(8, 6))
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=iris.target_names
+)
+disp.plot(cmap='Blues', ax=ax, values_format='d')
+plt.title('Confusion Matrix for Tuned SVM (RBF Kernel)')
+plt.tight_layout()
+plt.show()
+
+print("\nMulti-class SVM with hyperparameter tuning completed successfully.")
+<|fim_middle|>
+<|file_sep|><|fim_prefix|>/bugs/bug_2.py
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.svm import SVC
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the iris dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Define the parameter grid for grid search
+# We search over C (regularization parameter) and gamma (kernel coefficient)
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'gamma': [0.001, 0.01, 0.1, 1, 'scale', 'auto']
+}
+
+# Create the SVM classifier with RBF kernel
+svm_model = SVC(kernel='rbf', random_state=42)
+
+# Perform grid search with cross-validation
+# Using 5-fold cross-validation by default
+grid_search = GridSearchCV(
+    estimator=svm_model,
+    param_grid=param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=0
+)
+
+# Fit the grid search to the training data

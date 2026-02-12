@@ -1,0 +1,1 @@
+The original bug type was that the confidence interval was calculated with alpha=1.5 instead of alpha=0.05, which is the correct value for a 95% confidence interval.
