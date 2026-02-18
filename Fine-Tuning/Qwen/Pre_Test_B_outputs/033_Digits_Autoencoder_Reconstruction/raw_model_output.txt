@@ -1,0 +1,261 @@
+<correct_code>
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Set random seeds for reproducibility
+np.random.seed(42)
+import tensorflow as tf
+tf.random.set_seed(42)
+
+# Load the digits dataset
+digits = load_digits()
+X = digits.data  # Shape: (n_samples, 64)
+y = digits.target
+
+# Normalize the data to [0, 1] range
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
+
+# Define the autoencoder architecture
+input_dim = X_train.shape[1]  # 64 features
+encoding_dim = 32  # Compressed representation dimension
+
+# Encoder
+input_layer = layers.Input(shape=(input_dim,))
+encoded = layers.Dense(encoding_dim, activation='relu')(input_layer)
+
+# Decoder
+decoded = layers.Dense(input_dim, activation='sigmoid')(encoded)
+
+# Autoencoder model
+autoencoder = keras.Model(input_layer, decoded)
+
+# Compile the model
+autoencoder.compile(optimizer='adam', loss='mse')
+
+# Train the autoencoder
+history = autoencoder.fit(
+    X_train, X_train,
+    epochs=50,
+    batch_size=32,
+    shuffle=True,
+    validation_data=(X_test, X_test),
+    verbose=0
+)
+
+# Compute reconstruction loss on the test set
+reconstructions = autoencoder.predict(X_test, verbose=0)
+reconstruction_loss = np.mean(np.square(X_test - reconstructions))
+
+print(f"Reconstruction loss on test set: {reconstruction_loss:.6f}")
+
+# Ensure the loss is below 0.02
+assert reconstruction_loss < 0.02, f"Reconstruction loss {reconstruction_loss:.6f} is not below 0.02"
+print("Assertion passed: Reconstruction loss is below 0.02")
+
+# Display original versus reconstructed images for five samples
+n_samples = 5
+indices = np.random.choice(len(X_test), n_samples, replace=False)
+
+fig, axes = plt.subplots(2, n_samples, figsize=(12, 4))
+fig.suptitle('Original vs Reconstructed Digits', fontsize=14)
+
+for i, idx in enumerate(indices):
+    # Original image
+    original = X_test[idx].reshape(8, 8)
+    axes[0, i].imshow(original, cmap='gray')
+    axes[0, i].axis('off')
+    if i == 0:
+        axes[0, i].set_title('Original', fontsize=10)
+    
+    # Reconstructed image
+    reconstructed = reconstructions[idx].reshape(8, 8)
+    axes[1, i].imshow(reconstructed, cmap='gray')
+    axes[1, i].axis('off')
+    if i == 0:
+        axes[1, i].set_title('Reconstructed', fontsize=10)
+
+plt.tight_layout()
+plt.show()
+
+print("\nAutoencoder training and evaluation completed successfully.")
+print(f"Final reconstruction loss: {reconstruction_loss:.6f}")
+</correct_code>
+<|file_sep|><|fim_prefix|>/README.md
+# Fine-Tuning Qwen
+
+This repository contains the code for fine-tuning the Qwen model on the MNIST dataset using the Hugging Face Transformers library. The fine-tuning process involves training the model on the MNIST dataset and evaluating its performance on the test set.
+
+## Prerequisites
+
+To run the code in this repository, you need to have the following installed:
+
+- Python 3.8 or higher
+- PyTorch 1.10 or higher
+- Hugging Face Transformers library
+- MNIST dataset
+
+You can install the required libraries using pip:
+
+```bash
+pip install torch transformers
+```
+
+## Usage
+
+To fine-tune the Qwen model on the MNIST dataset, follow these steps:
+
+1. Clone this repository to your local machine:
+
+```bash
+git clone https://github.com/your-username/Fine-Tuning-Qwen.git
+```
+
+2. Navigate to the repository directory:
+
+```bash
+cd Fine-Tuning-Qwen
+```
+
+3. Run the fine-tuning script:
+
+```bash
+python fine_tune_qwen.py
+```
+
+This will start the fine-tuning process. The script will download the Qwen model, load the MNIST dataset, and train the model on the training set. The model will be evaluated on the test set after each epoch.
+
+4. Monitor the training progress and evaluation results. The script will print the loss and accuracy for each epoch.
+
+5. Once the training is complete, the fine-tuned model will be saved in the `output` directory.
+
+## Fine-Tuning Script
+
+The fine-tuning script `fine_tune_qwen.py` contains the following code:
+
+```python
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments
+from datasets import load_dataset
+
+# Load the Qwen model and tokenizer
+model_name = "qwen/Qwen-7B"
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=10)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# Load the MNIST dataset
+dataset = load_dataset("mnist")
+
+# Preprocess the dataset
+def preprocess_function(examples):
+    inputs = tokenizer(examples["image"], return_tensors="pt")
+    labels = torch.tensor(examples["label"], dtype=torch.long)
+    return {"input_ids": inputs["input_ids"], "labels": labels}
+
+dataset = dataset.map(preprocess_function, batched=True)
+
+# Split the dataset into training and test sets
+train_dataset = dataset["train"]
+test_dataset = dataset["test"]
+
+# Define the training arguments
+training_args = TrainingArguments(
+    output_dir="./output",
+    num_train_epochs=3,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
+    warmup_steps=500,
+    weight_decay=0.01,
+    logging_dir="./logs",
+)
+
+# Create the Trainer object
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=test_dataset,
+)
+
+# Train the model
+trainer.train()
+
+# Evaluate the model on the test set
+trainer.evaluate()
+```
+
+## Fine-Tuning Results
+
+The fine-tuning process will produce the following results:
+
+- The fine-tuned model will be saved in the `output` directory.
+- The training progress and evaluation results will be printed to the console.
+- The evaluation results will include the loss and accuracy on the test set.
+
+## Fine-Tuning Parameters
+
+The fine-tuning script allows you to customize the following parameters:
+
+- `model_name`: The name of the Qwen model to be fine-tuned. Default is "qwen/Qwen-7B".
+- `num_train_epochs`: The number of training epochs. Default is 3.
+- `per_device_train_batch_size`: The batch size for training. Default is 16.
+- `per_device_eval_batch_size`: The batch size for evaluation. Default is 16.
+- `warmup_steps`: The number of warmup steps for the learning rate scheduler. Default is 500.
+- `weight_decay`: The weight decay for the optimizer. Default is 0.01.
+
+You can modify these parameters in the script to fine-tune the model with different settings.
+
+## Fine-Tuning Notes
+
+- The fine-tuning process may take some time depending on your hardware and the size of the dataset.
+- The script uses the Hugging Face Transformers library, which provides a convenient interface for fine-tuning models on various datasets.
+- The MNIST dataset is loaded using the `datasets` library, which provides a convenient way to load and preprocess datasets.
+- The fine-tuned model is saved in the `output` directory, and the evaluation results are printed to the console.
+- The script uses the Adam optimizer and the CrossEntropyLoss loss function for training.
+
+## Fine-Tuning References
+
+- Hugging Face Transformers documentation: https://huggingface.co/transformers/
+- MNIST dataset: http://yann.lecun.com/exdb/mnist/
+
+## Fine-Tuning License
+
+This repository is licensed under the MIT License. See the `LICENSE` file for more information.
+
+## Fine-Tuning Acknowledgments
+
+- The Qwen model is provided by the Qwen team.
+- The MNIST dataset is provided by Yann LeCun and Corinna Cortes.
+
+## Fine-Tuning Contact
+
+If you have any questions or issues with the fine-tuning process, please feel free to contact us at [your-email@example.com](mailto:your-email@example.com).
+
+## Fine-Tuning Conclusion
+
+This repository provides a simple and convenient way to fine-tune the Qwen model on the MNIST dataset using the Hugging Face Transformers library. The fine-tuning process is straightforward and can be easily customized to suit your needs. We hope this repository will be helpful for anyone interested in fine-tuning models on the MNIST dataset.
+
+# Fine-Tuning Qwen
+
+This repository contains the code for fine-tuning the Qwen model on the MNIST dataset using the Hugging Face Transformers library. The fine-tuning process involves training the model on the MNIST dataset and evaluating its performance on the test set.
+
+## Prerequisites
+
+To run the code in this repository, you need to have the following installed:
+
+- Python 3.8 or higher
+- PyTorch 1.10 or higher
+- Hugging Face Transformers library
+- MNIST dataset
+
+You can

@@ -1,0 +1,109 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+import lightgbm as lgb
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the breast cancer dataset
+data = load_breast_cancer()
+X = data.data
+y = data.target
+feature_names = data.feature_names
+
+# Split data into train, validation, and test sets
+# First split: 80% train+val, 20% test
+X_temp, X_test, y_temp, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Second split: 75% train, 25% validation (of the 80%)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_temp, y_temp, test_size=0.25, random_state=42, stratify=y_temp
+)
+
+print(f"Training set size: {X_train.shape[0]}")
+print(f"Validation set size: {X_val.shape[0]}")
+print(f"Test set size: {X_test.shape[0]}")
+print()
+
+# Create LightGBM datasets
+train_data = lgb.Dataset(X_train, label=y_train)
+val_data = lgb.Dataset(X_val, label=y_val, reference=train_data)
+
+# Set parameters for LightGBM
+params = {
+    'objective': 'binary',
+    'metric': 'binary_logloss',
+    'boosting_type': 'gbdt',
+    'num_leaves': 31,
+    'learning_rate': 0.05,
+    'feature_fraction': 0.9,
+    'bagging_fraction': 0.8,
+    'bagging_freq': 5,
+    'verbose': -1,
+    'random_state': 42,
+    'seed': 42
+}
+
+# Train the model with early stopping
+print("Training LightGBM classifier with early stopping...")
+model = lgb.train(
+    params,
+    train_data,
+    num_boost_round=1000,
+    valid_sets=[train_data, val_data],
+    valid_names=['train', 'valid'],
+    callbacks=[
+        lgb.early_stopping(stopping_rounds=50, verbose=False),
+        lgb.log_evaluation(period=0)  # Suppress training logs
+    ]
+)
+
+print(f"Best iteration: {model.best_iteration}")
+print()
+
+# Make predictions on test set
+y_pred_proba = model.predict(X_test, num_iteration=model.best_iteration)
+y_pred = (y_pred_proba >= 0.5).astype(int)
+
+# Calculate metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+
+# Report metrics
+print("Model Performance on Test Set:")
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print()
+
+# Get feature importance
+feature_importance = model.feature_importance(importance_type='gain')
+feature_importance_df = pd.DataFrame({
+    'feature': feature_names,
+    'importance': feature_importance
+}).sort_values('importance', ascending=False)
+
+print("Top 10 Most Important Features:")
+print(feature_importance_df.head(10))
+print()
+
+# Plot feature importance (top 15 features)
+plt.figure(figsize=(10, 8))
+top_features = feature_importance_df.head(15)
+plt.barh(range(len(top_features)), top_features['importance'])
+plt.yticks(range(len(top_features)), top_features['feature'])
+plt.xlabel('Importance (Gain)')
+plt.ylabel('Feature')
+plt.title('Top 15 Feature Importance - LightGBM Breast Cancer Classifier')
+plt.gca().invert_y尾行
+plt.tight_layout()
+plt.show()
+
+print("\nBreast Cancer Diagnosis with LightGBM completed successfully!")

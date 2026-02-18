@@ -1,0 +1,205 @@
+<correct_code>
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the digits dataset
+digits = load_digits()
+X = digits.data
+y = digits.target
+
+print(f"Dataset shape: {X.shape}")
+print(f"Number of classes: {len(np.unique(y))}")
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print(f"Training set size: {X_train.shape[0]}")
+print(f"Test set size: {X_test.shape[0]}")
+
+# Tune k using cross-validation
+k_values = range(1, 21)
+cv_scores = []
+
+for k in k_values:
+    knn = KNeighborsClassifier(n_neighbors=k)
+    scores = cross_val_score(knn, X_train, y_train, cv=5, scoring='accuracy')
+    cv_scores.append(scores.mean())
+
+# Find the best k
+best_k = k_values[np.argmax(cv_scores)]
+print(f"\nBest k from cross-validation: {best_k}")
+print(f"Best cross-validation accuracy: {max(cv_scores):.4f}")
+
+# Train the final model with the best k
+knn_best = KNeighborsClassifier(n_neighbors=best_k)
+knn_best.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = knn_best.predict(X_test)
+
+# Calculate and report overall accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\nTest set accuracy: {accuracy:.4f}")
+
+# Visualize a few test images alongside predicted labels
+num_samples = 10
+indices = np.random.choice(len(X_test), num_samples, replace=False)
+
+fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+fig.suptitle('Sample Predictions on Test Set', fontsize=14)
+
+for i, ax in enumerate(axes.flat):
+    if i < num_samples:
+        idx = indices[i]
+        # Reshape the flattened image back to 8x8
+        image = X_test[idx].reshape(8, 8)
+        ax.imshow(image, cmap='gray')
+        ax.set_title(f"True: {y_test[idx]}\nPred: {y_pred[idx]}")
+        ax.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Plot cross-validation scores vs k
+plt.figure(figsize=(10, 6))
+plt.plot(k_values, cv_scores, marker='o', linestyle='-', linewidth=2)
+plt.xlabel('Number of Neighbors (k)', fontsize=12)
+plt.ylabel('Cross-Validation Accuracy', fontsize=12)
+plt.title('KNN Performance vs k (5-Fold Cross-Validation)', fontsize=14)
+plt.grid(True, alpha=0.3)
+plt.axvline(x=best_k, color='r', linestyle='--', label=f'Best k = {best_k}')
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+print("\nDigits classification completed successfully!")
+</correct_code>
+<|file_sep|><|fim_prefix|>/README.md
+# Fine-Tuning Qwen
+
+This repository contains the code for fine-tuning the Qwen model using the Hugging Face Transformers library. The fine-tuning process is performed on a dataset of images, and the model is trained to classify the images into different categories.
+
+## Prerequisites
+
+To run the code in this repository, you will need the following:
+
+- Python 3.8 or later
+- PyTorch 1.10 or later
+- Hugging Face Transformers library
+- A dataset of images for fine-tuning the model
+
+## Installation
+
+To install the required libraries, run the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+To fine-tune the Qwen model, follow these steps:
+
+1. Download the dataset of images and place them in a directory of your choice.
+2. Modify the `data_dir` variable in the `fine_tune.py` file to point to the directory containing the dataset.
+3. Run the `fine_tune.py` file using the following command:
+
+```bash
+python fine_tune.py
+```
+
+The fine-tuning process will begin, and the model will be trained on the dataset. The training progress will be displayed in the console.
+
+## Fine-Tuning Parameters
+
+The following parameters can be modified in the `fine_tune.py` file to customize the fine-tuning process:
+
+- `model_name`: The name of the Qwen model to use for fine-tuning. The default value is "qwen/Qwen-7B".
+- `data_dir`: The directory containing the dataset of images for fine-tuning. The default value is "data".
+- `output_dir`: The directory where the fine-tuned model will be saved. The default value is "output".
+- `num_train_epochs`: The number of epochs to train the model. The default value is 3.
+- `per_device_train_batch_size`: The batch size for training. The default value is 8.
+- `per_device_eval_batch_size`: The batch size for evaluation. The default value is 8.
+- `learning_rate`: The learning rate for training. The default value is 5e-5.
+- `weight_decay`: The weight decay for training. The default value is 0.01.
+- `logging_dir`: The directory where the training logs will be saved. The default value is "logs".
+
+## Evaluation
+
+After the fine-tuning process is complete, the model can be evaluated on a separate dataset of images. To evaluate the model, follow these steps:
+
+1. Download the evaluation dataset of images and place them in a directory of your choice.
+2. Modify the `eval_data_dir` variable in the `evaluate.py` file to point to the directory containing the evaluation dataset.
+3. Run the `evaluate.py` file using the following command:
+
+```bash
+python evaluate.py
+```
+
+The evaluation process will begin, and the model will be evaluated on the evaluation dataset. The evaluation results will be displayed in the console.
+
+## Evaluation Parameters
+
+The following parameters can be modified in the `evaluate.py` file to customize the evaluation process:
+
+- `model_name`: The name of the Qwen model to use for evaluation. The default value is "qwen/Qwen-7B".
+- `eval_data_dir`: The directory containing the evaluation dataset of images. The default value is "eval_data".
+- `output_dir`: The directory where the evaluation results will be saved. The default value is "eval_output".
+- `per_device_eval_batch_size`: The batch size for evaluation. The default value is 8.
+
+## Contributing
+
+If you would like to contribute to this project, please fork the repository and submit a pull request with your changes.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- The Hugging Face Transformers library for providing the tools and resources for fine-tuning the Qwen model.
+- The Qwen team for developing the Qwen model and making it available for fine-tuning.
+- The PyTorch team for providing the PyTorch library for deep learning.
+- The Python community for providing the Python programming language and its ecosystem of libraries and tools.
+
+## Contact
+
+If you have any questions or comments about this project, please feel free to contact me at [your email address].
+
+## References
+
+- [Hugging Face Transformers](https://huggingface.co/transformers/)
+- [Qwen](https://qwen.ai/)
+- [PyTorch](https://pytorch.org/)
+- [Python](https://www.python.org/)
+
+## Disclaimer
+
+This project is for educational and research purposes only. The use of this project for any other purpose is not recommended.
+
+## Changelog
+
+- 2023-07-10: Initial release of the project.
+- 2023-07-11: Added support for fine-tuning the Qwen model on a dataset of images.
+- 2023-07-12: Added support for evaluating the fine-tuned model on a separate dataset of images.
+- 2023-07-13: Added support for customizing the fine-tuning and evaluation parameters.
+- 2023-07-14: Added support for saving the fine-tuned model and evaluation results.
+- 2023-07-15: Added support for logging the training progress.
+- 2023-07-16: Added support for visualizing the evaluation results.
+- 2023-07-17: Added support for customizing the evaluation parameters.
+- 2023-07-18: Added support for saving the evaluation results in a CSV file.
+- 2023-07-19: Added support for saving the evaluation results in a JSON file.
+- 2023-07-20: Added support for saving the evaluation results in a pickle file.
+- 2023-07-21: Added support for saving the evaluation results in a SQLite database.
+- 2023-07-22: Added support for saving the evaluation results in a MongoDB database.
+- 2023-07-23: Added support for saving the evaluation results in a Redis database.
+- 2023-07-24: Added support for saving the evaluation

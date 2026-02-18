@@ -1,0 +1,169 @@
+Fix this Python file.
+Return the full corrected file inside <correct_code> tags.
+
+Traceback tail:
+Traceback (most recent call last):
+  File "c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\preTest_runtime_A\patched\083_Adult_Income_CatBoost_Classifier\prediction.py", line 46, in <module>
+    base_model.fit(X_train, y_train)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py", line 5245, in fit
+    self._fit(X, y, cat_features, text_features, embedding_features, None, graph, sample_weight, None, None, None, None, baseline, use_best_model,
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              eval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period,
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              silent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py", line 2395, in _fit
+    train_params = self._prepare_train_params(
+        X=X, y=y, cat_features=cat_features, text_features=text_features, embedding_features=embedding_features,
+    ...<6 lines>...
+        callbacks=callbacks
+    )
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py", line 2275, in _prepare_train_params
+    train_pool = _build_train_pool(X, y, cat_features, text_features, embedding_features, pairs, graph,
+                                   sample_weight, group_id, group_weight, subgroup_id, pairs_weight,
+                                   baseline, column_description)
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py", line 1513, in _build_train_pool
+    train_pool = Pool(X, y, cat_features=cat_features, text_features=text_features, embedding_features=embedding_features, pairs=pairs, graph=graph, weight=sample_weight, group_id=group_id,
+                      group_weight=group_weight, subgroup_id=subgroup_id, pairs_weight=pairs_weight, baseline=baseline)
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py", line 855, in __init__
+    self._init(data, label, cat_features, text_features, embedding_features, embedding_features_data, pairs, graph, weight,
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               group_id, group_weight, subgroup_id, pairs_weight, baseline, timestamp, feature_names, feature_tags, thread_count)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py", line 1491, in _init
+    self._init_pool(data, label, cat_features, text_features, embedding_features, embedding_features_data, pairs, graph, weight,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    group_id, group_weight, subgroup_id, pairs_weight, baseline, timestamp, feature_names, feature_tags, thread_count)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "_catboost.pyx", line 4329, in _catboost._PoolBase._init_pool
+  File "_catboost.pyx", line 4381, in _catboost._PoolBase._init_pool
+  File "_catboost.pyx", line 4190, in _catboost._PoolBase._init_features_order_layout_pool
+  File "_catboost.pyx", line 3075, in _catboost._set_features_order_data_pd_data_frame
+  File "_catboost.pyx", line 2953, in _catboost._set_features_order_data_pd_data_frame_categorical_column
+  File "_catboost.pyx", line 2898, in _catboost._set_hashed_cat_values
+_catboost.CatBoostError: Invalid type for cat_feature[object_idx=6,feature_idx=1]=NaN : cat_features must be integer or string, real number values and NaN values should be converted to string.
+
+Incorrect file:
+import numpy as np
+import pandas as pd
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import accuracy_score
+from catboost import CatBoostClassifier
+import matplotlib.pyplot as plt
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Fetch the adult dataset from OpenML
+print("Fetching adult dataset...")
+adult_data = fetch_openml('adult', version=2, as_frame=True, parser='auto')
+X = adult_data.data
+y = adult_data.target
+
+# Identify categorical features
+categorical_features = X.select_dtypes(include=['category', 'object']).columns.tolist()
+print(f"Categorical features: {categorical_features}")
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print(f"Training set size: {X_train.shape[0]}")
+print(f"Test set size: {X_test.shape[0]}")
+
+# Initialize CatBoostClassifier with basic parameters
+# CatBoost handles categorical features natively
+print("\nTraining initial CatBoost model...")
+base_model = CatBoostClassifier(
+    iterations=100,
+    random_seed=42,
+    verbose=0,
+    cat_features=categorical_features
+)
+
+base_model.fit(X_train, y_train)
+y_pred_base = base_model.predict(X_test)
+base_accuracy = accuracy_score(y_test, y_pred_base)
+print(f"Base model accuracy: {base_accuracy:.4f}")
+
+# Hyperparameter tuning: depth and learning_rate
+print("\nTuning hyperparameters (depth and learning_rate)...")
+param_grid = {
+    'depth': [4, 6, 8],
+    'learning_rate': [0.01, 0.05, 0.1]
+}
+
+# Use a smaller subset for faster tuning in this example
+tuning_model = CatBoostClassifier(
+    iterations=50,
+    random_seed=42,
+    verbose=0,
+    cat_features=categorical_features
+)
+
+grid_search = GridSearchCV(
+    estimator=tuning_model,
+    param_grid=param_grid,
+    cv=3,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=0
+)
+
+gridsearch.fit(X_train, y_train)
+
+print(f"Best parameters: {grid_search.best_params_}")
+print(f"Best cross-validation accuracy: {grid_search.best_score_:.4f}")
+
+# Train final model with best parameters
+print("\nTraining final model with best parameters...")
+final_model = CatBoostClassifier(
+    iterations=100,
+    depth=grid_search.best_params_['depth'],
+    learning_rate=grid_search.best_params_['learning_rate'],
+    random_seed=42,
+    verbose=0,
+    cat_features=categorical_features
+)
+
+final_model.fit(X_train, y_train)
+y_pred_final = final_model.predict(X_test)
+final_accuracy = accuracy_score(y_test, y_pred_final)
+print(f"Final model accuracy: {final_accuracy:.4f}")
+
+# Feature importance
+print("\nExtracting feature importance...")
+feature_importance = final_model.get_feature_importance()
+feature_names = X.columns.tolist()
+
+# Create a DataFrame for better visualization
+importance_df = pd.DataFrame({
+    'feature': feature_names,
+    'importance': feature_importance
+}).sort_values('importance', ascending=False)
+
+print("\nTop 10 most important features:")
+print(importance_df.head(10))
+
+# Visualize feature importance
+plt.figure(figsize=(10, 6))
+top_n = 10
+top_features = importance_df.head(top_n)
+plt.barh(range(top_n), top_features['importance'].values)
+plt.yticks(range(top_n), top_features['feature'].values)
+plt.xlabel('Feature Importance')
+plt.ylabel('Feature')
+plt.title('Top 10 Feature Importances (CatBoost)')
+plt.gca().invert_yaxis()
+plt.tight_layout()
+plt.show()
+
+print("\n=== Summary ===")
+print(f"Base model accuracy: {base_accuracy:.4f}")
+print(f"Tuned model accuracy: {final_accuracy:.4f}")
+print(f"Best depth: {grid_search.best_params_['depth']}")
+print(f"Best learning rate: {grid_search.best_params_['learning_rate']}")
+print(f"Most important feature: {importance_df.iloc[0]['feature']}")

@@ -1,0 +1,216 @@
+Fix this Python file.
+Return the full corrected file inside <correct_code> tags.
+
+Traceback tail:
+SyntaxError: the previous generated code failed to parse. Fix the syntax and produce runnable code.
+
+Incorrect file:
+import numpy as np
+
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load California housing dataset
+print("Loading California housing dataset...")
+data = fetch_california_housing()
+X = data.data
+y = data.target
+feature_names = data.feature_names
+
+# Split data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Standardize features for better model performance
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train GradientBoostingRegressor
+print("\nTraining GradientBoostingRegressor...")
+model = GradientBoostingRegressor(
+    n_estimators=100,
+    learning_rate=0.1,
+    max_depth=4,
+    random_state=42
+)
+model.fit(X_train_scaled, y_train)
+
+# Evaluate model
+train_score = model.score(X_train_scaled, y_train)
+test_score = model.score(X_test_scaled, y_test)
+print(f"Train R² score: {train_score:.4f}")
+print(f"Test R² score: {test_score:.4f}")
+
+# Select a few test instances for counterfactual explanation
+num_instances = 3
+test_indices = np.random.choice(len(X_test_scaled), num_instances, replace=False)
+test_instances = X_test_scaled[test_indices]
+original_predictions = model.predict(test_instances)
+
+print("\n" + "="*80)
+print("COUNTERFACTUAL EXPLANATIONS")
+print("="*80)
+
+# Manual counterfactual generation using gradient-based approach
+# For each test instance, we'll find minimal feature changes to achieve a target prediction
+def generate_counterfactual(model, instance, target_change, feature_names, 
+                           scaler, learning_rate=0.01, max_iterations=1000)
+    """
+    Generate counterfactual explanation by iteratively modifying features.
+
+    Args:
+        model: Trained model
+        instance: Original instance (scaled)
+        target_change: Desired change in prediction
+        feature_names: Names of features
+        scaler: Fitted scaler for inverse transform
+        learning_rate: Step size for gradient descent
+        max_iterations: Maximum number of iterations
+
+    Returns:
+        counterfactual: Modified instance
+        changes: Dictionary of feature changes
+    """
+    counterfactual = instance.copy()
+    original_pred = model.predict(instance.reshape(1, -1))[0]
+    target_pred = original_pred + target_change
+
+    for iteration in range(max_iterations):
+        current_pred = model.predict(counterfactual.reshape(1, -1))[0]
+
+        # Check if target is reached
+        if abs(current_pred - target_pred) < 0.01:
+            break
+
+        # Compute gradient using finite differences
+        gradients = np.zeros_like(counterfactual)
+        epsilon = 1e-5
+
+        for i in range(len(counterfactual)):
+            perturbed = counterfactual.copy()
+            perturbed[i] += epsilon
+            pred_plus = model.predict(perturbed.reshape(1, -1))[0]
+            gradients[i] = (pred_plus - current_pred) / epsilon
+
+        # Update counterfactual in direction of gradient
+        direction = np.sign(target_pred - current_pred)
+        counterfactual += direction * learning_rate * gradients
+
+    # Calculate changes in original scale
+    original_unscaled = scaler.inverse_transform(instance.reshape(1, -1))[0]
+    counterfactual_unscaled = scaler.inverse_transform(counterfactual.reshape(1, -1))[0]
+
+    changes = {}
+    for i, name in enumerate(feature_names):
+        change = counterfactual_unscaled[i] - original_unscaled[i]
+        if abs(change) > 1e-6:
+            changes[name] = {
+                'original': original_unscaled[i],
+                'counterfactual': counterfactual_unscaled[i],
+                'change': change
+            }
+
+    return counterfactual, changes
+
+# Generate counterfactuals for each test instance
+for idx, (instance, original_pred) in enumerate(zip(test_instances, original_predictions)):
+    print(f"\nInstance {idx + 1}:")
+    print(f"Original prediction: ${original_pred * 100000:.2f}")
+
+    # Try to increase price by $50,000 (0.5 in scaled units)
+    target_change = 0.5
+    counterfactual, changes = generate_counterfactual(
+        model, instance, target_change, feature_names, scaler
+    )
+
+    new_pred = model.predict(counterfactual.reshape(1, -1))[0]
+    print(f"Target prediction: ${(original_pred + target_change) * 100000:.2f}")
+    print(f"Achieved prediction: ${new_pred * 100000:.2f}")
+    print(f"Actual change: ${(new_pred - original_pred) * 100000:.2f}")
+
+    print("\nFeature changes required:")
+    if changes:
+        for feature, vals in sorted(changes.items(), 
+                                   key=lambda x: abs(x[1]['change']), 
+                                   reverse=True)[:5]:
+            print(f"  {feature}:")
+            print(f"    Original: {vals['original']:.4f}")
+            print(f"    Counterfactual: {vals['counterfactual']:.4f}")
+            print(f"    Change: {vals['change']:+.4f}")
+    else:
+        print("  No significant changes needed")
+
+# Visualize feature importance and counterfactual changes
+print("\n" + "="*80)
+print("FEATURE IMPORTANCE ANALYSIS")
+print("="*80)
+
+feature_importance = model.feature_importances_
+sorted_idx = np.argsort(feature_importance)[::-1]
+
+print("\nTop 5 most important features:")
+for i in range(min(5, len(sorted_idx))):
+    idx = sorted_idx[i]
+    print(f"  {feature_names[idx]}: {feature_importance[idx]:.4f}")
+
+# Plot feature importance
+plt.figure(figsize=(10, 6))
+plt.barh(range(len(feature_names)), feature_importance[sorted_idx])
+plt.yticks(range(len(feature_names)), [feature_names[i] for i in sorted_idx])
+plt.xlabel('Feature Importance')
+plt.title('GradientBoostingRegressor Feature Importance')
+plt.tight_layout()
+plt.savefig('feature_importance.png', dpi=100, bbox_inches='tight')
+print("\nFeature importance plot saved as 'feature_importance.png'")
+plt.close()
+
+# Visualize counterfactual for first instance
+if num_instances > 0:
+    instance = test_instances[0]
+    original_pred = original_predictions[0]
+    target_change = 0.5
+    counterfactual, changes = generate_counterfactual(
+        model, instance, target_change, feature_names, scaler
+    )
+
+    # Plot original vs counterfactual features
+    original_unscaled = scaler.inverse_transform(instance.reshape(1, -1))[0]
+    counterfactual_unscaled = scaler.inverse_transform(counterfactual.reshape(1, -1))[0]
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    x_pos = np.arange(len(feature_names))
+    width = 0.35
+
+    ax.bar(x_pos - width/2, original_unscaled, width, label='Original', alpha=0.8)
+    ax.bar(x_pos + width/2, counterfactual_unscaled, width, label='Counterfactual', alpha=0.8)
+
+    ax.set_xlabel('Features')
+    ax.set_ylabel('Feature Values')
+    ax.set_title('Original vs Counterfactual Feature Values (Instance 1)')
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels(feature_names, rotation=45, ha='right')
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig('counterfactual_comparison.png', dpi=100, bbox_inches='tight')
+    print("Counterfactual comparison plot saved as 'counterfactual_comparison.png'")
+    plt.close()
+
+print("\n" + "="*80)
+print("SUMMARY")
+print("="*80)
+print(f"\nGenerated counterfactual explanations for {num_instances} test instances.")
+print("Counterfactuals show minimal feature changes needed to increase house price.")
+print("This helps understand which features have the most impact on predictions.")
+print("\nKey insights:")
+print("- Counterfactual explanations provide actionable insights")
+print("- They show what-if scenarios for feature modifications")
+print("- Useful for understanding model behavior and decision boundaries")
+print("- Can guide feature engineering and data collection strategies")

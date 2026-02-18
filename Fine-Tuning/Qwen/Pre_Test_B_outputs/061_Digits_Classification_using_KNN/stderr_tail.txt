@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\preTest_runtime_A\patched\061_Digits_Classification_using_KNN\prediction.py"[0m, line [35m26[0m, in [35m<module>[0m
+    X_train, X_test, y_train, y_test = [31mtrain_test_split[0m[1;31m([0m
+                                       [31m~~~~~~~~~~~~~~~~[0m[1;31m^[0m
+        [1;31mX, y, test_size=1.5, random_state=42, stratify=y[0m
+        [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+    [1;31m)[0m
+    [1;31m^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\utils\_param_validation.py"[0m, line [35m208[0m, in [35mwrapper[0m
+    [31mvalidate_parameter_constraints[0m[1;31m([0m
+    [31m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^[0m
+        [1;31mparameter_constraints, params, caller_name=func.__qualname__[0m
+        [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+    [1;31m)[0m
+    [1;31m^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\utils\_param_validation.py"[0m, line [35m98[0m, in [35mvalidate_parameter_constraints[0m
+    raise InvalidParameterError(
+    ...<2 lines>...
+    )
+[1;35msklearn.utils._param_validation.InvalidParameterError[0m: [35mThe 'test_size' parameter of train_test_split must be a float in the range (0.0, 1.0), an int in the range [1, inf) or None. Got 1.5 instead.[0m

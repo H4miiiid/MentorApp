@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\preTest_runtime_A\patched\046_Penguins_Migration_Time_Series_ARIMA\prediction.py"[0m, line [35m10[0m, in [35m<module>[0m
+    from statsmodels.tsa.arima.model import ARIMA
+[1;35mModuleNotFoundError[0m: [35mNo module named 'statsmodels'[0m

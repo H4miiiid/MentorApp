@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\preTest_runtime_A\patched\075_Breast_Cancer_Diagnosis_with_LightGBM\prediction.py"[0m, line [35m77[0m, in [35m<module>[0m
+    y_pred_proba = [1;31mmodle[0m.predict(X_test, num_iteration=modle.best_iteration)
+                   [1;31m^^^^^[0m
+[1;35mNameError[0m: [35mname 'modle' is not defined. Did you mean: 'model'?[0m

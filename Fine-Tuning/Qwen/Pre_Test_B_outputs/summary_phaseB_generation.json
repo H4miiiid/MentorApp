@@ -1,0 +1,209 @@
+[
+  {
+    "sid": "001_CIFAR-10_Deep_CNN_Data_Augmentation",
+    "status": "OK",
+    "latency_s": 9.091,
+    "pred_len": 6559,
+    "source_idx": 2,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\001_CIFAR-10_Deep_CNN_Data_Augmentation\\prediction.py",
+    "source_patched": null
+  },
+  {
+    "sid": "010_MNIST_Digit_Distribution_Check",
+    "status": "OK",
+    "latency_s": 8.097,
+    "pred_len": 1906,
+    "source_idx": 11,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\010_MNIST_Digit_Distribution_Check\\prediction.py",
+    "source_patched": null
+  },
+  {
+    "sid": "012_Fashion_MNIST_CNN_Early_Stopping",
+    "status": "OK",
+    "latency_s": 5.472,
+    "pred_len": 3737,
+    "source_idx": 13,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\012_Fashion_MNIST_CNN_Early_Stopping\\prediction.py",
+    "source_patched": null
+  },
+  {
+    "sid": "013_Digits_Classification_using_Convolutiona",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 9.112,
+    "pred_len": 0,
+    "source_idx": 14,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\013_Digits_Classification_using_Convolutiona\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\013_Digits_Classification_using_Convolutiona\\prediction.py"
+  },
+  {
+    "sid": "014_IMDB_Sentiment_Analysis_using_LSTM",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 8.907,
+    "pred_len": 0,
+    "source_idx": 15,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py"
+  },
+  {
+    "sid": "017_Reuters_News_Topic_Classification",
+    "status": "OK",
+    "latency_s": 8.585,
+    "pred_len": 3129,
+    "source_idx": 18,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\017_Reuters_News_Topic_Classification\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\017_Reuters_News_Topic_Classification\\prediction.py"
+  },
+  {
+    "sid": "026_Titanic_Survival_ROC_Curve",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 8.882,
+    "pred_len": 0,
+    "source_idx": 27,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\026_Titanic_Survival_ROC_Curve\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\026_Titanic_Survival_ROC_Curve\\prediction.py"
+  },
+  {
+    "sid": "031_California_Counterfactual_Explainability",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 8.817,
+    "pred_len": 0,
+    "source_idx": 32,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\031_California_Counterfactual_Explainability\\prediction.py",
+    "source_patched": null
+  },
+  {
+    "sid": "033_Digits_Autoencoder_Reconstruction",
+    "status": "OK",
+    "latency_s": 9.977,
+    "pred_len": 2711,
+    "source_idx": 34,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\033_Digits_Autoencoder_Reconstruction\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\033_Digits_Autoencoder_Reconstruction\\prediction.py"
+  },
+  {
+    "sid": "046_Penguins_Migration_Time_Series_ARIMA",
+    "status": "OK",
+    "latency_s": 9.155,
+    "pred_len": 4686,
+    "source_idx": 47,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py"
+  },
+  {
+    "sid": "047_Heart_Model_Calibration_Plot",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 9.523,
+    "pred_len": 0,
+    "source_idx": 48,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\047_Heart_Model_Calibration_Plot\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\047_Heart_Model_Calibration_Plot\\prediction.py"
+  },
+  {
+    "sid": "048_Sunspots_SARIMAX_Seasonal_Forecast_Model",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 6.152,
+    "pred_len": 0,
+    "source_idx": 49,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py"
+  },
+  {
+    "sid": "057_MNIST_Voting_Ensemble_Classification",
+    "status": "OK",
+    "latency_s": 5.445,
+    "pred_len": 4368,
+    "source_idx": 58,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\057_MNIST_Voting_Ensemble_Classification\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\057_MNIST_Voting_Ensemble_Classification\\prediction.py"
+  },
+  {
+    "sid": "058_Diabetes_Progression_Neural_Network_Regr",
+    "status": "OK",
+    "latency_s": 8.937,
+    "pred_len": 4074,
+    "source_idx": 59,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py"
+  },
+  {
+    "sid": "061_Digits_Classification_using_KNN",
+    "status": "OK",
+    "latency_s": 9.117,
+    "pred_len": 2579,
+    "source_idx": 62,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\061_Digits_Classification_using_KNN\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\061_Digits_Classification_using_KNN\\prediction.py"
+  },
+  {
+    "sid": "071_Reuters_Topic_Classification_with_LSTM",
+    "status": "OK",
+    "latency_s": 4.032,
+    "pred_len": 3278,
+    "source_idx": 72,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py"
+  },
+  {
+    "sid": "075_Breast_Cancer_Diagnosis_with_LightGBM",
+    "status": "OK",
+    "latency_s": 6.585,
+    "pred_len": 3190,
+    "source_idx": 76,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\075_Breast_Cancer_Diagnosis_with_LightGBM\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\075_Breast_Cancer_Diagnosis_with_LightGBM\\prediction.py"
+  },
+  {
+    "sid": "076_Fashion_MNIST_Transfer_Learning_with_Mob",
+    "status": "UNPARSEABLE_OUTPUT",
+    "latency_s": 16.0,
+    "pred_len": 0,
+    "source_idx": 77,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py"
+  },
+  {
+    "sid": "077_Iris_tSNE_Cluster_Visualization",
+    "status": "OK",
+    "latency_s": 9.298,
+    "pred_len": 2672,
+    "source_idx": 78,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\077_Iris_tSNE_Cluster_Visualization\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\077_Iris_tSNE_Cluster_Visualization\\prediction.py"
+  },
+  {
+    "sid": "080_IMDB_Sentiment_Bidirectional_LSTM_Embedd",
+    "status": "OK",
+    "latency_s": 8.559,
+    "pred_len": 7856,
+    "source_idx": 81,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py"
+  },
+  {
+    "sid": "083_Adult_Income_CatBoost_Classifier",
+    "status": "OK",
+    "latency_s": 4.422,
+    "pred_len": 3746,
+    "source_idx": 84,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\083_Adult_Income_CatBoost_Classifier\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\083_Adult_Income_CatBoost_Classifier\\prediction.py"
+  },
+  {
+    "sid": "086_IMDB_Sentiment_BERT_Fine-Tuning",
+    "status": "OK",
+    "latency_s": 6.529,
+    "pred_len": 6510,
+    "source_idx": 87,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py"
+  },
+  {
+    "sid": "087_Digits_PCA_Explained_Variance",
+    "status": "OK",
+    "latency_s": 3.401,
+    "pred_len": 2762,
+    "source_idx": 88,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Pre_Test_A_outputs\\087_Digits_PCA_Explained_Variance\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\preTest_runtime_A\\patched\\087_Digits_PCA_Explained_Variance\\prediction.py"
+  }
+]
