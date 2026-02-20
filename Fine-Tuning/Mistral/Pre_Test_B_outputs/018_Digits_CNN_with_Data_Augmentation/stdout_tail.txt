@@ -1,0 +1,8 @@
+Training samples: 1437
+Validation samples: 360
+Image shape: (8, 8, 1)
+
+=== Training Baseline Dense Model (No Augmentation) ===
+Dense model final validation accuracy: 0.9639
+
+=== Visualizing Augmented Samples ===

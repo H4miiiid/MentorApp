@@ -1,0 +1,9 @@
+Dataset shape: (10000, 21)
+Normal transactions: 9461
+Anomalous transactions: 539
+
+Training set shape: (7568, 20)
+Validation set shape: (1893, 20)
+Anomalous set shape: (539, 20)
+
+Training VAE...

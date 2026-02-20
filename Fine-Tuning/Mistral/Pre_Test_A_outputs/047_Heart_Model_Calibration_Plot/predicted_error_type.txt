@@ -1,0 +1,1 @@
+Typo in `plt.plott()` (should be `plt.plot()`)

@@ -1,0 +1,1 @@
+Typo in variable name 'X_trian' instead of 'X_train' when fitting the GaussianNB model

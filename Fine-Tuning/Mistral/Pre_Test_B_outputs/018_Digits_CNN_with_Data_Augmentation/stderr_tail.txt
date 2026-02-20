@@ -1,0 +1,7 @@
+c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\keras\src\layers\reshaping\flatten.py:37: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\018_Digits_CNN_with_Data_Augmentation\prediction.py"[0m, line [35m134[0m, in [35m<module>[0m
+    axes[1, 0].imshow([31msample_image2[0m[1;31m[0, :, :, 0][0m, cmap='gray')
+                      [31m~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^[0m
+[1;35mIndexError[0m: [35mindex 0 is out of bounds for axis 0 with size 0[0m

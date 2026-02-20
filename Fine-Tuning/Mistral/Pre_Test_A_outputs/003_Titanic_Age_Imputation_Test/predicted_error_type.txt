@@ -1,0 +1,1 @@
+SyntaxError: Missing colon in the if statement condition

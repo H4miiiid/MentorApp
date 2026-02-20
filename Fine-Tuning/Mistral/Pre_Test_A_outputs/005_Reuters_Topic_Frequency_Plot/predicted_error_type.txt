@@ -1,0 +1,1 @@
+Variable name typo: `total_articls` should be `total_articles` in the print statement.

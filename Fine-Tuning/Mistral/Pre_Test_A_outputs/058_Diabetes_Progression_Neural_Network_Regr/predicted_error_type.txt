@@ -1,0 +1,1 @@
+Typo in variable name 'y_trian' instead of 'y_train' when training the model

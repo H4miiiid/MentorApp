@@ -1,0 +1,236 @@
+[
+  {
+    "sid": "008_Breast_Cancer_SVM_Classifier",
+    "status": "OK",
+    "latency_s": 15.101,
+    "pred_len": 4398,
+    "source_idx": 9,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\008_Breast_Cancer_SVM_Classifier\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\008_Breast_Cancer_SVM_Classifier\\prediction.py"
+  },
+  {
+    "sid": "014_IMDB_Sentiment_Analysis_using_LSTM",
+    "status": "OK",
+    "latency_s": 12.511,
+    "pred_len": 3737,
+    "source_idx": 15,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py"
+  },
+  {
+    "sid": "017_Reuters_News_Topic_Classification",
+    "status": "OK",
+    "latency_s": 10.044,
+    "pred_len": 3153,
+    "source_idx": 18,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\017_Reuters_News_Topic_Classification\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\017_Reuters_News_Topic_Classification\\prediction.py"
+  },
+  {
+    "sid": "018_Digits_CNN_with_Data_Augmentation",
+    "status": "OK",
+    "latency_s": 26.451,
+    "pred_len": 7458,
+    "source_idx": 19,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\018_Digits_CNN_with_Data_Augmentation\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\018_Digits_CNN_with_Data_Augmentation\\prediction.py"
+  },
+  {
+    "sid": "025_Diabetes_Progression_LightGBM_Regression",
+    "status": "OK",
+    "latency_s": 13.876,
+    "pred_len": 4480,
+    "source_idx": 26,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\025_Diabetes_Progression_LightGBM_Regression\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\025_Diabetes_Progression_LightGBM_Regression\\prediction.py"
+  },
+  {
+    "sid": "026_Titanic_Survival_ROC_Curve",
+    "status": "OK",
+    "latency_s": 18.432,
+    "pred_len": 5108,
+    "source_idx": 27,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\026_Titanic_Survival_ROC_Curve\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\026_Titanic_Survival_ROC_Curve\\prediction.py"
+  },
+  {
+    "sid": "033_Digits_Autoencoder_Reconstruction",
+    "status": "OK",
+    "latency_s": 10.377,
+    "pred_len": 2707,
+    "source_idx": 34,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\033_Digits_Autoencoder_Reconstruction\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\033_Digits_Autoencoder_Reconstruction\\prediction.py"
+  },
+  {
+    "sid": "041_IMDB_Sentiment_Ensemble_Stacking",
+    "status": "OK",
+    "latency_s": 12.353,
+    "pred_len": 3550,
+    "source_idx": 42,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\041_IMDB_Sentiment_Ensemble_Stacking\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\041_IMDB_Sentiment_Ensemble_Stacking\\prediction.py"
+  },
+  {
+    "sid": "042_Digits_Classification_with_CNN_and_Dropo",
+    "status": "OK",
+    "latency_s": 13.856,
+    "pred_len": 3928,
+    "source_idx": 43,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\042_Digits_Classification_with_CNN_and_Dropo\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\042_Digits_Classification_with_CNN_and_Dropo\\prediction.py"
+  },
+  {
+    "sid": "045_Credit_Card_Anomaly_Detection_VAE",
+    "status": "OK",
+    "latency_s": 25.62,
+    "pred_len": 8917,
+    "source_idx": 46,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\045_Credit_Card_Anomaly_Detection_VAE\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\045_Credit_Card_Anomaly_Detection_VAE\\prediction.py"
+  },
+  {
+    "sid": "046_Penguins_Migration_Time_Series_ARIMA",
+    "status": "OK",
+    "latency_s": 15.144,
+    "pred_len": 4342,
+    "source_idx": 47,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py"
+  },
+  {
+    "sid": "047_Heart_Model_Calibration_Plot",
+    "status": "OK",
+    "latency_s": 6.305,
+    "pred_len": 1935,
+    "source_idx": 48,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\047_Heart_Model_Calibration_Plot\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\047_Heart_Model_Calibration_Plot\\prediction.py"
+  },
+  {
+    "sid": "048_Sunspots_SARIMAX_Seasonal_Forecast_Model",
+    "status": "OK",
+    "latency_s": 14.342,
+    "pred_len": 4548,
+    "source_idx": 49,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py"
+  },
+  {
+    "sid": "057_MNIST_Voting_Ensemble_Classification",
+    "status": "OK",
+    "latency_s": 13.734,
+    "pred_len": 4288,
+    "source_idx": 58,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\057_MNIST_Voting_Ensemble_Classification\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\057_MNIST_Voting_Ensemble_Classification\\prediction.py"
+  },
+  {
+    "sid": "058_Diabetes_Progression_Neural_Network_Regr",
+    "status": "OK",
+    "latency_s": 12.277,
+    "pred_len": 4049,
+    "source_idx": 59,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py"
+  },
+  {
+    "sid": "060_Breast_Cancer_Tree_Ensemble",
+    "status": "OK",
+    "latency_s": 18.741,
+    "pred_len": 4521,
+    "source_idx": 61,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\060_Breast_Cancer_Tree_Ensemble\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\060_Breast_Cancer_Tree_Ensemble\\prediction.py"
+  },
+  {
+    "sid": "065_MNIST_Digit_Normalization_KNN",
+    "status": "OK",
+    "latency_s": 12.553,
+    "pred_len": 2763,
+    "source_idx": 66,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\065_MNIST_Digit_Normalization_KNN\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\065_MNIST_Digit_Normalization_KNN\\prediction.py"
+  },
+  {
+    "sid": "071_Reuters_Topic_Classification_with_LSTM",
+    "status": "OK",
+    "latency_s": 11.911,
+    "pred_len": 3272,
+    "source_idx": 72,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py"
+  },
+  {
+    "sid": "074_Fashion_MNIST_Hyperparameter_Search",
+    "status": "OK",
+    "latency_s": 32.461,
+    "pred_len": 8047,
+    "source_idx": 75,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\074_Fashion_MNIST_Hyperparameter_Search\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\074_Fashion_MNIST_Hyperparameter_Search\\prediction.py"
+  },
+  {
+    "sid": "076_Fashion_MNIST_Transfer_Learning_with_Mob",
+    "status": "OK",
+    "latency_s": 19.574,
+    "pred_len": 5068,
+    "source_idx": 77,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py"
+  },
+  {
+    "sid": "077_Iris_tSNE_Cluster_Visualization",
+    "status": "OK",
+    "latency_s": 9.265,
+    "pred_len": 2707,
+    "source_idx": 78,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\077_Iris_tSNE_Cluster_Visualization\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\077_Iris_tSNE_Cluster_Visualization\\prediction.py"
+  },
+  {
+    "sid": "079_Breast_Cancer_Gradient_Boosting_Classifi",
+    "status": "OK",
+    "latency_s": 7.594,
+    "pred_len": 2169,
+    "source_idx": 80,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\079_Breast_Cancer_Gradient_Boosting_Classifi\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\079_Breast_Cancer_Gradient_Boosting_Classifi\\prediction.py"
+  },
+  {
+    "sid": "080_IMDB_Sentiment_Bidirectional_LSTM_Embedd",
+    "status": "OK",
+    "latency_s": 12.44,
+    "pred_len": 3651,
+    "source_idx": 81,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py"
+  },
+  {
+    "sid": "083_Adult_Income_CatBoost_Classifier",
+    "status": "OK",
+    "latency_s": 12.069,
+    "pred_len": 3945,
+    "source_idx": 84,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\083_Adult_Income_CatBoost_Classifier\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\083_Adult_Income_CatBoost_Classifier\\prediction.py"
+  },
+  {
+    "sid": "084_Wine_Alcohol_Content_Prediction",
+    "status": "OK",
+    "latency_s": 5.542,
+    "pred_len": 1816,
+    "source_idx": 85,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\084_Wine_Alcohol_Content_Prediction\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\084_Wine_Alcohol_Content_Prediction\\prediction.py"
+  },
+  {
+    "sid": "086_IMDB_Sentiment_BERT_Fine-Tuning",
+    "status": "OK",
+    "latency_s": 18.721,
+    "pred_len": 6451,
+    "source_idx": 87,
+    "source_file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py",
+    "source_patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_A\\patched\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py"
+  }
+]

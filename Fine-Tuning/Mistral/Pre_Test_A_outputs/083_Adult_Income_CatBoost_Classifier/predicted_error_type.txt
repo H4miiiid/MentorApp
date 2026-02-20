@@ -1,0 +1,1 @@
+Variable name mismatch (gridsearch vs grid_search) and missing target conversion to binary for accuracy_score

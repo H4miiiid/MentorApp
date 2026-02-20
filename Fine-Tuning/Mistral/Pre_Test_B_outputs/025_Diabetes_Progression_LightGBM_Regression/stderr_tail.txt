@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\025_Diabetes_Progression_LightGBM_Regression\prediction.py"[0m, line [35m74[0m, in [35m<module>[0m
+    lgb_model = lgb.train(
+        params,
+    ...<4 lines>...
+        early_stopping_rounds=10  # Added to prevent overfitting
+    )
+[1;35mTypeError[0m: [35mtrain() got an unexpected keyword argument 'early_stopping_rounds'[0m

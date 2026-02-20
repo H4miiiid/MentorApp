@@ -1,0 +1,1 @@
+Method name typo: "predic" instead of "predict" in RandomForestClassifier prediction.

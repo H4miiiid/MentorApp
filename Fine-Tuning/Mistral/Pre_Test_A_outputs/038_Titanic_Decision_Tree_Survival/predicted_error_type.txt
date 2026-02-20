@@ -1,0 +1,1 @@
+The original bug was using an extremely large test_size (0.9) which would result in a very small training set (only 10% of data), making the model evaluation unreliable and potentially overfitting to the test set.

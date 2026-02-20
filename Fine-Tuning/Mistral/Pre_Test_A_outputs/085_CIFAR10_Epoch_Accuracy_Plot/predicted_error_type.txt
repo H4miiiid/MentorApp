@@ -1,0 +1,1 @@
+SyntaxError: dictionary key 'bar' not found in {'foo': 1} (unrelated to the main code)

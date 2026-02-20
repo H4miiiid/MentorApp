@@ -1,0 +1,1 @@
+The CNN model was not properly fitted within the KerasClassifierWrapper class, causing the ensemble to fail.

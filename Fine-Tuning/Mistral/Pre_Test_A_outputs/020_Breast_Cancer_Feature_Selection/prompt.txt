@@ -1,0 +1,136 @@
+Incorrect code:
+```python
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_selection import RFE
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the breast cancer dataset
+data = load_breast_cancer()
+X = data.data
+y = data.target
+feature_names = data.feature_names
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Standardize the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train a logistic regression model with all features
+print("=" * 60)
+print("Model Performance with ALL Features")
+print("=" * 60)
+lr_all = LogisticRegression(max_iter=10000, random_state=42)
+lr_all.fit(X_train_scaled, y_train)
+y_pred_all = lr_all.predict(X_test_scaled)
+accuracy_all = accuracy_score(y_test, y_pred_all)
+print(f"Number of features: {X_train_scaled.shape[1]}")
+print(f"Accuracy: {accuracy_all:.4f}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred_all, target_names=data.target_names))
+
+# Perform Recursive Feature Elimination (RFE)
+print("\n" + "=" * 60)
+print("Performing Recursive Feature Elimination (RFE)")
+print("=" * 60)
+
+# Use RFE to select the top 10 features
+n_features_to_select = 10
+lr_rfe = LogisticRegression(max_iter=10000, random_state=42)
+rfe = RFE(estimator=lr_rfe, n_features_to_select=n_features_to_select)
+rfe.fit(X_train_scaled, y_train)
+
+# Get the selected features
+selected_features_mask = rfe.support_
+selected_features = feature_names[selected_features_mask]
+print(f"\nSelected {n_features_to_select} features:")
+for i, feature in enumerate(selected_features, 1):
+    print(f"{i}. {feature}")
+
+# Get feature rankings
+feature_ranking = rfe.ranking_
+feature_ranking_df = pd.DataFrame({
+    'Feature': feature_names,
+    'Ranking': feature_ranking,
+    'Selected': selected_features_mask
+}).sort_values('Ranking')
+
+print("\nFeature Rankings (1 = selected):")
+print(feature_ranking_df.to_string(index=False))
+
+# Transform the data to use only selected features
+X_train_selected = rfe.transform(X_train_scaled)
+X_test_selected = rfe.transform(X_test_scaled)
+
+# Train a logistic regression model with selected features
+print("\n" + "=" * 60)
+print("Model Performance with SELECTED Features")
+print("=" * 60)
+lr_selected = LogisticRegression(max_iter=10000, random_state=42)
+lr_selected.fit(X_train_selected, y_train)
+y_pred_selected = lr_selected.predict(X_test_selected)
+accuracy_selected = accuracy_score(y_test, y_pred_selected)
+print(f"Number of features: {X_train_selected.shape[1]}")
+print(f"Accuracy: {accuracy_selected:.4f}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred_selected, target_names=data.target_names))
+
+# Compare the performance
+print("\n" + "=" * 60)
+print("Performance Comparison")
+print("=" * 60)
+print(f"All features ({X_train_scaled.shape[1]} features): Accuracy = {accuracy_all:.4f}")
+print(f"Selected features ({n_features_to_select} features): Accuracy = {accuracy_selected:.4f}")
+print(f"Difference: {accuracy_selected - accuracy_all:.4f}")
+
+if accuracy_selected >= accuracy_all:
+    print(f"\nThe model with selected features performs as well or better with {X_train_scaled.shape[1] - n_features_to_select} fewer features!")
+else:
+    print(f"\nThe model with all features has slightly better accuracy, but the selected features model is more efficient.")
+
+# Visualize the comparison
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# Confusion matrix for all features
+cm_all = confusion_matrix(y_test, y_pred_all)
+sns.heatmap(cm_all, annot=True, fmt='d', cmap='Blues', ax=axes[0],
+            xticklabels=data.target_names, yticklabels=data.target_names)
+axes[0].set_title(f'All Features\nAccuracy: {accuracy_all:.4f}')
+axes[0].set_ylabel('True Label')
+axes[0].set_xlabel('Predicted Label')
+
+# Confusion matrix for selected features
+cm_selected = confusion_matrix(y_test, y_pred_selected)
+sns.heatmap(cm_selected, annot=True, fmt='d', cmap='Greens', ax=axes[1],
+            xticklabels=data.target_names, yticklabels=data.target_names)
+axes[1].set_title(f'Selected Features ({n_features_to_select})\nAccuracy: {accuracy_selected:.4f}')
+axes[1].set_ylabel('True Label')
+axes[1].set_xlabel('Predicted Label')
+
+plt.tight_layout()
+plt.shwo()
+
+# Visualize feature importance (coefficients) for selected features
+fig, ax = plt.subplots(figsize=(10, 6))
+coefficients = lr_selected.coef_[0]
+feature_importance = pd.DataFrame({
+    'Feature': selected_features,
+    'Coefficient': np.abs(coefficients)
+}).sort_values('Coefficient', ascending=True)
+
+ax.barh(feature_importance['Feature'], feature_importance['Coefficient'], color='steelblue')
+ax.set_xlabel('Absolute Coefficient Value')
+ax.set_title('Feature Importance (Selected Features)')
+ax.grid(axis='x', alpha=0.3)
+plt.tight_layout()
+plt.show()
+```

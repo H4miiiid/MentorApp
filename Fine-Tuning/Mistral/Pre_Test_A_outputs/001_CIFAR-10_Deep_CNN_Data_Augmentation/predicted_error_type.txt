@@ -1,0 +1,1 @@
+Typo in variable name 'histroy' instead of 'history' when plotting training history

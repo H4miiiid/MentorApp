@@ -1,0 +1,70 @@
+<correct_code>
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_linnerud
+from sklearn.decomposition import TruncatedSVD
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the Linnerud dataset
+linnerud = load_linnerud()
+X = linnerud.data  # Shape: (20, 3) - exercise features
+y = linnerud.target  # Shape: (20, 3) - physiological features
+
+# Combine X and y to get all six features
+# The Linnerud dataset has 3 exercise features and 3 physiological features
+X_combined = np.hstack([X, y])  # Shape: (20, 6)
+
+print("Original data shape:", X_combined.shape)
+print("Feature names (exercise):", linnerud.feature_names)
+print("Target names (physiological):", linnerud.target_names)
+print()
+
+# Apply TruncatedSVD to reduce from 6 features to 2 components
+svd = TruncatedSVD(n_components=2, random_state=42)
+X_reduced = svd.fit_transform(X_combined)
+
+print("Reduced data shape:", X_reduced.shape)
+print()
+
+# Calculate and display variance explained
+variance_explained = svd.explained_variance_ratio_
+total_variance = np.sum(variance_explained)
+
+print("Variance explained by component 1: {:.4f}".format(variance_explained[0]))
+print("Variance explained by component 2: {:.4f}".format(variance_explained[1]))
+print("Total variance retained: {:.4f}".format(total_variance))
+print()
+
+# Visualize the reduced 2D space
+plt.figure(figsize=(10, 6))
+plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c='blue', edgecolors='k', s=100, alpha=0.7)
+plt.xlabel('First Component')
+plt.ylabel('Second Component')
+plt.title('Linnerud Dataset - TruncatedSVD Dimensionality Reduction (6D -> 2D)')
+plt.grid(True, alpha=0.3)
+
+# Add sample indices as labels
+for i in range(len(X_reduced)):
+    plt.annotate(str(i), (X_reduced[i, 0], X_reduced[i, 1]),
+                 fontsize=8, alpha=0.6, xytext=(3, 3), textcoords='offset points')
+
+plt.tight_layout()
+plt.show()
+
+# Comment on variance retained
+print("\n=== Analysis ===")
+print("The TruncatedSVD successfully reduced the Linnerud dataset from 6 features to 2 components.")
+print("The two components retain {:.2f}% of the total variance in the original data.".format(total_variance * 100))
+if total_variance >= 0.7:
+    print("This is a good reduction, as most of the variance is preserved.")
+else:
+    print("A significant amount of variance is lost in this reduction.")
+print("The visualization shows the distribution of the 20 samples in the reduced 2D space.")
+```
+</correct_code>
+<error_type>
+Typo in `plt.scatter` (was `plt.scattter`).
+</error_type>

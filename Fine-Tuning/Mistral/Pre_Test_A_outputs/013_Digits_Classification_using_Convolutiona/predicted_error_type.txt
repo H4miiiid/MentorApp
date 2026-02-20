@@ -1,0 +1,1 @@
+Variable name mismatch in encoder.predict() call (using 'encodr' instead of 'encoder')

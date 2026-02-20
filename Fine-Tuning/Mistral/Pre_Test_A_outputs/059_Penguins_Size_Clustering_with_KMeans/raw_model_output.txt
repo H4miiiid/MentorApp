@@ -1,0 +1,83 @@
+```xml
+<correct_code>
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the penguins dataset from seaborn
+penguins = sns.load_dataset('penguins')
+
+# Display basic information about the dataset
+print("Penguins Dataset Info:")
+print(penguins.info())
+print("\nFirst few rows:")
+print(penguins.head())
+
+# Select numeric size measurements (bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g)
+size_features = ['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']
+
+# Drop rows with missing values in the selected features
+penguins_clean = penguins[size_features].dropna()
+
+print(f"\nNumber of samples after removing missing values: {len(penguins_clean)}")
+
+# Standardize the features (important for KMeans)
+scaler = StandardScaler()
+penguins_scaled = scaler.fit_transform(penguins_clean)
+
+# Apply KMeans clustering with 3 clusters (matching the 3 penguin species)
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+cluster_labels = kmeans.fit_predict(penguins_scaled)
+
+# Add cluster labels to the dataframe
+penguins_clean = penguins_clean.copy()
+penguins_clean['cluster'] = cluster_labels
+
+print("\nCluster assignments:")
+print(penguins_clean['cluster'].value_counts().sort_index())
+
+# Visualize clusters on a pair plot
+print("\nGenerating pair plot...")
+plt.figure(figsize=(12, 10))
+sns.pairplot(penguins_clean, hue='cluster', palette='Set1', diag_kind='kde', plot_kws={'alpha': 0.6})
+plt.suptitle('KMeans Clustering of Penguins by Size Measurements', y=1.01)
+plt.tight_layout()
+plt.show()
+
+# Display cluster centers (in original scale)
+cluster_centers_original = scaler.inverse_transform(kmeans.cluster_centers_)
+centers_df = pd.DataFrame(cluster_centers_original, columns=size_features)
+centers_df.index = [f'Cluster {i}' for i in range(3)]
+
+print("\nCluster Centers (original scale):")
+print(centers_df)
+
+# Cluster interpretation
+print("\n" + "="*60)
+print("CLUSTER INTERPRETATION")
+print("="*60)
+print("\nBased on the cluster centers and visualizations:")
+print("\n- Cluster 0: Characterized by specific size patterns")
+print("  (e.g., smaller body mass, shorter flippers, etc.)")
+print("\n- Cluster 1: Characterized by different size patterns")
+print("  (e.g., medium-sized measurements)")
+print("\n- Cluster 2: Characterized by distinct size patterns")
+print("  (e.g., larger body mass, longer flippers, etc.)")
+print("\nThese clusters likely correspond to the three penguin species")
+print("(Adelie, Chinstrap, Gentoo) in the dataset, as different species")
+print("have distinct physical characteristics.")
+print("\nThe pair plot shows how well the clusters separate in different")
+print("feature combinations, with some overlap indicating similar sizes")
+print("between certain species.")
+print("="*60)
+</correct_code>
+<error_type>
+Column name typo in 'penguins_clean['clusterr'].value_counts()' (should be 'cluster')
+</error_type>
+```

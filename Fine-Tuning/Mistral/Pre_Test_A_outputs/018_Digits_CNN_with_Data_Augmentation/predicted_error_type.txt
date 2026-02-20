@@ -1,0 +1,1 @@
+Missing colons in function definitions and incorrect slice in sample_image2 assignment

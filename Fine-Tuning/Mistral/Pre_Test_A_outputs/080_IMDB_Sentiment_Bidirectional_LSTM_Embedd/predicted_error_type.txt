@@ -1,0 +1,1 @@
+SyntaxError: Invalid syntax in Bidirectional LSTM layer (extra closing parenthesis)

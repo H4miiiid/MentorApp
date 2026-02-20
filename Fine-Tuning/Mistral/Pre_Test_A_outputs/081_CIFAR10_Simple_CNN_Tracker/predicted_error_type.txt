@@ -1,0 +1,1 @@
+Missing plt.close() after plt.savefig() could cause memory issues when running multiple plots in sequence.

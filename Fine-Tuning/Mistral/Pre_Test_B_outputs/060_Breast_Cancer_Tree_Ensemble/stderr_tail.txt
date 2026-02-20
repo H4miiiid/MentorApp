@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\060_Breast_Cancer_Tree_Ensemble\prediction.py"[0m, line [35m64[0m, in [35m<module>[0m
+    print(f"Out-of-Bag (OOB) Score: {[31mbagging_clf.oob_score_[0m[1;31m[0][0m:.4f}")  # Corrected OOB score access
+                                     [31m~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^^^[0m
+[1;35mTypeError[0m: [35m'float' object is not subscriptable[0m

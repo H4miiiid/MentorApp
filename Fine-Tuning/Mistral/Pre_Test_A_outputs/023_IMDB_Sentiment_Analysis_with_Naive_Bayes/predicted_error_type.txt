@@ -1,0 +1,1 @@
+The confusion matrix visualization had incorrect y-axis labels (0,1 were mapped to ['Negative', 'Positive'] instead of ['Positive', 'Negative'])

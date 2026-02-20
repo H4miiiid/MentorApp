@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\047_Heart_Model_Calibration_Plot\prediction.py"[0m, line [35m13[0m, in [35m<module>[0m
+    import statsmodels.api as sm
+[1;35mModuleNotFoundError[0m: [35mNo module named 'statsmodels'[0m

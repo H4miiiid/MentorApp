@@ -1,0 +1,1 @@
+Typo in method name: "fitt" instead of "fit" in autoencoder.fit()

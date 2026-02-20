@@ -1,0 +1,1 @@
+SyntaxError: invalid dictionary key expression {"valid": 0}["invalid"]

@@ -1,0 +1,1 @@
+Missing plt.close() calls after plt.savefig() which could cause memory leaks and prevent proper display of subsequent plots

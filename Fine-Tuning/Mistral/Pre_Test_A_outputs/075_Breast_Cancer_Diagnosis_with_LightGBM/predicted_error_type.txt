@@ -1,0 +1,1 @@
+Typo in variable names ('modle' instead of 'model') when making predictions and accessing best_iteration

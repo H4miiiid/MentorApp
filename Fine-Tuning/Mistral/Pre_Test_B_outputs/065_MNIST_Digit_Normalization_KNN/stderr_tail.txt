@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\065_MNIST_Digit_Normalization_KNN\prediction.py"[0m, line [35m48[0m, in [35m<module>[0m
+    accuracy = accuracy_score(y_test_subset, y_pred)
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\utils\_param_validation.py"[0m, line [35m218[0m, in [35mwrapper[0m
+    return func(*args, **kwargs)
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\metrics\_classification.py"[0m, line [35m411[0m, in [35maccuracy_score[0m
+    y_type, y_true, y_pred, sample_weight = [31m_check_targets[0m[1;31m([0m
+                                            [31m~~~~~~~~~~~~~~[0m[1;31m^[0m
+        [1;31my_true, y_pred, sample_weight[0m
+        [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+    [1;31m)[0m
+    [1;31m^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\metrics\_classification.py"[0m, line [35m108[0m, in [35m_check_targets[0m
+    [31mcheck_consistent_length[0m[1;31m(y_true, y_pred, sample_weight)[0m
+    [31m~~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\utils\validation.py"[0m, line [35m464[0m, in [35mcheck_consistent_length[0m
+    raise ValueError(
+    ...<2 lines>...
+    )
+[1;35mValueError[0m: [35mFound input variables with inconsistent numbers of samples: [1000, 9000][0m

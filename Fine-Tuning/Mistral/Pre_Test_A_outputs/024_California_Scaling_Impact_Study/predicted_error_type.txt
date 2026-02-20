@@ -1,0 +1,1 @@
+KeyError: The code incorrectly appends the RMSE with scaling to the wrong list (rmse_with_scaling instead of rmse_with_scaling)

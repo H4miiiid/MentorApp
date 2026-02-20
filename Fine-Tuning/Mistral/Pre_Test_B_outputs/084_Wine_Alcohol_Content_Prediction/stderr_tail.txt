@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\084_Wine_Alcohol_Content_Prediction\prediction.py"[0m, line [35m22[0m, in [35m<module>[0m
+    y = [31mwine.target[0m[1;31m[:, 0][0m  # Using only alcohol content (first column) as target
+        [31m~~~~~~~~~~~[0m[1;31m^^^^^^[0m
+[1;35mIndexError[0m: [35mtoo many indices for array: array is 1-dimensional, but 2 were indexed[0m

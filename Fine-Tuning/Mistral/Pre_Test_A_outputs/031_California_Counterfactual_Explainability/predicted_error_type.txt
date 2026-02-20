@@ -1,0 +1,1 @@
+Missing proper finite difference calculation for gradient computation (only used positive perturbation)

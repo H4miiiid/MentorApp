@@ -1,0 +1,618 @@
+[
+  {
+    "idx": 1,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\000_Titanic_Missing_Age_Imputation_using_Sim\\prediction.py",
+    "ok": true,
+    "seconds": 0.0056,
+    "error": ""
+  },
+  {
+    "idx": 2,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\001_CIFAR-10_Deep_CNN_Data_Augmentation\\prediction.py",
+    "ok": true,
+    "seconds": 0.0044,
+    "error": ""
+  },
+  {
+    "idx": 3,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\002_Digits_Misclassification_Report\\prediction.py",
+    "ok": true,
+    "seconds": 0.0043,
+    "error": ""
+  },
+  {
+    "idx": 4,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\003_Titanic_Age_Imputation_Test\\prediction.py",
+    "ok": true,
+    "seconds": 0.0051,
+    "error": ""
+  },
+  {
+    "idx": 5,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\004_Penguins_Domain_Adaptation_Evaluation\\prediction.py",
+    "ok": true,
+    "seconds": 0.005,
+    "error": ""
+  },
+  {
+    "idx": 6,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\005_Reuters_Topic_Frequency_Plot\\prediction.py",
+    "ok": true,
+    "seconds": 0.0043,
+    "error": ""
+  },
+  {
+    "idx": 7,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\006_Wine_Dataset_Outlier_Detection\\prediction.py",
+    "ok": true,
+    "seconds": 0.0035,
+    "error": ""
+  },
+  {
+    "idx": 8,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\007_Wine_Alcohol_Content_Decision_Tree\\prediction.py",
+    "ok": true,
+    "seconds": 0.0041,
+    "error": ""
+  },
+  {
+    "idx": 9,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\008_Breast_Cancer_SVM_Classifier\\prediction.py",
+    "ok": true,
+    "seconds": 0.0039,
+    "error": ""
+  },
+  {
+    "idx": 10,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\009_MNIST_Pixel_Intensity_Histogram_Feature_\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 11,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\010_MNIST_Digit_Distribution_Check\\prediction.py",
+    "ok": true,
+    "seconds": 0.0031,
+    "error": ""
+  },
+  {
+    "idx": 12,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\011_Tips_Dataset_Tip_Amount_Forecast\\prediction.py",
+    "ok": true,
+    "seconds": 0.0049,
+    "error": ""
+  },
+  {
+    "idx": 13,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\012_Fashion_MNIST_CNN_Early_Stopping\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 14,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\013_Digits_Classification_using_Convolutiona\\prediction.py",
+    "ok": true,
+    "seconds": 0.0034,
+    "error": ""
+  },
+  {
+    "idx": 15,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 16,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\015_Fashion_MNIST_Class_Balance_Check\\prediction.py",
+    "ok": true,
+    "seconds": 0.0039,
+    "error": ""
+  },
+  {
+    "idx": 17,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\016_IMDB_Sentiment_Analysis_Naive_Bayes\\prediction.py",
+    "ok": true,
+    "seconds": 0.0032,
+    "error": ""
+  },
+  {
+    "idx": 18,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\017_Reuters_News_Topic_Classification\\prediction.py",
+    "ok": true,
+    "seconds": 0.003,
+    "error": ""
+  },
+  {
+    "idx": 19,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\018_Digits_CNN_with_Data_Augmentation\\prediction.py",
+    "ok": true,
+    "seconds": 0.0045,
+    "error": ""
+  },
+  {
+    "idx": 20,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\019_Titanic_Survival_Ensemble_Stacking\\prediction.py",
+    "ok": true,
+    "seconds": 0.0033,
+    "error": ""
+  },
+  {
+    "idx": 21,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\020_Breast_Cancer_Feature_Selection\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 22,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\021_Breast_Cancer_Neural_Network\\prediction.py",
+    "ok": true,
+    "seconds": 0.0038,
+    "error": ""
+  },
+  {
+    "idx": 23,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\022_Titanic_Survival_Prediction_Simple\\prediction.py",
+    "ok": true,
+    "seconds": 0.0029,
+    "error": ""
+  },
+  {
+    "idx": 24,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\023_IMDB_Sentiment_Analysis_with_Naive_Bayes\\prediction.py",
+    "ok": true,
+    "seconds": 0.0034,
+    "error": ""
+  },
+  {
+    "idx": 25,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\024_California_Scaling_Impact_Study\\prediction.py",
+    "ok": true,
+    "seconds": 0.003,
+    "error": ""
+  },
+  {
+    "idx": 26,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\025_Diabetes_Progression_LightGBM_Regression\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 27,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\026_Titanic_Survival_ROC_Curve\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 28,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\027_Iris_Multi-Class_SVM_with_Hyperparameter\\prediction.py",
+    "ok": true,
+    "seconds": 0.0029,
+    "error": ""
+  },
+  {
+    "idx": 29,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\028_Tips_Dataset_Spend_Prediction\\prediction.py",
+    "ok": true,
+    "seconds": 0.003,
+    "error": ""
+  },
+  {
+    "idx": 30,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\029_Fashion_MNIST_Dropout_Eval\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 31,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\030_Breast_Cancer_Confusion_Matrix_Study\\prediction.py",
+    "ok": true,
+    "seconds": 0.0039,
+    "error": ""
+  },
+  {
+    "idx": 32,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\031_California_Counterfactual_Explainability\\prediction.py",
+    "ok": true,
+    "seconds": 0.0057,
+    "error": ""
+  },
+  {
+    "idx": 33,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\032_Breast_Cancer_Diagnosis_using_KNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0034,
+    "error": ""
+  },
+  {
+    "idx": 34,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\033_Digits_Autoencoder_Reconstruction\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 35,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\034_Iris_Clustering_Agglomerative_Hierarchy\\prediction.py",
+    "ok": true,
+    "seconds": 0.0039,
+    "error": ""
+  },
+  {
+    "idx": 36,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\035_IMDB_Sentiment_Classification_Naive_Baye\\prediction.py",
+    "ok": true,
+    "seconds": 0.0035,
+    "error": ""
+  },
+  {
+    "idx": 37,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\036_Wine_Quality_Binary_Classification_with_\\prediction.py",
+    "ok": true,
+    "seconds": 0.0027,
+    "error": ""
+  },
+  {
+    "idx": 38,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\037_Penguins_Gender_Error_Analysis\\prediction.py",
+    "ok": true,
+    "seconds": 0.0031,
+    "error": ""
+  },
+  {
+    "idx": 39,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\038_Titanic_Decision_Tree_Survival\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 40,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\039_California_Feature_Importance_Summary\\prediction.py",
+    "ok": true,
+    "seconds": 0.0028,
+    "error": ""
+  },
+  {
+    "idx": 41,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\040_Wine_Stacking_Ensemble_Evaluation\\prediction.py",
+    "ok": true,
+    "seconds": 0.0029,
+    "error": ""
+  },
+  {
+    "idx": 42,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\041_IMDB_Sentiment_Ensemble_Stacking\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 43,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\042_Digits_Classification_with_CNN_and_Dropo\\prediction.py",
+    "ok": true,
+    "seconds": 0.0033,
+    "error": ""
+  },
+  {
+    "idx": 44,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\043_Titanic_Survival_Random_Forest_GridSearc\\prediction.py",
+    "ok": true,
+    "seconds": 0.0032,
+    "error": ""
+  },
+  {
+    "idx": 45,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\044_IMDB_Review_Length_Feature_Engineering\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 46,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\045_Credit_Card_Anomaly_Detection_VAE\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 47,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py",
+    "ok": true,
+    "seconds": 0.0035,
+    "error": ""
+  },
+  {
+    "idx": 48,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\047_Heart_Model_Calibration_Plot\\prediction.py",
+    "ok": true,
+    "seconds": 0.0032,
+    "error": ""
+  },
+  {
+    "idx": 49,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 50,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\049_Linnerud_Dimensionality_Reduction\\prediction.py",
+    "ok": true,
+    "seconds": 0.003,
+    "error": ""
+  },
+  {
+    "idx": 51,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\050_California_Housing_Price_Estimate\\prediction.py",
+    "ok": true,
+    "seconds": 0.0033,
+    "error": ""
+  },
+  {
+    "idx": 52,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\051_Diamonds_Price_Regression\\prediction.py",
+    "ok": true,
+    "seconds": 0.0028,
+    "error": ""
+  },
+  {
+    "idx": 53,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\052_Wine_Quality_XGBoost_Model\\prediction.py",
+    "ok": true,
+    "seconds": 0.0027,
+    "error": ""
+  },
+  {
+    "idx": 54,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\053_California_Housing_Boosting_with_Hyperpa\\prediction.py",
+    "ok": true,
+    "seconds": 0.0032,
+    "error": ""
+  },
+  {
+    "idx": 55,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\054_Fashion_MNIST_Simple_CNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0033,
+    "error": ""
+  },
+  {
+    "idx": 56,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\055_Reuters_MultiLabel_Hierarchical_Metrics\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 57,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\056_Tips_Bill_Amount_Forecast\\prediction.py",
+    "ok": true,
+    "seconds": 0.0024,
+    "error": ""
+  },
+  {
+    "idx": 58,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\057_MNIST_Voting_Ensemble_Classification\\prediction.py",
+    "ok": true,
+    "seconds": 0.0027,
+    "error": ""
+  },
+  {
+    "idx": 59,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py",
+    "ok": true,
+    "seconds": 0.0028,
+    "error": ""
+  },
+  {
+    "idx": 60,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\059_Penguins_Size_Clustering_with_KMeans\\prediction.py",
+    "ok": true,
+    "seconds": 0.0031,
+    "error": ""
+  },
+  {
+    "idx": 61,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\060_Breast_Cancer_Tree_Ensemble\\prediction.py",
+    "ok": true,
+    "seconds": 0.0041,
+    "error": ""
+  },
+  {
+    "idx": 62,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\061_Digits_Classification_using_KNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0031,
+    "error": ""
+  },
+  {
+    "idx": 63,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\062_Fashion_MNIST_CNN_Baseline\\prediction.py",
+    "ok": true,
+    "seconds": 0.003,
+    "error": ""
+  },
+  {
+    "idx": 64,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\063_Penguins_Gender_Prediction_Naive_Bayes\\prediction.py",
+    "ok": true,
+    "seconds": 0.0031,
+    "error": ""
+  },
+  {
+    "idx": 65,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\064_Tips_Simple_Linear_Regression\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 66,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\065_MNIST_Digit_Normalization_KNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0035,
+    "error": ""
+  },
+  {
+    "idx": 67,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\066_Penguins_Species_Classification_with_Ran\\prediction.py",
+    "ok": true,
+    "seconds": 0.0036,
+    "error": ""
+  },
+  {
+    "idx": 68,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\067_Iris_Feature_Importance_Analysis\\prediction.py",
+    "ok": true,
+    "seconds": 0.0034,
+    "error": ""
+  },
+  {
+    "idx": 69,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\068_CIFAR10_Simple_CNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.0043,
+    "error": ""
+  },
+  {
+    "idx": 70,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\069_California_Housing_LightGBM_Regressor\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 71,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\070_Wine_Quality_Gradient_Boosting\\prediction.py",
+    "ok": true,
+    "seconds": 0.0041,
+    "error": ""
+  },
+  {
+    "idx": 72,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py",
+    "ok": true,
+    "seconds": 0.0035,
+    "error": ""
+  },
+  {
+    "idx": 73,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\072_California_Residual_Distribution_Across_\\prediction.py",
+    "ok": true,
+    "seconds": 0.0031,
+    "error": ""
+  },
+  {
+    "idx": 74,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\073_California_Housing_Random_Forest_Regress\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 75,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\074_Fashion_MNIST_Hyperparameter_Search\\prediction.py",
+    "ok": true,
+    "seconds": 0.0044,
+    "error": ""
+  },
+  {
+    "idx": 76,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\075_Breast_Cancer_Diagnosis_with_LightGBM\\prediction.py",
+    "ok": true,
+    "seconds": 0.0034,
+    "error": ""
+  },
+  {
+    "idx": 77,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py",
+    "ok": true,
+    "seconds": 0.0032,
+    "error": ""
+  },
+  {
+    "idx": 78,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\077_Iris_tSNE_Cluster_Visualization\\prediction.py",
+    "ok": true,
+    "seconds": 0.0028,
+    "error": ""
+  },
+  {
+    "idx": 79,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\078_Digits_Confusion_Matrix_Visualization\\prediction.py",
+    "ok": true,
+    "seconds": 0.0033,
+    "error": ""
+  },
+  {
+    "idx": 80,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\079_Breast_Cancer_Gradient_Boosting_Classifi\\prediction.py",
+    "ok": true,
+    "seconds": 0.0028,
+    "error": ""
+  },
+  {
+    "idx": 81,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py",
+    "ok": true,
+    "seconds": 0.0032,
+    "error": ""
+  },
+  {
+    "idx": 82,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\081_CIFAR10_Simple_CNN_Tracker\\prediction.py",
+    "ok": true,
+    "seconds": 0.0034,
+    "error": ""
+  },
+  {
+    "idx": 83,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\082_Breast_Cancer_Neural_Network\\prediction.py",
+    "ok": true,
+    "seconds": 0.003,
+    "error": ""
+  },
+  {
+    "idx": 84,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\083_Adult_Income_CatBoost_Classifier\\prediction.py",
+    "ok": true,
+    "seconds": 0.0037,
+    "error": ""
+  },
+  {
+    "idx": 85,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\084_Wine_Alcohol_Content_Prediction\\prediction.py",
+    "ok": true,
+    "seconds": 0.0026,
+    "error": ""
+  },
+  {
+    "idx": 86,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\085_CIFAR10_Epoch_Accuracy_Plot\\prediction.py",
+    "ok": true,
+    "seconds": 0.0028,
+    "error": ""
+  },
+  {
+    "idx": 87,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py",
+    "ok": true,
+    "seconds": 0.0045,
+    "error": ""
+  },
+  {
+    "idx": 88,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_A_outputs\\087_Digits_PCA_Explained_Variance\\prediction.py",
+    "ok": true,
+    "seconds": 0.0034,
+    "error": ""
+  }
+]

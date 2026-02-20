@@ -1,0 +1,1 @@
+Invalid test_size value (1.5) in train_test_split - test_size must be between 0.0 and 1.0 (or appropriate fraction for small datasets)

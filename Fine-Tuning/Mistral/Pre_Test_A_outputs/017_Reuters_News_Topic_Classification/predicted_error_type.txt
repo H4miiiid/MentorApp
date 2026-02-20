@@ -1,0 +1,3 @@
+The original code incorrectly tried to use TF-IDF vectorization on encoded word indices instead of raw text,
+and the word index mapping approach was flawed because reuters.get_word_index() doesn't exist.
+The code also didn't properly handle the label decoding for display in sample predictions.

@@ -1,0 +1,1 @@
+Column name typo in 'penguins_clean['clusterr'].value_counts()' (should be 'cluster')

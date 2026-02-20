@@ -1,0 +1,16 @@
+Dataset Information:
+Number of samples: 569
+Number of features: 30
+Target classes: ['malignant' 'benign']
+Training set size: 455
+Test set size: 114
+
+============================================================
+
+Training Single Decision Tree...
+Single Decision Tree Accuracy: 0.9474
+
+============================================================
+
+Training Bagging Ensemble (with OOB estimation)...
+Bagging Ensemble Accuracy: 0.9561

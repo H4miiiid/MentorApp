@@ -1,0 +1,3 @@
+The original code had two issues:
+1. The `predict()` method for LightGBM was incorrectly using `num_iteration` parameter (should be `num_iterations` with an 's')
+2. The `barhh` function was used instead of `barh` for plotting feature importance

@@ -1,0 +1,1 @@
+The original code used an excessively high perplexity value (200) for t-SNE on the Iris dataset, which is too large for this small dataset (150 samples) and could cause warnings or instability. The corrected code uses a more appropriate perplexity value (30) for the Iris dataset size.

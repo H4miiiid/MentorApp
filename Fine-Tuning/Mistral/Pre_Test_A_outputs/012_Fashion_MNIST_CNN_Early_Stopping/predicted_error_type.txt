@@ -1,0 +1,1 @@
+Invalid batch_size value (0) in model.fit() - batch_size must be greater than 0.

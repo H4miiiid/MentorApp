@@ -1,0 +1,3 @@
+Training samples: 8982
+Test samples: 2246
+Number of classes: 46

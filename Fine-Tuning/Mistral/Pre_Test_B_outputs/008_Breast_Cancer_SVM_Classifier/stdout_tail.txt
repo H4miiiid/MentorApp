@@ -1,0 +1,30 @@
+weighted avg       0.98      0.98      0.98       171
+
+
+Confusion Matrix:
+[[ 62   2]
+ [  2 105]]
+
+==================================================
+
+Logistic Regression Baseline Results:
+ROC-AUC Score: 0.9981
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   malignant       0.98      0.98      0.98        64
+      benign       0.99      0.99      0.99       107
+
+    accuracy                           0.99       171
+   macro avg       0.99      0.99      0.99       171
+weighted avg       0.99      0.99      0.99       171
+
+
+Confusion Matrix:
+[[ 63   1]
+ [  1 106]]
+
+==================================================
+
+Comparison: SVM ROC-AUC (0.9978) vs Logistic Regression ROC-AUC (0.9981)

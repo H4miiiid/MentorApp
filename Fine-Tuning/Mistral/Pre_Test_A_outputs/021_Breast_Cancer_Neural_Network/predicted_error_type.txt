@@ -1,0 +1,1 @@
+The bug was a type mismatch in batch_size parameter (string '32' instead of integer 32) and incorrect validation set indexing.

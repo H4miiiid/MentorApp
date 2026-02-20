@@ -1,0 +1,1 @@
+AttributeError: 'LinearRegression' object has no attribute 'coefs_' (should be 'coef_') and incorrect scaling of one-hot encoded features.

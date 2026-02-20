@@ -1,0 +1,8 @@
+Dataset loaded successfully.
+Training samples: 353, Testing samples: 89
+Number of features: 10
+
+Training baseline Linear Regression model...
+Linear Regression RMSE: 53.85
+
+Training LightGBM Regressor...

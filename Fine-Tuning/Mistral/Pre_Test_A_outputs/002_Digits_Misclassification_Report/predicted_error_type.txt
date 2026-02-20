@@ -1,0 +1,1 @@
+The accuracy was incorrectly calculated using the training set (X_train, y_train) instead of the test set (X_test, y_test).

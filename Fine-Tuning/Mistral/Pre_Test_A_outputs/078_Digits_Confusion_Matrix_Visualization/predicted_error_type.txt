@@ -1,0 +1,1 @@
+SyntaxError: missing closing parenthesis in SVC initialization and ConfusionMatrixDisplay colorbar parameter issue

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\079_Breast_Cancer_Gradient_Boosting_Classifi\prediction.py"[0m, line [35m30[0m, in [35m<module>[0m
+    roc_auc_scores = [1;31mcross_val_score[0m(gb_classifier, X, y, cv=5, scoring='roc_auc')
+                     [1;31m^^^^^^^^^^^^^^^[0m
+[1;35mNameError[0m: [35mname 'cross_val_score' is not defined[0m

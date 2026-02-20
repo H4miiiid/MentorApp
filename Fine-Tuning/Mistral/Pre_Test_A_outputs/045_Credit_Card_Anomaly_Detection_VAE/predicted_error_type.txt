@@ -1,0 +1,1 @@
+The main bug was in the VAE training where the decoder input was incorrectly set to the same data as the encoder input (X_train_scaled, X_train_scaled) instead of using the encoder's latent space output. Also, the Sampling layer used tf.keras.backend.random_normal which is deprecated, and the reconstruction error computation used predict() which is inefficient for this purpose.

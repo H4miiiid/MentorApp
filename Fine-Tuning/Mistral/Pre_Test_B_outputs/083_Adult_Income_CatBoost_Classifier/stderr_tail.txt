@@ -1,0 +1,41 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\083_Adult_Income_CatBoost_Classifier\prediction.py"[0m, line [35m49[0m, in [35m<module>[0m
+    [31mbase_model.fit[0m[1;31m(X_train, y_train)[0m
+    [31m~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py"[0m, line [35m5245[0m, in [35mfit[0m
+    [31mself._fit[0m[1;31m(X, y, cat_features, text_features, embedding_features, None, graph, sample_weight, None, None, None, None, baseline, use_best_model,[0m
+    [31m~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+              [1;31meval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period,[0m
+              [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+              [1;31msilent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)[0m
+              [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py"[0m, line [35m2395[0m, in [35m_fit[0m
+    train_params = self._prepare_train_params(
+        X=X, y=y, cat_features=cat_features, text_features=text_features, embedding_features=embedding_features,
+    ...<6 lines>...
+        callbacks=callbacks
+    )
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py"[0m, line [35m2275[0m, in [35m_prepare_train_params[0m
+    train_pool = _build_train_pool(X, y, cat_features, text_features, embedding_features, pairs, graph,
+                                   sample_weight, group_id, group_weight, subgroup_id, pairs_weight,
+                                   baseline, column_description)
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py"[0m, line [35m1513[0m, in [35m_build_train_pool[0m
+    train_pool = Pool(X, y, cat_features=cat_features, text_features=text_features, embedding_features=embedding_features, pairs=pairs, graph=graph, weight=sample_weight, group_id=group_id,
+                      group_weight=group_weight, subgroup_id=subgroup_id, pairs_weight=pairs_weight, baseline=baseline)
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py"[0m, line [35m855[0m, in [35m__init__[0m
+    [31mself._init[0m[1;31m(data, label, cat_features, text_features, embedding_features, embedding_features_data, pairs, graph, weight,[0m
+    [31m~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+               [1;31mgroup_id, group_weight, subgroup_id, pairs_weight, baseline, timestamp, feature_names, feature_tags, thread_count)[0m
+               [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\catboost\core.py"[0m, line [35m1491[0m, in [35m_init[0m
+    [31mself._init_pool[0m[1;31m(data, label, cat_features, text_features, embedding_features, embedding_features_data, pairs, graph, weight,[0m
+    [31m~~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+                    [1;31mgroup_id, group_weight, subgroup_id, pairs_weight, baseline, timestamp, feature_names, feature_tags, thread_count)[0m
+                    [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"_catboost.pyx"[0m, line [35m4329[0m, in [35m_catboost._PoolBase._init_pool[0m
+  File [35m"_catboost.pyx"[0m, line [35m4381[0m, in [35m_catboost._PoolBase._init_pool[0m
+  File [35m"_catboost.pyx"[0m, line [35m4190[0m, in [35m_catboost._PoolBase._init_features_order_layout_pool[0m
+  File [35m"_catboost.pyx"[0m, line [35m3075[0m, in [35m_catboost._set_features_order_data_pd_data_frame[0m
+  File [35m"_catboost.pyx"[0m, line [35m2953[0m, in [35m_catboost._set_features_order_data_pd_data_frame_categorical_column[0m
+  File [35m"_catboost.pyx"[0m, line [35m2898[0m, in [35m_catboost._set_hashed_cat_values[0m
+[1;35m_catboost.CatBoostError[0m: [35mInvalid type for cat_feature[object_idx=6,feature_idx=1]=NaN : cat_features must be integer or string, real number values and NaN values should be converted to string.[0m

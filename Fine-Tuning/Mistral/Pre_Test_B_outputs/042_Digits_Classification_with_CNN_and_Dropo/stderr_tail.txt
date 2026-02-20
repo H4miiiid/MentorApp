@@ -1,0 +1,20 @@
+c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\keras\src\layers\convolutional\base_conv.py:113: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(activity_regularizer=activity_regularizer, **kwargs)
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\042_Digits_Classification_with_CNN_and_Dropo\prediction.py"[0m, line [35m76[0m, in [35m<module>[0m
+    history = model.fit(
+        X_train, y_train,
+    ...<3 lines>...
+        verbose=1
+    )
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\keras\src\utils\traceback_utils.py"[0m, line [35m122[0m, in [35merror_handler[0m
+    raise e.with_traceback(filtered_tb) from None
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\keras\src\utils\traceback_utils.py"[0m, line [35m124[0m, in [35merror_handler[0m
+    del [1;31mfiltered_tb[0m
+        [1;31m^^^^^^^^^^^[0m
+[1;35mValueError[0m: [35mException encountered when calling MaxPooling2D.call().
+
+[1mNegative dimension size caused by subtracting 2 from 1 for '{{node sequential_1/max_pooling2d_1_2/MaxPool2d}} = MaxPool[T=DT_FLOAT, data_format="NHWC", explicit_paddings=[], ksize=[1, 2, 2, 1], padding="VALID", strides=[1, 2, 2, 1]](sequential_1/conv2d_1_2/Relu)' with input shapes: [?,1,1,64].[0m
+
+Arguments received by MaxPooling2D.call():
+  • inputs=tf.Tensor(shape=(None, 1, 1, 64), dtype=float32)[0m

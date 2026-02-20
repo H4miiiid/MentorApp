@@ -1,0 +1,80 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the iris dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+feature_names = iris.feature_names
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# Train a Gradient Boosting Classifier
+gb_classifier = GradientBoostingClassifier(n_estimators=100, random_state=42)
+gb_classifier.fit(X_train, y_train)
+
+# Extract feature importances from Gradient Boosting
+gb_importances = gb_classifier.feature_importances_
+
+# Train a Decision Tree Classifier
+dt_classifier = DecisionTreeClassifier(random_state=42)
+dt_classifier.fit(X_train, y_train)
+
+# Extract feature importances from Decision Tree
+dt_importances = dt_classifier.feature_importances_
+
+# Print feature importances
+print("Gradient Boosting Feature Importances:")
+for name, importance in zip(feature_names, gb_importances):
+    print(f"  {name}: {importance:.4f}")
+
+print("\nDecision Tree Feature Importances:")
+for name, importance in zip(feature_names, dt_importances):
+    print(f"  {name}: {importance:.4f}")
+
+# Visualize feature importances with a horizontal bar chart
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# Gradient Boosting feature importances
+y_pos = np.arange(len(feature_names))
+axes[0].barh(y_pos, gb_importances, align='center', color='skyblue')
+axes[0].set_yticks(y_pos)
+axes[0].set_yticklabels(feature_names)
+axes[0].invert_yaxis()  # Labels read top-to-bottom
+axes[0].set_xlabel('Importance')
+axes[0].set_title('Gradient Boosting Feature Importances')
+axes[0].grid(axis='x', alpha=0.3)
+
+# Decision Tree feature importances
+axes[1].barh(y_pos, dt_importances, align='center', color='lightcoral')
+axes[1].set_yticks(y_pos)
+axes[1].set_yticklabels(feature_names)
+axes[1].invert_yaxis()  # Labels read top-to-bottom
+axes[1].set_xlabel('Importance')
+axes[1].set_title('Decision Tree Feature Importances')
+axes[1].grid(axis='x', alpha=0.3)
+
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+# Print model accuracies for reference
+gb_accuracy = gb_classifier.score(X_test, y_test)
+dt_accuracy = dt_classifier.score(X_test, y_test)
+print(f"\nGradient Boosting Test Accuracy: {gb_accuracy:.4f}")
+print(f"Decision Tree Test Accuracy: {dt_accuracy:.4f}")

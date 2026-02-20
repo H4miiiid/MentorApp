@@ -1,0 +1,1 @@
+The `contamination` parameter in `IsolationForest` was incorrectly set to `1.5` (invalid value) instead of a valid float between `0` and `0.5`. Also, the percentage formatting in the discussion section was inconsistent with the earlier print statement.

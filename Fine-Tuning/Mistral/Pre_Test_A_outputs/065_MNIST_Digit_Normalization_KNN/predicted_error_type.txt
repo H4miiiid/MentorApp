@@ -1,0 +1,1 @@
+Variable name mismatch (knn_classifier instead of knn) and incorrect subset usage for test data visualization.

@@ -1,0 +1,98 @@
+import numpy as np
+from tensorflow import keras
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import accuracy_score, f1_score
+
+# Set random seeds for reproducibility
+np.random.seed(42)
+
+# Load IMDB dataset from keras
+print("Loading IMDB dataset...")
+(x_train_indices, y_train), (x_test_indices, y_test) = keras.datasets.imdb.load_data(num_words=10000)
+
+# Convert indices back to words
+word_index = keras.datasets.imdb.get_word_index()
+reverse_word_index = {v: k for k, v in word_index.items()}
+
+def decode_review(encoded_review):
+    """Decode an encoded review back to text."""
+    # Note: indices are offset by 3 (0=padding, 1=start, 2=unknown)
+    return ' '.join([reverse_word_index.get(i - 3, '?') for i in encoded_review])
+
+# Decode reviews to text
+print("Decoding reviews...")
+x_train_text = [decode_review(review) for review in x_train_indices]
+x_test_text = [decode_review(review) for review in x_test_indices]
+
+# Use a subset for faster runtime (first 5000 train, 2000 test)
+x_train_text = x_train_text[:5000]
+y_train = y_train[:5000]
+x_test_text = x_test_text[:2000]
+y_test = y_test[:2000]
+
+# Vectorize text with TF-IDF
+print("Vectorizing text with TF-IDF...")
+vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
+X_train_tfidf = vectorizer.fit_transform(x_train_text)
+X_test_tfidf = vectorizer.transform(x_test_text)
+
+# Define base models
+print("\nBuilding stacking ensemble...")
+base_models = [
+    ('lr', LogisticRegression(max_iter=500, random_state=42)),
+    ('svm', SVC(kernel='linear', probability=True, random_state=42)),
+    ('gb', GradientBoostingClassifier(n_estimators=50, random_state=42))
+]
+
+# Generate meta-features using cross-validated predictions
+print("Generating meta-features with cross-validation...")
+meta_features_train = []
+for name, model in base_models:
+    print(f"  Training {name}...")
+    # Get cross-validated predictions on training set
+    cv_preds = cross_val_predict(model, X_train_tfidf, y_train, cv=3, method='predict_proba')
+    meta_features_train.append(cv_preds[:, 1])  # Use probability of positive class
+
+# Stack meta-features horizontally
+X_train_meta = np.hstack(meta_features_train)
+
+# Train base models on full training set and generate meta-features for test set
+print("\nTraining base models on full training set...")
+meta_features_test = []
+for name, model in base_models:
+    print(f"  Training {name} on full training set...")
+    model.fit(X_train_tfidf, y_train)
+    test_preds = model.predict_proba(X_test_tfidf)[:, 1]
+    meta_features_test.append(test_preds)
+
+# Stack meta-features for test set
+X_test_meta = np.hstack(meta_features_test)
+
+# Train meta-model (Logistic Regression) on meta-features
+print("\nTraining meta-features...")
+meta_model = LogisticRegression(random_state=42)
+meta_model.fit(X_train_meta, y_train)
+
+# Make final predictions
+print("\nMaking final predictions...")
+y_pred = meta_model.predict(X_test_meta)
+
+# Evaluate the stacking ensemble
+accuracy = accuracy_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+print("\n" + "="*50)
+print("STACKING ENSEMBLE RESULTS")
+print("="*50)
+print(f"Accuracy: {accuracy:.4f}")
+print(f"F1 Score: {f1:.4f}")
+print("="*50)
+
+# Display sample predictions
+print("\nSample predictions:")
+for i in range(5):
+    print(f"Review {i+1}: True={y_test[i]}, Predicted={y_pred[i]}")

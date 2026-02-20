@@ -1,0 +1,2 @@
+The main bug was a typo in `plt.shwo()` which should be `plt.show()`.
+Additionally, the feature importance visualization was sorted in ascending order, which is counterintuitive for importance visualization.

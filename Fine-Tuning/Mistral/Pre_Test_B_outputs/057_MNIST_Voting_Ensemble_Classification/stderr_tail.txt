@@ -1,0 +1,28 @@
+c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\linear_model\_logistic.py:406: ConvergenceWarning: lbfgs failed to converge after 100 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=100).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\keras\src\layers\convolutional\base_conv.py:113: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(activity_regularizer=activity_regularizer, **kwargs)
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Mistral\preTest_runtime_A\patched\057_MNIST_Voting_Ensemble_Classification\prediction.py"[0m, line [35m108[0m, in [35m<module>[0m
+    [31mvoting_clf.fit[0m[1;31m(X_train_flat_subset, y_train_subset)[0m
+    [31m~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\base.py"[0m, line [35m1336[0m, in [35mwrapper[0m
+    return fit_method(estimator, *args, **kwargs)
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\ensemble\_voting.py"[0m, line [35m405[0m, in [35mfit[0m
+    return [31msuper().fit[0m[1;31m(X, transformed_y, **fit_params)[0m
+           [31m~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\ensemble\_voting.py"[0m, line [35m80[0m, in [35mfit[0m
+    names, clfs = [31mself._validate_estimators[0m[1;31m()[0m
+                  [31m~~~~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^^[0m
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\ensemble\_base.py"[0m, line [35m243[0m, in [35m_validate_estimators[0m
+    raise ValueError(
+    ...<3 lines>...
+    )
+[1;35mValueError[0m: [35mThe estimator KerasClassifierWrapper should be a classifier.[0m

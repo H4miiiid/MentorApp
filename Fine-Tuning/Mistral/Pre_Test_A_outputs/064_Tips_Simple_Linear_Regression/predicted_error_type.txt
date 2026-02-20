@@ -1,0 +1,1 @@
+Variable name typo: "slop" should be "slope" in the print statement.
