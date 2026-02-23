@@ -1,0 +1,28 @@
+Dataset loaded successfully.
+Training samples: 353, Testing samples: 89
+Number of features: 10
+
+Training baseline Linear Regression model...
+Linear Regression RMSE: 53.85
+
+Training LightGBM Regressor...
+LightGBM RMSE: 53.61
+
+Model Comparison:
+Linear Regression RMSE: 53.85
+LightGBM RMSE: 53.61
+Improvement: 0.24 (0.45%)
+
+Plotting feature importance...
+Feature Importance:
+  feature    importance
+2     bmi  6.241095e+06
+8      s5  3.242343e+06
+3      bp  1.446918e+06
+9      s6  1.272008e+06
+6      s3  7.682067e+05
+4      s1  7.531566e+05
+0     age  7.124176e+05
+5      s2  6.795880e+05
+1     sex  3.026412e+05
+7      s4  2.795893e+05

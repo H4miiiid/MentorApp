@@ -1,0 +1,16 @@
+Training samples: 25000
+Test samples: 25000
+Example review (encoded): [1, 14, 22, 16, 43, 530, 973, 1622, 1385, 65, 458, 4468, 66, 3941, 4, 173, 36, 256, 5, 25]...
+Example label: 1 (0=negative, 1=positive)
+
+Converting sequences to bag-of-words vectors...
+Training BOW shape: (25000, 10000)
+Test BOW shape: (25000, 10000)
+
+Training Multinomial Naive Bayes classifier...
+Training Accuracy: 0.8498
+Test Accuracy: 0.8162
+
+Example reviews with predictions:
+
+================================================================================

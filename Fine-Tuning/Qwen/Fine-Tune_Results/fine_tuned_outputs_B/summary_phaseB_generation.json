@@ -1,0 +1,164 @@
+[
+  {
+    "sample_folder": "014_IMDB_Sentiment_Analysis_using_LSTM",
+    "status": "OK",
+    "latency_s": 10.446,
+    "pred_len": 3735,
+    "source_idx": 15,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\014_IMDB_Sentiment_Analysis_using_LSTM\\prediction.py"
+  },
+  {
+    "sample_folder": "016_IMDB_Sentiment_Analysis_Naive_Bayes",
+    "status": "OK",
+    "latency_s": 9.011,
+    "pred_len": 3225,
+    "source_idx": 17,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\016_IMDB_Sentiment_Analysis_Naive_Bayes\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\016_IMDB_Sentiment_Analysis_Naive_Bayes\\prediction.py"
+  },
+  {
+    "sample_folder": "017_Reuters_News_Topic_Classification",
+    "status": "OK",
+    "latency_s": 8.973,
+    "pred_len": 3129,
+    "source_idx": 18,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\017_Reuters_News_Topic_Classification\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\017_Reuters_News_Topic_Classification\\prediction.py"
+  },
+  {
+    "sample_folder": "025_Diabetes_Progression_LightGBM_Regression",
+    "status": "OK",
+    "latency_s": 12.523,
+    "pred_len": 4449,
+    "source_idx": 26,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\025_Diabetes_Progression_LightGBM_Regression\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\025_Diabetes_Progression_LightGBM_Regression\\prediction.py"
+  },
+  {
+    "sample_folder": "026_Titanic_Survival_ROC_Curve",
+    "status": "OK",
+    "latency_s": 16.05,
+    "pred_len": 5042,
+    "source_idx": 27,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\026_Titanic_Survival_ROC_Curve\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\026_Titanic_Survival_ROC_Curve\\prediction.py"
+  },
+  {
+    "sample_folder": "033_Digits_Autoencoder_Reconstruction",
+    "status": "OK",
+    "latency_s": 7.294,
+    "pred_len": 2711,
+    "source_idx": 34,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\033_Digits_Autoencoder_Reconstruction\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\033_Digits_Autoencoder_Reconstruction\\prediction.py"
+  },
+  {
+    "sample_folder": "046_Penguins_Migration_Time_Series_ARIMA",
+    "status": "OK",
+    "latency_s": 13.054,
+    "pred_len": 4352,
+    "source_idx": 47,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py"
+  },
+  {
+    "sample_folder": "047_Heart_Model_Calibration_Plot",
+    "status": "OK",
+    "latency_s": 4.988,
+    "pred_len": 1773,
+    "source_idx": 48,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\047_Heart_Model_Calibration_Plot\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\047_Heart_Model_Calibration_Plot\\prediction.py"
+  },
+  {
+    "sample_folder": "048_Sunspots_SARIMAX_Seasonal_Forecast_Model",
+    "status": "OK",
+    "latency_s": 13.313,
+    "pred_len": 4455,
+    "source_idx": 49,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\048_Sunspots_SARIMAX_Seasonal_Forecast_Model\\prediction.py"
+  },
+  {
+    "sample_folder": "057_MNIST_Voting_Ensemble_Classification",
+    "status": "OK",
+    "latency_s": 12.0,
+    "pred_len": 4368,
+    "source_idx": 58,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\057_MNIST_Voting_Ensemble_Classification\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\057_MNIST_Voting_Ensemble_Classification\\prediction.py"
+  },
+  {
+    "sample_folder": "058_Diabetes_Progression_Neural_Network_Regr",
+    "status": "OK",
+    "latency_s": 10.559,
+    "pred_len": 4049,
+    "source_idx": 59,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\058_Diabetes_Progression_Neural_Network_Regr\\prediction.py"
+  },
+  {
+    "sample_folder": "065_MNIST_Digit_Normalization_KNN",
+    "status": "OK",
+    "latency_s": 8.927,
+    "pred_len": 2992,
+    "source_idx": 66,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\065_MNIST_Digit_Normalization_KNN\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\065_MNIST_Digit_Normalization_KNN\\prediction.py"
+  },
+  {
+    "sample_folder": "071_Reuters_Topic_Classification_with_LSTM",
+    "status": "OK",
+    "latency_s": 9.151,
+    "pred_len": 3278,
+    "source_idx": 72,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\071_Reuters_Topic_Classification_with_LSTM\\prediction.py"
+  },
+  {
+    "sample_folder": "076_Fashion_MNIST_Transfer_Learning_with_Mob",
+    "status": "OK",
+    "latency_s": 14.448,
+    "pred_len": 5069,
+    "source_idx": 77,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\076_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py"
+  },
+  {
+    "sample_folder": "077_Iris_tSNE_Cluster_Visualization",
+    "status": "OK",
+    "latency_s": 7.393,
+    "pred_len": 2671,
+    "source_idx": 78,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\077_Iris_tSNE_Cluster_Visualization\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\077_Iris_tSNE_Cluster_Visualization\\prediction.py"
+  },
+  {
+    "sample_folder": "080_IMDB_Sentiment_Bidirectional_LSTM_Embedd",
+    "status": "OK",
+    "latency_s": 9.58,
+    "pred_len": 3650,
+    "source_idx": 81,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\080_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py"
+  },
+  {
+    "sample_folder": "083_Adult_Income_CatBoost_Classifier",
+    "status": "OK",
+    "latency_s": 9.79,
+    "pred_len": 3747,
+    "source_idx": 84,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\083_Adult_Income_CatBoost_Classifier\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\083_Adult_Income_CatBoost_Classifier\\prediction.py"
+  },
+  {
+    "sample_folder": "086_IMDB_Sentiment_BERT_Fine-Tuning",
+    "status": "OK",
+    "latency_s": 15.852,
+    "pred_len": 6511,
+    "source_idx": 87,
+    "source_file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py",
+    "source_patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\086_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py"
+  }
+]

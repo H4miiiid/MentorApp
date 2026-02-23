@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"C:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\Fine-Tune_Results\fine_tuned_eval_runtime_A\patched\setting_A\025_Diabetes_Progression_LightGBM_Regression\prediction.py"[0m, line [35m117[0m, in [35m<module>[0m
+    [1;31mplt.barhh[0m(feature_importance_df['feature'], feature_importance_df['importance'])
+    [1;31m^^^^^^^^^[0m
+[1;35mAttributeError[0m: [35mmodule 'matplotlib.pyplot' has no attribute 'barhh'. Did you mean: 'barh'?[0m

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"C:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\Fine-Tune_Results\fine_tuned_eval_runtime_A\patched\setting_A\065_MNIST_Digit_Normalization_KNN\prediction.py"[0m, line [35m42[0m, in [35m<module>[0m
+    [1;31mknn_classifier[0m.fit(X_train, y_train)
+    [1;31m^^^^^^^^^^^^^^[0m
+[1;35mNameError[0m: [35mname 'knn_classifier' is not defined[0m
