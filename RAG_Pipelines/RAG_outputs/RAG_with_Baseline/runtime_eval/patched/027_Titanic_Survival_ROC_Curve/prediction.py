@@ -1,0 +1,156 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import LabelEncoder
+from sklearn.impute import SimpleImputer
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Create a synthetic Titanic-like dataset
+# Features: Pclass, Sex, Age, SibSp, Parch, Fare
+# Target: Survived (0 or 1)
+n_samples = 800
+
+# Generate synthetic features
+pclass = np.random.choice([1, 2, 3], size=n_samples, p=[0.25, 0.25, 0.5])
+sex = np.random.choice(['male', 'female'], size=n_samples, p=[0.65, 0.35])
+age = np.random.normal(30, 15, n_samples)
+age = np.clip(age, 0.5, 80)  # Clip age to reasonable range
+sibsp = np.random.choice([0, 1, 2, 3], size=n_samples, p=[0.6, 0.25, 0.1, 0.05])
+parch = np.random.choice([0, 1, 2], size=n_samples, p=[0.7, 0.2, 0.1])
+fare = np.random.exponential(30, n_samples)
+fare = np.clip(fare, 0, 500)
+
+# Create survival target with realistic patterns
+# Higher survival for: females, higher class, younger age
+survival_prob = np.zeros(n_samples)
+for i in range(n_samples):
+    prob = 0.3  # Base probability
+    if sex[i] == 'female':
+        prob += 0.4
+    if pclass[i] == 1:
+        prob += 0.2
+    elif pclass[i] == 2:
+        prob += 0.1
+    if age[i] < 18:
+        prob += 0.15
+    prob = np.clip(prob, 0, 1)
+    survival_prob[i] = prob
+
+survived = np.random.binomial(1, survival_prob)
+
+# Create DataFrame
+df = pd.DataFrame({
+    'Pclass': pclass,
+    'Sex': sex,
+    'Age': age,
+    'SibSp': sibsp,
+    'Parch': parch,
+    'Fare': fare,
+    'Survived': survived
+})
+
+# Handle missing values (simulate some missing ages)
+missing_age_idx = np.random.choice(n_samples, size=int(0.15 * n_samples), replace=False)
+df.loc[missing_age_idx, 'Age'] = np.nan
+
+# Fill missing ages with median
+imputer = SimpleImputer(strategy='median')
+df['Age'] = imputer.fit_transform(df[['Age']])
+
+# Encode categorical variable (Sex)
+le = LabelEncoder()
+df['Sex_encoded'] = le.fit_transform(df['Sex'])
+
+# Prepare features and target
+feature_cols = ['Pclass', 'Sex_encoded', 'Age', 'SibSp', 'Parch', 'Fare']
+X = df[feature_cols].values
+y = df['Survived'].values
+
+# Split data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Fit logistic regression model
+log_reg = LogisticRegression(random_state=42, max_iter=1000)
+log_reg.fit(X_train, y_train)
+
+# Compute predicted probabilities on test set
+# Get probabilities for the positive class (survived=1)
+y_pred_proba = log_reg.predict_proba(X_test)[:, 1]
+
+# Compute ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+
+# Calculate AUC score
+roc_auc = auc(fpr, tpr)
+
+print("=" * 60)
+print("Titanic Survival ROC Curve Analysis")
+print("=" * 60)
+print(f"\nAUC Score: {roc_auc:.4f}")
+print(f"Number of test samples: {len(y_test)}")
+print(f"Number of survivors in test set: {sum(y_test)}")
+print(f"Number of non-survivors in test set: {len(y_test) - sum(y_test)}")
+
+# Plot ROC curve
+plt.figure(figsize=(10, 8))
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.4f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random classifier')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate', fontsize=12)
+plt.ylabel('True Positive Rate', fontsize=12)
+plt.title('ROC Curve - Titanic Survival Prediction', fontsize=14, fontweight='bold')
+plt.legend(loc="lower right", fontsize=11)
+plt.grid(alpha=0.3)
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+# Discuss threshold selection
+print("\n" + "=" * 60)
+print("Threshold Selection Discussion")
+print("=" * 60)
+
+# Find optimal threshold using Youden's J statistic
+youden_j = tpr - fpr
+optimal_idx = np.argmax(youden_j)
+optimal_threshold = thresholds[optimal_idx]
+optimal_tpr = tpr[optimal_idx]
+optimal_fpr = fpr[optimal_idx]
+
+print(f"\nOptimal threshold (Youden's J): {optimal_threshold:.4f}")
+print(f"  - True Positive Rate: {optimal_tpr:.4f}")
+print(f"  - False Positive Rate: {optimal_fpr:.4f}")
+print(f"  - Youden's J statistic: {youden_j[optimal_idx]:.4f}")
+
+# Show a few example thresholds
+print("\nExample thresholds and their trade-offs:")
+for threshold_val in [0.3, 0.5, 0.7]:
+    idx = np.argmin(np.abs(thresholds - threshold_val))
+    print(f"\nThreshold = {thresholds[idx]:.4f}:")
+    print(f"  - TPR (Sensitivity): {tpr[idx]:.4f}")
+    print(f"  - FPR (1 - Specificity): {fpr[idx]:.4f}")
+    print(f"  - Specificity: {1 - fpr[idx]:.4f}")
+
+print("\n" + "=" * 60)
+print("Key Insights:")
+print("=" * 60)
+print("- The ROC curve shows the trade-off between TPR and FPR.")
+print("- AUC closer to 1.0 indicates better model performance.")
+print("- Threshold selection depends on the cost of false positives vs false negatives.")
+print("- Lower thresholds increase sensitivity (catch more survivors) but also FPR.")
+print("- Higher thresholds increase specificity but may miss actual survivors.")
+print("- Youden's J statistic maximizes (TPR - FPR) for balanced performance.")
+print("=" * 60)

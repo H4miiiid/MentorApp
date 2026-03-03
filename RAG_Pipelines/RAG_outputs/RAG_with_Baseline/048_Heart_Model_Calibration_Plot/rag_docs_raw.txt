@@ -1,0 +1,65 @@
+[matplotlib v3.10.0  score=0.00]
+w of axes. To keep this title in its previous position,
+either pass in_layout=False or explicitly set y=0.98 in the suptitle call.
+
+## Deprecations #
+
+### Positional parameters in plotting functions #
+
+Many plotting functions will restrict positional arguments to the first few parameters
+in the future. All further configuration parameters will have to be passed as keyword
+arguments. This is to enforce better code and and allow for future changes with reduced
+risk of breaking existing code.
+
+### Changing Figure.number #
+
+Changing Figure.number is deprecated. This value is used by pyplot to identify figures. It must stay in sync with the pyplot internal state
+and is not intended to be modified by the user.
+
+### PdfFile.hatchPatterns #
+
+... is deprecated.
+
+### (Sub)Figure.set_figure #
+
+...is deprecated and in future will always raise an exception. The parent and
+root figures of a (Sub)Figure are set at instantiation and cannot be changed.
+
+### Poly3DCollection.get_vector #
+
+... is deprecated with no replacement.
+
+### Deprecated register on matplotlib.patches._Styles and subclasses #
+
+This class method is never used internally. Due to the internal check in the
+method it only accepts subclasses of a private baseclass embedded in the host
+class which makes it unlikely that it has been used externally.
+
+### matplotlib.validate_backend #
+
+...is deprecated. Please use matplotlib.rcsetup.validate_backend instead.
+
+### matplotlib.sanitize_sequence #
+---
+[scikit-learn v1.8  score=0.00]
+arn.compose #
+
+Fix The compose.ColumnTransformer now correctly fits on data provided as a polars.DataFrame when any transformer has a sparse output.
+By Phillipp Gnan . #32188
+
+### sklearn.covariance #
+
+Efficiency sklearn.covariance.GraphicalLasso , sklearn.covariance.GraphicalLassoCV and sklearn.covariance.graphical_lasso with mode="cd" profit from the
+fit time performance improvement of sklearn.linear_model.Lasso by means of
+gap safe screening rules.
+By Christian Lorentzen . #31987
+Fix Fixed uncontrollable randomness in sklearn.covariance.GraphicalLasso , sklearn.covariance.GraphicalLassoCV and sklearn.covariance.graphical_lasso . For mode="cd" , they now use cyclic
+coordinate descent. Before, it was random coordinate descent with uncontrollable
+random number seeding.
+By Christian Lorentzen . #31987
+Fix Added correction to covariance.MinCovDet to adjust for
+consistency at the normal distribution. This reduces the bias present
+when applying this method to data that is normally distributed.
+By Daniel Herrera-Esposito #32117
+
+### sklearn.decomposition #

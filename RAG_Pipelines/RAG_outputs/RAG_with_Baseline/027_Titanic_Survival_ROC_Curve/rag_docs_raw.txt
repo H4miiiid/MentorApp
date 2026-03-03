@@ -1,0 +1,45 @@
+[pandas v3.0.0  score=0.01]
+preserving the original name. ( GH 60522 )
+Bug in Series.map() with a timestamp[pyarrow] dtype or duration[pyarrow] dtype incorrectly returning all- NaN entries ( GH 61231 )
+Bug in Series.mode() where an exception was raised when taking the mode with nullable types with no null values in the series. ( GH 58926 )
+Bug in Series.rank() that doesn’t preserve missing values for nullable integers when na_option='keep' . ( GH 56976 )
+Bug in Series.replace() and DataFrame.replace() throwing ValueError when regex=True and all NA values. ( GH 60688 )
+Bug in Series.replace() when the Series was created from an Index and Copy-On-Write is enabled ( GH 61622 )
+Bug in Series.to_string() when series contains complex floats with exponents ( GH 60405 )
+Bug in Dataframe Interchange Protocol implementation was returning incorrect results for data buffers’ associated dtype, for string and datetime columns ( GH 54781 )
+Bug in divmod and rdivmod with DataFrame , Series , and Index with bool dtypes failing to raise, which was inconsistent with __floordiv__ behavior ( GH 46043 )
+Bug in printing a DataFrame with a DataFrame stored in DataFrame.attrs raised a ValueError ( GH 60455 )
+Bug in printing a Series with a DataFrame stored in Series.attrs raised a ValueError ( GH 60568 )
+Bug when calling copy.copy() on a DataFrame or Series which would return a deep copy instead of a shallow copy ( GH 62971 )
+Fixed bug in the Series.rank() with object dtype and extremely small float values ( GH 62036 )
+Fixed bu
+---
+[scikit-learn v1.8  score=0.01]
+i Krishnan . #15504
+
+### sklearn.naive_bayes #
+
+Fix naive_bayes.GaussianNB preserves the dtype of the fitted attributes
+according to the dtype of X .
+By Omar Salman #32497
+
+### sklearn.preprocessing #
+
+Enhancement preprocessing.SplineTransformer can now handle missing values with the
+parameter handle_missing . By Stefanie Senger . #28043
+Enhancement The preprocessing.PowerTransformer now returns a warning
+when NaN values are encountered in the inverse transform, inverse_transform , typically
+caused by extremely skewed data.
+By Roberto Mourao #29307
+Enhancement preprocessing.MaxAbsScaler can now clip out-of-range values in held-out data
+with the parameter clip .
+By Hleb Levitski . #31790
+Fix Fixed a bug in preprocessing.OneHotEncoder where handle_unknown='warn' incorrectly behaved like 'ignore' instead of 'infrequent_if_exist' .
+By Nithurshen #32592
+
+### sklearn.semi_supervised #
+
+Fix User written kernel results are now normalized in semi_supervised.LabelPropagation so all row sums equal 1 even if kernel gives asymmetric or non-uniform row sums.
+By Dan Schult . #31924
+
+### sklearn.tree #

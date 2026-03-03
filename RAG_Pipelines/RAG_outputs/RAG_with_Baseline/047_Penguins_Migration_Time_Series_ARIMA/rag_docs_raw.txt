@@ -1,0 +1,43 @@
+[pandas v3.0.0  score=1.00]
+and read_table() , use sep=r"\s+" instead ( GH 55569 )
+Require SparseDtype.fill_value() to be a valid value for the SparseDtype.subtype() ( GH 53043 )
+Stopped automatically casting non-datetimelike values (mainly strings) in Series.isin() and Index.isin() with datetime64 , timedelta64 , and PeriodDtype dtypes ( GH 53111 )
+Stopped performing dtype inference in Index , Series and DataFrame constructors when given a pandas object ( Series , Index , ExtensionArray ), call .infer_objects on the input to keep the current behavior ( GH 56012 )
+Stopped performing dtype inference when setting a Index into a DataFrame ( GH 56102 )
+Stopped performing dtype inference with in Index.insert() with object-dtype index; this often affects the index/columns that result when setting new entries into an empty Series or DataFrame ( GH 51363 )
+Removed the closed and unit keywords in TimedeltaIndex constructor ( GH 52628 , GH 55499 )
+All arguments in Index.sort_values() are now keyword only ( GH 56493 )
+All arguments in Series.to_dict() are now keyword only ( GH 56493 )
+Changed the default value of na_action in Categorical.map() to None ( GH 51645 )
+Changed the default value of observed in DataFrame.groupby() and Series.groupby() to True ( GH 51811 )
+Enforce banning of upcasting in in-place setitem-like operations; see PDEP6 ( GH 59007 )
+Enforce deprecation in testing.assert_series_equal() and testing.assert_frame_equal() with object dtype and mismatched null-like values, which are now considered no
+---
+[numpy v2.4.0  score=1.00]
+st_finfo.py to validate all finfo properties against expected machine arithmetic values for
+float16, float32, and float64 types.
+( gh-29836 )
+
+### Multiple axes are now supported in numpy.trim_zeros #
+
+The axis argument of numpy.trim_zeros now accepts a sequence; for example np.trim_zeros(x, axis=(0, 1)) will trim the zeros from a multi-dimensional
+array x along axes 0 and 1. This fixes issue gh‑29945 and was implemented
+in pull request gh‑29947 .
+( gh-29947 )
+
+### Runtime signature introspection support has been significantly improved #
+
+Many NumPy functions, classes, and methods that previously raised ValueError when passed to inspect.signature() now return meaningful
+signatures. This improves support for runtime type checking, IDE autocomplete,
+documentation generation, and runtime introspection capabilities across the
+NumPy API.
+Over three hundred classes and functions have been updated in total, including,
+but not limited to, core classes such as ndarray , generic , dtype , ufunc , broadcast , nditer , etc., most methods of ndarray and
+scalar types, array constructor functions ( array , empty , arange , fromiter , etc.), all ufuncs , and many other commonly used functions,
+including dot , concat , where , bincount , can_cast , and
+numerous others.
+( gh-30208 )
+
+## Performance improvements and changes #
+
+### Performance improvements to np.unique for string dtypes #

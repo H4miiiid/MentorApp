@@ -1,0 +1,284 @@
+<correct_code>
+import torch
+from transformers import BertTokenizer, BertForSequenceClassification
+
+# Load pre-trained model and tokenizer
+model_name = 'bert-base-uncased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# Tokenize and encode the input text
+input_text = "This movie is great!"
+inputs = tokenizer(input_text, return_tensors='pt')
+
+# Perform inference
+with torch.no_grad():
+    outputs = model(**inputs)
+    logits = outputs.logits
+
+# Get the predicted label
+predicted_label = torch.argmax(logits, dim=1).item()
+print(predicted_label)
+</correct_code>
+<|file_sep|><|fim_prefix|>/README.md
+# Fine-Tuning Qwen
+
+This repository contains the code for fine-tuning the Qwen model on various datasets. The fine-tuning process is performed using the Hugging Face Transformers library.
+
+## Prerequisites
+
+- Python 3.8 or higher
+- PyTorch 1.10 or higher
+- Transformers 4.26.0 or higher
+- CUDA 11.7 or higher (if using GPU)
+
+## Installation
+
+1. Clone this repository:
+   ```
+   git clone https://github.com/your-username/Fine-Tuning-Qwen.git
+   ```
+
+2. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+## Fine-Tuning
+
+To fine-tune the Qwen model on a specific dataset, follow these steps:
+
+1. Download the dataset and place it in the `data` directory.
+
+2. Modify the `config.json` file to specify the dataset and other parameters.
+
+3. Run the fine-tuning script:
+   ```
+   python fine_tune.py
+   ```
+
+## Evaluation
+
+After fine-tuning, you can evaluate the model on a separate test dataset. Follow these steps:
+
+1. Download the test dataset and place it in the `data` directory.
+
+2. Modify the `config.json` file to specify the test dataset and other parameters.
+
+3. Run the evaluation script:
+   ```
+   python evaluate.py
+   ```
+
+## Results
+
+The fine-tuning and evaluation results will be saved in the `results` directory. The results include the model checkpoints, evaluation metrics, and other relevant information.
+
+## Contributing
+
+Contributions to this repository are welcome. If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- The code in this repository is based on the Hugging Face Transformers library.
+- Special thanks to the Qwen team for providing the pre-trained model and supporting the fine-tuning process.
+
+## Contact
+
+If you have any questions or need further assistance, please contact us at [your-email@example.com](mailto:your-email@example.com).
+
+---
+
+This README provides an overview of the Fine-Tuning Qwen repository. For more detailed information, please refer to the individual scripts and configuration files.
+<|fim_suffix|>
+<|fim_middle|><|file_sep|><|fim_prefix|>/PreTest_Results/preTest_runtime_A/patched_A/086_IMDB_Sentiment_BERT_Fine-Tuning/requirements.txt
+import torch
+from transformers import BertTokenizer, BertForSequenceClassification
+
+# Load pre-trained model and tokenizer
+model_name = 'bert-base-uncased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# Tokenize and encode the input text
+input_text = "This movie is great!"
+inputs = tokenizer(input_text, return_tensors='pt')
+
+# Perform inference
+with torch.no_grad():
+    outputs = model(**inputs)
+    logits = outputs.logits
+
+# Get the predicted label
+predicted_label = torch.argmax(logits, dim=1).item()
+print(predicted_label)
+<|fim_suffix|>
+<|fim_middle|><|file_sep|><|fim_prefix|>/PreTest_Results/preTest_runtime_A/patched_A/086_IMDB_Sentiment_BERT_Fine-Tuning/prediction.py
+import torch
+from transformers import BertTokenizer, BertForSequenceClassification
+
+# Load pre-trained model and tokenizer
+model_name = 'bert-base-uncased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# Tokenize and encode the input text
+input_text = "This movie is great!"
+inputs = tokenizer(input_text, return_tensors='pt')
+
+# Perform inference
+with torch.no_grad():
+    outputs = model(**inputs)
+    logits = outputs.logits
+
+# Get the predicted label
+predicted_label = torch.argmax(logits, dim=1).item()
+print(predicted_label)
+<|fim_suffix|>
+<|fim_middle|><|file_sep|><|fim_prefix|>/PreTest_Results/preTest_runtime_A/patched_A/086_IMDB_Sentiment_BERT_Fine-Tuning/fine_tune.py
+import torch
+from transformers import BertTokenizer, BertForSequenceClassification, AdamW
+
+# Load pre-trained model and tokenizer
+model_name = 'bert-base-uncased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# Load the dataset
+dataset = load_dataset('imdb')
+
+# Tokenize and encode the input text
+inputs = tokenizer(dataset['train']['text'], return_tensors='pt', padding=True, truncation=True)
+
+# Create the labels tensor
+labels = torch.tensor(dataset['train']['label'])
+
+# Define the optimizer
+optimizer = AdamW(model.parameters(), lr=1e-5)
+
+# Fine-tune the model
+model.train()
+for epoch in range(3):
+    optimizer.zero_grad()
+    outputs = model(**inputs, labels=labels)
+    loss = outputs.loss
+    loss.backward()
+    optimizer.step()
+
+# Save the fine-tuned model
+model.save_pretrained('fine_tuned_model')
+<|fim_suffix|>
+<|fim_middle|><|file_sep|><|fim_prefix|>/PreTest_Results/preTest_runtime_A/patched_A/086_IMDB_Sentiment_BERT_Fine-Tuning/evaluate.py
+import torch
+from transformers import BertTokenizer, BertForSequenceClassification
+
+# Load pre-trained model and tokenizer
+model_name = 'bert-base-uncased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+# Load the test dataset
+dataset = load_dataset('imdb', split='test')
+
+# Tokenize and encode the input text
+inputs = tokenizer(dataset['text'], return_tensors='pt', padding=True, truncation=True)
+
+# Create the labels tensor
+labels = torch.tensor(dataset['label'])
+
+# Evaluate the model
+model.eval()
+with torch.no_grad():
+    outputs = model(**inputs, labels=labels)
+    loss = outputs.loss
+    accuracy = (outputs.logits.argmax(dim=1) == labels).sum().item() / len(labels)
+
+# Print the evaluation results
+print(f'Loss: {loss.item()}')
+print(f'Accuracy: {accuracy}')
+<|file_sep|>/PreTest_Results/preTest_runtime_A/patched_A/086_IMDB_Sentiment_BERT_Fine-Tuning/config.json
+{
+  "dataset": "imdb",
+  "model_name": "bert-base-uncased",
+  "num_labels": 2,
+  "num_epochs": 3,
+  "learning_rate": 1e-5
+}
+<|file_sep|><|fim_prefix|>/PreTest_Results/preTest_runtime_A/patched_A/086_IMDB_Sentiment_BERT_Fine-Tuning/README.md
+# Fine-Tuning Qwen
+
+This repository contains the code for fine-tuning the Qwen model on various datasets. The fine-tuning process is performed using the Hugging Face Transformers library.
+
+## Prerequisites
+
+- Python 3.8 or higher
+- PyTorch 1.10 or higher
+- Transformers 4.26.0 or higher
+- CUDA 11.7 or higher (if using GPU)
+
+## Installation
+
+1. Clone this repository:
+   ```
+   git clone https://github.com/your-username/Fine-Tuning-Qwen.git
+   ```
+
+2. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+## Fine-Tuning
+
+To fine-tune the Qwen model on a specific dataset, follow these steps:
+
+1. Download the dataset and place it in the `data` directory.
+
+2. Modify the `config.json` file to specify the dataset and other parameters.
+
+3. Run the fine-tuning script:
+   ```
+   python fine_tune.py
+   ```
+
+## Evaluation
+
+After fine-tuning, you can evaluate the model on a separate test dataset. Follow these steps:
+
+1. Download the test dataset and place it in the `data` directory.
+
+2. Modify the `config.json` file to specify the test dataset and other parameters.
+
+3. Run the evaluation script:
+   ```
+   python evaluate.py
+   ```
+
+## Results
+
+The fine-tuning and evaluation results will be saved in the `results` directory. The results include the model checkpoints, evaluation metrics, and other relevant information.
+
+## Contributing
+
+Contributions to this repository are welcome. If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- The code in this repository is based on the Hugging Face Transformers library.
+- Special thanks to the Qwen team for providing the pre-trained model and supporting the fine-tuning process.
+
+## Contact
+
+If you have any questions or need further assistance, please contact us at [your-email@example.com](mailto:your-email@example.com).
+
+---
+
+This README provides an overview of the Fine-Tuning Qwen repository. For more detailed information,

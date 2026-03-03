@@ -1,0 +1,38 @@
+[scikit-learn v1.8  score=0.62]
+cNetCV , linear_model.Lasso , linear_model.LassoCV , linear_model.MultiTaskElasticNet , linear_model.MultiTaskElasticNetCV linear_model.MultiTaskLasso , linear_model.MultiTaskLassoCV as well as linear_model.lasso_path and linear_model.enet_path now implement
+gap safe screening rules in the coordinate descent solver for dense and sparse X .
+The speedup of fitting time is particularly pronounced (10-times is possible) when
+computing regularization paths like the *CV-variants of the above estimators do.
+There is now an additional check of the stopping criterion before entering the main
+loop of descent steps. As the stopping criterion requires the computation of the dual
+gap, the screening happens whenever the dual gap is computed.
+By Christian Lorentzen #31882 , #31986 , #31987 and #32014
+Enhancement linear_model.ElasticNet , linear_model.ElasticNetCV , linear_model.Lasso , linear_model.LassoCV , MultiTaskElasticNet , MultiTaskElasticNetCV , MultiTaskLasso , MultiTaskLassoCV , as well as linear_model.enet_path and linear_model.lasso_path now use dual gap <= tol instead of dual gap < tol as stopping criterion.
+The resulting coefficients might differ to previous versions of scikit-learn in
+rare cases.
+By Christian Lorentzen . #31906
+Fix Fix the convergence criteria for SGD models, to avoid premature convergence when tol != None . This primarily impacts SGDOneClassSVM but also affects SGDClassifier and SGDRegressor . Before this fix, only the loss
+function without penalty was used 
+---
+[scikit-learn v1.8  score=0.59]
+9
+
+### sklearn.gaussian_process #
+
+Efficiency make GaussianProcessRegressor.predict faster when return_cov and return_std are both False .
+By Rafael Ayllón Gavilán . #31431
+
+### sklearn.linear_model #
+
+Efficiency linear_model.ElasticNet and linear_model.Lasso with precompute=False use less memory for dense X and are a bit faster.
+Previously, they used twice the memory of X even for Fortran-contiguous X .
+By Christian Lorentzen #31665
+Efficiency linear_model.ElasticNet and linear_model.Lasso avoid
+double input checking and are therefore a bit faster.
+By Christian Lorentzen . #31848
+Efficiency linear_model.ElasticNet , linear_model.ElasticNetCV , linear_model.Lasso , linear_model.LassoCV , linear_model.MultiTaskElasticNet , linear_model.MultiTaskElasticNetCV , linear_model.MultiTaskLasso and linear_model.MultiTaskLassoCV are faster to fit by avoiding a BLAS level 1 (axpy) call in the innermost loop.
+Same for functions linear_model.enet_path and linear_model.lasso_path .
+By Christian Lorentzen #31956 and #31880
+Efficiency linear_model.ElasticNetCV , linear_model.LassoCV , linear_model.MultiTaskElasticNetCV and linear_model.MultiTaskLassoCV avoid an additional copy of X with default copy_X=True .
+By Christian Lorentzen . #31946
+Efficiency linear_model.ElasticNet , linear_model.ElasticNetCV , linear_model.Lasso , linear_model.LassoCV , linear_model.MultiTaskElasticNet , linear_model.MultiTaskElasticNetCV linear_model.MultiTaskLasso , linear_model.MultiTaskLassoCV as well as linear

@@ -1,0 +1,12 @@
+Fix this Python file.
+Return the full corrected file inside <correct_code> tags.
+
+Traceback tail:
+Traceback (most recent call last):
+  File "c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\075_Breast_Cancer_Diagnosis_with_LightGBM\prediction.py", line 77, in <module>
+    y_pred_proba = modle.predict(X_test, num_iteration=modle.best_iteration)
+                   ^^^^^
+NameError: name 'modle' is not defined. Did you mean: 'model'?
+
+Incorrect file:
+

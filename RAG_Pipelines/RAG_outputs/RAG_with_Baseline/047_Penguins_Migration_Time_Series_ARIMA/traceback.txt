@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\046_Penguins_Migration_Time_Series_ARIMA\prediction.py", line 20, in <module>
+    time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='M')
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\pandas\core\indexes\datetimes.py", line 1442, in date_range
+    freq = to_offset(freq)
+  File "pandas/_libs/tslibs/offsets.pyx", line 6229, in pandas._libs.tslibs.offsets.to_offset
+  File "pandas/_libs/tslibs/offsets.pyx", line 6352, in pandas._libs.tslibs.offsets.to_offset
+  File "pandas/_libs/tslibs/offsets.pyx", line 6137, in pandas._libs.tslibs.offsets.raise_invalid_freq
+ValueError: Invalid frequency: M. Failed to parse with error message: ValueError("'M' is no longer supported for offsets. Please use 'ME' instead.")

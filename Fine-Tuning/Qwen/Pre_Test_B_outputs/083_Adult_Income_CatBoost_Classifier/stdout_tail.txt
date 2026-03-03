@@ -1,0 +1,6 @@
+Fetching adult dataset...
+Categorical features: ['workclass', 'education', 'marital-status', 'occupation', 'relationship', 'race', 'sex', 'native-country']
+Training set size: 39073
+Test set size: 9769
+
+Training initial CatBoost model...

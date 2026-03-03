@@ -1,0 +1,32 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import pandas as pd
+from catboost import CatBoostClassifier
+
+# Load the dataset
+data = pd.read_csv('adult.csv')
+
+# Preprocess the data
+data['workclass'] = data['workclass'].fillna('Unknown')
+data['occupation'] = data['occupation'].fillna('Unknown')
+data['native-country'] = data['native-country'].fillna('Unknown')
+
+# Convert categorical variables to numerical
+data = pd.get_dummies(data, columns=['workclass', 'education', 'marital-status', 'occupation', 'relationship', 'race', 'sex', 'native-country'])
+
+# Split the data into training and testing sets
+X = data.drop('income', axis=1)
+y = data['income']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+model = CatBoostClassifier(iterations=100, learning_rate=0.1, depth=6)
+model.fit(X_train, y_train)
+
+# Evaluate the model
+accuracy = model.score(X_test, y_test)
+print('Accuracy:', accuracy)

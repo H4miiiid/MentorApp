@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\077_Iris_tSNE_Cluster_Visualization\prediction.py"[0m, line [35m23[0m, in [35m<module>[0m
+    tsne = TSNE(n_components=2, random_state=42, perplexity=200, n_iter=1000)
+[1;35mTypeError[0m: [35mTSNE.__init__() got an unexpected keyword argument 'n_iter'[0m

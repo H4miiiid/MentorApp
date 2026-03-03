@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\013_Digits_Classification_using_Convolutiona\prediction.py", line 103, in <module>
+    X_train_encoded = encodr.predict(X_train, verbose=0)
+                      ^^^^^^
+NameError: name 'encodr' is not defined. Did you mean: 'encoder'?

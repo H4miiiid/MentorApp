@@ -1,0 +1,79 @@
+[numpy v2.4.0  score=0.02]
+np.testing.suppress_warnings are
+deprecated. Use warnings.catch_warnings , warnings.filterwarnings , pytest.warns , or pytest.filterwarnings instead.
+( gh-29550 )
+
+### np.fix is pending deprecation #
+
+The numpy.fix function will be deprecated in a future release. It is
+recommended to use numpy.trunc instead, as it provides the same
+functionality of truncating decimal values to their integer parts. Static type
+checkers might already report a warning for the use of numpy.fix .
+( gh-30168 )
+
+### in-place modification of ndarray.shape is pending deprecation #
+
+Setting the ndarray.shape attribute directly will be deprecated in a future
+release. Instead of modifying the shape in place, it is recommended to use the numpy.reshape function. Static type checkers might already report a
+warning for assignments to ndarray.shape .
+( gh-30282 )
+
+### Deprecation of numpy.lib.user_array.container #
+
+The numpy.lib.user_array.container class is deprecated and will be removed
+in a future version.
+( gh-30284 )
+
+## Expired deprecations #
+
+### Removed deprecated MachAr runtime discovery mechanism. #
+
+( gh-29836 )
+
+### Raise TypeError on attempt to convert array with ndim > 0 to scalar #
+
+Conversion of an array with ndim > 0 to a scalar was deprecated in NumPy
+1.25. Now, attempting to do so raises TypeError . Ensure you extract a
+single element from your array before performing this operation.
+( gh-29841 )
+
+### Removed numpy.linalg.linalg and numpy.fft.helper #
+---
+[numpy v2.4.0  score=0.01]
+ions,
+including dot , concat , where , bincount , can_cast , and
+numerous others.
+( gh-30208 )
+
+## Performance improvements and changes #
+
+### Performance improvements to np.unique for string dtypes #
+
+The hash-based algorithm for unique extraction provides an order-of-magnitude
+speedup on large string arrays. In an internal benchmark with about 1 billion
+string elements, the hash-based np.unique completed in roughly 33.5 seconds,
+compared to 498 seconds with the sort-based method – about 15× faster for
+unsorted unique operations on strings. This improvement greatly reduces the
+time to find unique values in very large string datasets.
+( gh-28767 )
+
+### Rewrite of np.ndindex using itertools.product #
+
+The numpy.ndindex function now uses itertools.product internally,
+providing significant improvements in performance for large iteration spaces,
+while maintaining the original behavior and interface. For example, for an
+array of shape (50, 60, 90) the NumPy ndindex benchmark improves
+performance by a factor 5.2.
+( gh-29165 )
+
+### Performance improvements to np.unique for complex dtypes #
+
+The hash-based algorithm for unique extraction now also supports
+complex dtypes, offering noticeable performance gains.
+In our benchmarks on complex128 arrays with 200,000 elements,
+the hash-based approach was about 1.4–1.5× faster
+than the sort-based baseline when there were 20% of unique values,
+and about 5× faster when there were 0.2% of unique values.
+( gh-29537 )
+
+## Changes #

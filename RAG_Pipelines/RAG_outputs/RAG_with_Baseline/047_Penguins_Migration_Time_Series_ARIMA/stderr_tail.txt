@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File [35m"pandas/_libs/tslibs/offsets.pyx"[0m, line [35m6313[0m, in [35mpandas._libs.tslibs.offsets.to_offset[0m
+  File [35m"pandas/_libs/tslibs/offsets.pyx"[0m, line [35m6180[0m, in [35mpandas._libs.tslibs.offsets._validate_to_offset_alias[0m
+[1;35mValueError[0m: [35m'M' is no longer supported for offsets. Please use 'ME' instead.[0m
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\046_Penguins_Migration_Time_Series_ARIMA\prediction.py"[0m, line [35m20[0m, in [35m<module>[0m
+    time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='M')
+  File [35m"c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\pandas\core\indexes\datetimes.py"[0m, line [35m1442[0m, in [35mdate_range[0m
+    freq = to_offset(freq)
+  File [35m"pandas/_libs/tslibs/offsets.pyx"[0m, line [35m6229[0m, in [35mpandas._libs.tslibs.offsets.to_offset[0m
+  File [35m"pandas/_libs/tslibs/offsets.pyx"[0m, line [35m6352[0m, in [35mpandas._libs.tslibs.offsets.to_offset[0m
+  File [35m"pandas/_libs/tslibs/offsets.pyx"[0m, line [35m6137[0m, in [35mpandas._libs.tslibs.offsets.raise_invalid_freq[0m
+[1;35mValueError[0m: [35mInvalid frequency: M. Failed to parse with error message: ValueError("'M' is no longer supported for offsets. Please use 'ME' instead.")[0m

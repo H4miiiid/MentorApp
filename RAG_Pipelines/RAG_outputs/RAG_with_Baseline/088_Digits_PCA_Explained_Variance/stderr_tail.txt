@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\087_Digits_PCA_Explained_Variance\prediction.py"[0m, line [35m36[0m, in [35m<module>[0m
+    [31m{"valid": 0}[0m[1;31m["invalid"][0m
+    [31m~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^[0m
+[1;35mKeyError[0m: [35m'invalid'[0m

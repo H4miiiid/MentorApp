@@ -1,0 +1,101 @@
+[matplotlib v3.10.0  score=0.00]
+np.random.seed(19680801)
+
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(9, 9))
+
+data1 = np.random.poisson(5, 1000)
+data2 = np.random.poisson(7, 1000)
+data3 = np.random.poisson(10, 1000)
+
+labels = ["Data 1", "Data 2", "Data 3"]
+
+ax1.hist([data1, data2, data3], bins=range(17), histtype="step", stacked=True,
+ edgecolor=["red", "green", "blue"], linewidth=[1, 2, 3])
+ax1.set_title("Different linewidths")
+ax1.legend(labels)
+
+ax2.hist([data1, data2, data3], bins=range(17), histtype="barstacked",
+ hatch=["/", ".", "*"])
+ax2.set_title("Different hatch patterns")
+ax2.legend(labels)
+
+ax3.hist([data1, data2, data3], bins=range(17), histtype="bar", fill=False,
+ edgecolor=["red", "green", "blue"], linestyle=["--", "-.", ":"])
+ax3.set_title("Different linestyles")
+ax3.legend(labels)
+
+ax4.hist([data1, data2, data3], bins=range(17), histtype="barstacked",
+ facecolor=["red", "green", "blue"])
+ax4.set_title("Different facecolors")
+ax4.legend(labels)
+
+plt.show()
+
+```
+
+( Source code , 2x.png , png )
+
+## InsetIndicator artist #
+
+indicate_inset and indicate_inset_zoom now return an instance
+of InsetIndicator which contains the rectangle and
+connector patches. These patches now update automatically so that
+
+```
+ax.indicate_inset_zoom(ax_inset)
+ax_inset.set_xlim(new_lim)
+
+```
+
+now gives the same result as
+
+```
+ax_inset.set_xlim(new_lim)
+ax.indicate_inset_zoom(ax_inset)
+
+```
+
+## matplotlib.ticker.EngFormatter can computes offsets now #
+---
+[matplotlib v3.10.0  score=0.00]
+w of axes. To keep this title in its previous position,
+either pass in_layout=False or explicitly set y=0.98 in the suptitle call.
+
+## Deprecations #
+
+### Positional parameters in plotting functions #
+
+Many plotting functions will restrict positional arguments to the first few parameters
+in the future. All further configuration parameters will have to be passed as keyword
+arguments. This is to enforce better code and and allow for future changes with reduced
+risk of breaking existing code.
+
+### Changing Figure.number #
+
+Changing Figure.number is deprecated. This value is used by pyplot to identify figures. It must stay in sync with the pyplot internal state
+and is not intended to be modified by the user.
+
+### PdfFile.hatchPatterns #
+
+... is deprecated.
+
+### (Sub)Figure.set_figure #
+
+...is deprecated and in future will always raise an exception. The parent and
+root figures of a (Sub)Figure are set at instantiation and cannot be changed.
+
+### Poly3DCollection.get_vector #
+
+... is deprecated with no replacement.
+
+### Deprecated register on matplotlib.patches._Styles and subclasses #
+
+This class method is never used internally. Due to the internal check in the
+method it only accepts subclasses of a private baseclass embedded in the host
+class which makes it unlikely that it has been used externally.
+
+### matplotlib.validate_backend #
+
+...is deprecated. Please use matplotlib.rcsetup.validate_backend instead.
+
+### matplotlib.sanitize_sequence #

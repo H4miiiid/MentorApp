@@ -1,0 +1,5 @@
+- Verify that the `test_size` argument is a float in (0.0, 1.0), an int ≥ 1, or `None`; 1.5 is invalid.
+- Replace `test_size=1.5` with a valid value such as `test_size=0.25` or an integer number of samples.
+- Ensure the parameter name is spelled correctly (`test_size`) and not mistyped.
+- If you intended a 15% split, use `test_size=0.15` instead of 1.5.
+- Double‑check that no other code path is overriding `test_size` with an invalid value.

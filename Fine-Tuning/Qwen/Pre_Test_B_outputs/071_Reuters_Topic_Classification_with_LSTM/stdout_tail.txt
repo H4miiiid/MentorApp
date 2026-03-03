@@ -1,0 +1,7 @@
+Number of training samples: 8982
+Number of test samples: 2246
+Number of classes: 46
+Shape of padded training data: (8982, 200)
+Shape of padded test data: (2246, 200)
+Shape of one-hot encoded training labels: (8982, 46)
+Shape of one-hot encoded test labels: (2246, 46)

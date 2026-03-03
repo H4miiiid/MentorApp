@@ -1,0 +1,106 @@
+[pandas v3.0.0  score=0.01]
+ead ( GH 35830 )
+Deprecated support for the Dataframe Interchange Protocol ( GH 56732 )
+Deprecated the inplace keyword from Resampler.interpolate() , as passing True raises AttributeError ( GH 58690 )
+
+## Removal of prior version deprecations/changes #
+
+### Enforced deprecation of aliases M , Q , Y , etc. in favour of ME , QE , YE , etc. for offsets #
+
+Renamed the following offset aliases ( GH 57986 ):
+offset
+removed alias
+new alias
+MonthEnd
+M
+ME
+BusinessMonthEnd
+BM
+BME
+SemiMonthEnd
+SM
+SME
+CustomBusinessMonthEnd
+CBM
+CBME
+QuarterEnd
+Q
+QE
+BQuarterEnd
+BQ
+BQE
+YearEnd
+Y
+YE
+BYearEnd
+BY
+BYE
+
+### Other Removals #
+---
+[catboost vlatest  score=0.01]
+ze=(100))
+test_data = np.random.randint(0,
+ 100,
+ size=(50, 10))
+# initialize Pool
+train_pool = Pool(train_data,
+ train_label,
+ cat_features=[0,2,5])
+test_pool = Pool(test_data,
+ cat_features=[0,2,5])
+
+# specify the training parameters
+model = CatBoostRegressor(iterations=2,
+ depth=2,
+ learning_rate=1,
+ loss_function='RMSE')
+#train the model
+model.fit(train_pool)
+# make the prediction using the resulting model
+preds = model.predict(test_pool)
+print(preds)
+
+```
+
+## CatBoost
+
+Datasets can be read from input files. For example, the Pool class offers this functionality.
+
+```
+import numpy as np
+from catboost import CatBoost, Pool
+
+# read the dataset
+
+train_data = np.random.randint(0,
+ 100,
+ size=(100, 10))
+train_labels = np.random.randint(0,
+ 2,
+ size=(100))
+test_data = np.random.randint(0,
+ 100,
+ size=(50, 10))
+
+train_pool = Pool(train_data,
+ train_labels)
+
+test_pool = Pool(test_data)
+# specify training parameters via map
+
+param = {'iterations':5}
+model = CatBoost(param)
+#train the model
+model.fit(train_pool)
+# make the prediction using the resulting model
+preds_class = model.predict(test_pool, prediction_type='Class')
+preds_proba = model.predict(test_pool, prediction_type='Probability')
+preds_raw_vals = model.predict(test_pool, prediction_type='RawFormulaVal')
+print("Class", preds_class)
+print("Proba", preds_proba)
+print("Raw", preds_raw_vals)
+
+```
+
+### Was the article helpful?

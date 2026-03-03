@@ -1,0 +1,6 @@
+2026-03-02 10:35:54.088308: E tensorflow/core/util/util.cc:131] oneDNN supports DT_INT32 only on platforms with AVX-512. Falling back to the default Eigen-based implementation if present.
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\013_Digits_Classification_using_Convolutiona\prediction.py"[0m, line [35m103[0m, in [35m<module>[0m
+    X_train_encoded = [1;31mencodr[0m.predict(X_train, verbose=0)
+                      [1;31m^^^^^^[0m
+[1;35mNameError[0m: [35mname 'encodr' is not defined. Did you mean: 'encoder'?[0m

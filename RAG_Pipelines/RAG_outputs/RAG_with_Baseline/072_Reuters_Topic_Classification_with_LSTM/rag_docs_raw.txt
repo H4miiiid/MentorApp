@@ -1,0 +1,44 @@
+[scikit-learn v1.8  score=0.96]
+mpatible inputs.
+By Thomas Li #30878
+Feature preprocessing.PolynomialFeatures now supports array API compatible inputs.
+By Omar Salman #31580
+Feature calibration.CalibratedClassifierCV now supports array API compatible
+inputs with method="temperature" and when the underlying estimator also
+supports the array API.
+By Omar Salman #32246
+Feature sklearn.metrics.precision_recall_curve now supports array API compatible
+inputs.
+By Lucy Liu #32249
+Feature sklearn.model_selection.cross_val_predict now supports array API compatible inputs.
+By Omar Salman #32270
+Feature sklearn.metrics.brier_score_loss , sklearn.metrics.log_loss , sklearn.metrics.d2_brier_score and sklearn.metrics.d2_log_loss_score now support array API compatible inputs.
+By Omar Salman #32422
+Feature naive_bayes.GaussianNB now supports array API compatible inputs.
+By Omar Salman #32497
+Feature preprocessing.LabelBinarizer and preprocessing.label_binarize now
+support numeric array API compatible inputs with sparse_output=False .
+By Virgil Chan . #32582
+Feature sklearn.metrics.det_curve now supports Array API compliant inputs.
+By Josef Affourtit . #32586
+Feature sklearn.metrics.pairwise.manhattan_distances now supports array API compatible inputs.
+By Omar Salman . #32597
+Feature sklearn.metrics.calinski_harabasz_score now supports Array API compliant inputs.
+By Josef Affourtit . #32600
+Feature sklearn.metrics.balanced_accuracy_score now supports array API compatible inputs.
+By Omar Salman . #32604
+Feature sklearn.metric
+---
+[scikit-learn v1.8  score=0.95]
+upports Array API compliant inputs.
+By Josef Affourtit . #32600
+Feature sklearn.metrics.balanced_accuracy_score now supports array API compatible inputs.
+By Omar Salman . #32604
+Feature sklearn.metrics.pairwise.laplacian_kernel now supports array API compatible inputs.
+By Zubair Shakoor . #32613
+Feature sklearn.metrics.cohen_kappa_score now supports array API compatible inputs.
+By Omar Salman . #32619
+Feature sklearn.metrics.cluster.davies_bouldin_score now supports Array API compliant inputs.
+By Josef Affourtit . #32693
+Fix Estimators with array API support no longer reject dataframe inputs when array API support is enabled.
+By Tim Head #32838

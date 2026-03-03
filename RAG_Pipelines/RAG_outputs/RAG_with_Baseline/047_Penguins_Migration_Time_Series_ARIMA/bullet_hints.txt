@@ -1,0 +1,3 @@
+- Replace the frequency string `'M'` with `'ME'` (or `'MS'` if you need month start) in the pandas function that parses the offset.
+- Verify that the function you call accepts an offset alias; if it expects a `DateOffset` object, use `pd.offsets.MonthEnd()` instead of the string `'M'`.
+- Ensure you are using a recent pandas version where `'M'` has been removed; update your code to the new alias conventions.

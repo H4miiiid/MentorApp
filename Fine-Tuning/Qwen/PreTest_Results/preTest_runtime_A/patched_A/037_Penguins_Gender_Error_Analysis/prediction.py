@@ -1,0 +1,97 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import LabelEncoder
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the penguins dataset from seaborn
+penguins = sns.load_dataset('penguins')
+
+# Drop rows with missing values
+penguins = penguins.dropna()
+
+# Select features for prediction (numeric features)
+feature_columns = ['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']
+X = penguins[feature_columns].values
+
+# Encode the target variable (sex)
+le = LabelEncoder()
+y = le.fit_transform(penguins['sex'])
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Create and train a KNN classifier
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+
+# Predict probabilities on the test set
+y_pred_proba = knn.predict_proba(X_test)
+
+# Get the probability of the positive class (class 1)
+# Assuming class 1 corresponds to one of the sexes
+proba_class_1 = y_pred_proba[:, 1]
+
+# Compute residuals: actual - predicted probability
+# For binary classification, residual = actual_label - predicted_probability_of_class_1
+residuals = y_test - proba_class_1
+
+# Plot the error distribution
+plt.figure(figsize=(10, 6))
+plt.hist(residuals, bins=30, edgecolor='black', alpha=0.7)
+plt.xlabel('Residuals (Actual - Predicted Probability)')
+plt.ylabel('Frequency')
+plt.title('Distribution of Prediction Residuals')
+plt.axvline(x=0, color='red', linestyle='--', linewidth=2, label='Zero Error')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')
+
+# Analyze systematic bias
+mean_residual = np.mean(residuals)
+print(f"Mean residual: {mean_residual:.4f}")
+
+# Flag systematic bias
+# A positive mean residual suggests the model underestimates the probability of class 1
+# A negative mean residual suggests the model overestimates the probability of class 1
+if abs(mean_residual) > 0.1:
+    if mean_residual > 0:
+        bias_direction = le.inverse_transform([1])[0]
+        print(f"Systematic bias detected: Model tends to underestimate the probability of '{bias_direction}'.")
+    else:
+        bias_direction = le.inverse_transform([0])[0]
+        print(f"Systematic bias detected: Model tends to overestimate the probability of '{le.inverse_transform([1])[0]}', favoring '{bias_direction}'.")
+else:
+    print("No significant systematic bias detected.")
+
+# Additional analysis: residuals by actual sex
+residuals_by_sex = pd.DataFrame({
+    'sex': le.inverse_transform(y_test),
+    'residual': residuals
+})
+
+print("\nMean residuals by sex:")
+print(residuals_by_sex.groupby('sex')['residual'].mean())
+
+# Visualize residuals by sex
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=residuals_by_sex, x='sex', y='residual')
+plt.xlabel('Sex')
+plt.ylabel('Residuals')
+plt.title('Residuals by Sex')
+plt.axhline(y=0, color='red', linestyle='--', linewidth=2)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+print('[FAST_EVAL] plt.show() skipped')

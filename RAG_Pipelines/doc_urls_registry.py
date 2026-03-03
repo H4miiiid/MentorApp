@@ -126,7 +126,7 @@ DOC_URLS: dict[str, list[tuple[str, str, str]]] = {
 
     # ─── Boosting ────────────────────────────────────────────────────────
     "xgboost": [
-        ("migration", "latest", "https://xgboost.readthedocs.io/en/stable/python/sklearn_estimator.html"),
+        ("migration", "latest", "https://xgboost.readthedocs.io/en/stable/python/python_api.html"),
     ],
     "lightgbm": [
         ("guide",     "latest", "https://lightgbm.readthedocs.io/en/latest/Python-Intro.html"),

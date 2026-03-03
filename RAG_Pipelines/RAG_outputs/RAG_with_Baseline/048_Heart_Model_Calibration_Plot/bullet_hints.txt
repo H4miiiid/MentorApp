@@ -1,0 +1,5 @@
+- Verify that every class in `y` has at least two samples before calling a stratified splitter.
+- Remove or merge classes that appear only once to satisfy the minimum‑group requirement.
+- If using `StratifiedKFold`, reduce `n_splits` to no more than the smallest class size.
+- Switch to a non‑stratified split (e.g., `train_test_split` without `stratify`) if class balance is not critical.
+- Ensure `y` is an array‑like of discrete labels (e.g., integers or strings) rather than continuous floats.

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\086_IMDB_Sentiment_BERT_Fine-Tuning\prediction.py"[0m, line [35m12[0m, in [35m<module>[0m
+    from transformers import BertTokenizer, BertForSequenceClassification, AdamW
+[1;35mImportError[0m: [35mcannot import name 'AdamW' from 'transformers' (c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\transformers\__init__.py)[0m

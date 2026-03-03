@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File [35m"c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\033_Digits_Autoencoder_Reconstruction\prediction.py"[0m, line [35m68[0m, in [35m<module>[0m
+    assert [1;31mreconstruction_loss < 0.02[0m, f"Reconstruction loss {reconstruction_loss:.6f} is not below 0.02"
+           [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[1;35mAssertionError[0m: [35mReconstruction loss 0.040210 is not below 0.02[0m

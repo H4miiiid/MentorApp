@@ -1,0 +1,3 @@
+Experimenting with different neural network architectures:
+
+Configuration 1: Hidden layers = [64]

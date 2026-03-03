@@ -1,0 +1,121 @@
+[
+  {
+    "idx": 1,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\011_MNIST_Digit_Distribution_Check\\prediction.py",
+    "ok": true,
+    "seconds": 0.0046,
+    "error": ""
+  },
+  {
+    "idx": 2,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\013_Fashion_MNIST_CNN_Early_Stopping\\prediction.py",
+    "ok": false,
+    "seconds": 0.0028,
+    "error": "PyCompileError('  File \"C:\\\\Users\\\\hbahmanyar\\\\MentorApp\\\\RAG_Pipelines\\\\RAG_outputs\\\\RAG_with_Baseline\\\\013_Fashion_MNIST_CNN_Early_Stopping\\\\prediction.py\", line 119\\n    axes[[1].set_xlabel(\\'Epoch\\')\\n        ^\\nSyntaxError: \\'[\\' was never closed\\n', 'SyntaxError', SyntaxError(\"'[' was never closed\", ('C:\\\\Users\\\\hbahmanyar\\\\MentorApp\\\\RAG_Pipelines\\\\RAG_outputs\\\\RAG_with_Baseline\\\\013_Fashion_MNIST_CNN_Early_Stopping\\\\prediction.py', 119, 5, \"axes[[1].set_xlabel('Epoch')\\n\", 119, 0)), 'C:\\\\Users\\\\hbahmanyar\\\\MentorApp\\\\RAG_Pipelines\\\\RAG_outputs\\\\RAG_with_Baseline\\\\013_Fashion_MNIST_CNN_Early_Stopping\\\\prediction.py')"
+  },
+  {
+    "idx": 3,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\018_Reuters_News_Topic_Classification\\prediction.py",
+    "ok": true,
+    "seconds": 0.0066,
+    "error": ""
+  },
+  {
+    "idx": 4,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\027_Titanic_Survival_ROC_Curve\\prediction.py",
+    "ok": true,
+    "seconds": 0.0062,
+    "error": ""
+  },
+  {
+    "idx": 5,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\032_California_Counterfactual_Explainability\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 6,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\034_Digits_Autoencoder_Reconstruction\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 7,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\047_Penguins_Migration_Time_Series_ARIMA\\prediction.py",
+    "ok": true,
+    "seconds": 0.0054,
+    "error": ""
+  },
+  {
+    "idx": 8,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\048_Heart_Model_Calibration_Plot\\prediction.py",
+    "ok": true,
+    "seconds": 0.0025,
+    "error": ""
+  },
+  {
+    "idx": 9,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\058_MNIST_Voting_Ensemble_Classification\\prediction.py",
+    "ok": true,
+    "seconds": 0.0048,
+    "error": ""
+  },
+  {
+    "idx": 10,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\059_Diabetes_Progression_Neural_Network_Regr\\prediction.py",
+    "ok": true,
+    "seconds": 0.0052,
+    "error": ""
+  },
+  {
+    "idx": 11,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\062_Digits_Classification_using_KNN\\prediction.py",
+    "ok": true,
+    "seconds": 0.004,
+    "error": ""
+  },
+  {
+    "idx": 12,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\076_Breast_Cancer_Diagnosis_with_LightGBM\\prediction.py",
+    "ok": true,
+    "seconds": 0.0029,
+    "error": ""
+  },
+  {
+    "idx": 13,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\077_Fashion_MNIST_Transfer_Learning_with_Mob\\prediction.py",
+    "ok": true,
+    "seconds": 0.0047,
+    "error": ""
+  },
+  {
+    "idx": 14,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\078_Iris_tSNE_Cluster_Visualization\\prediction.py",
+    "ok": true,
+    "seconds": 0.0039,
+    "error": ""
+  },
+  {
+    "idx": 15,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\081_IMDB_Sentiment_Bidirectional_LSTM_Embedd\\prediction.py",
+    "ok": true,
+    "seconds": 0.0038,
+    "error": ""
+  },
+  {
+    "idx": 16,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\084_Adult_Income_CatBoost_Classifier\\prediction.py",
+    "ok": true,
+    "seconds": 0.0035,
+    "error": ""
+  },
+  {
+    "idx": 17,
+    "file": "C:\\Users\\hbahmanyar\\MentorApp\\RAG_Pipelines\\RAG_outputs\\RAG_with_Baseline\\087_IMDB_Sentiment_BERT_Fine-Tuning\\prediction.py",
+    "ok": true,
+    "seconds": 0.0056,
+    "error": ""
+  }
+]

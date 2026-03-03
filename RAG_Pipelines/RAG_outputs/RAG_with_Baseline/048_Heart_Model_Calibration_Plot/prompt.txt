@@ -1,0 +1,88 @@
+Fix this Python file.
+Return the full corrected python file inside <correct_code> tags.
+
+Traceback tail:
+Traceback (most recent call last):
+  File "c:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\PreTest_Results\preTest_runtime_A\patched_A\047_Heart_Model_Calibration_Plot\prediction.py", line 24, in <module>
+    X_train, X_test, y_train, y_test = train_test_split(
+                                       ~~~~~~~~~~~~~~~~^
+        X, y, test_size=0.3, random_state=42, stratify=y
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\utils\_param_validation.py", line 218, in wrapper
+    return func(*args, **kwargs)
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\model_selection\_split.py", line 2945, in train_test_split
+    train, test = next(cv.split(X=arrays[0], y=stratify))
+                  ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\model_selection\_split.py", line 1928, in split
+    for train, test in self._iter_indices(X, y, groups):
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "c:\Users\hbahmanyar\MentorApp\.venv\Lib\site-packages\sklearn\model_selection\_split.py", line 2346, in _iter_indices
+    raise ValueError(
+    ...<5 lines>...
+    )
+ValueError: The least populated classes in y have only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2. Classes with too few members are: [3.0, 10.0, 12.0, 13.0, 14.0, 15.0, 23.0, 25.0, 26.0, 29.0, 30.0, 39.0, 44.0, 46.0, 47.0, 48.0, 50.0, 54.0, 60.0, 63.0, 64.0, 66.0, 68.0, 110.0, 127.0, 136.0, 147.0, 161.0, 167.0, 228.0, 237.0, 253.0, 280.0, 297.0, 305.0, 322.0, 339.0, 389.0, 439.0, 456.0, 499.0, 551.0, 589.0, 592.0, 624.0, 660.0, 730.0, 815.0, 836.0, 838.0, 875.0, 897.0, 994.0, 1024.0, 1106.0, 1264.0, 1350.0, 1367.0, 1536.0, 1549.0, 1775.0]
+
+Incorrect file:
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.calibration import calibration_curve
+from sklearn.metrics import brier_score_loss
+import statsmodels.api as sm
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the heart disease dataset from statsmodels
+heart_data = sm.datasets.heart.load_pandas()
+X = heart_data.data
+y = heart_data.endog
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Train a Logistic Regression model
+model = LogisticRegression(max_iter=1000, random_state=42)
+model.fit(X_train, y_train)
+
+# Get predicted probabilities on the test set
+y_prob = model.predict_proba(X_test)[:, 1]
+
+# Compute the Brier score
+brier_score = brier_score_loss(y_test, y_prob)
+print(f"Brier Score: {brier_score:.4f}")
+
+# Generate calibration curve (reliability diagram)
+fraction_of_positives, mean_predicted_value = calibration_curve(
+    y_test, y_prob, n_bins=10, strategy='uniform'
+)
+
+# Plot the calibration curve
+plt.figure(figsize=(8, 6))
+plt.plot(mean_predicted_value, fraction_of_positives, marker='o', label='Logistic Regression')
+plt.plot([0, 1], [0, 1], linestyle='--', color='gray', label='Perfectly Calibrated')
+plt.xlabel('Mean Predicted Probability')
+plt.ylabel('Fraction of Positives')
+plt.title('Calibration Curve (Reliability Diagram)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Check if the model is well-calibrated
+if brier_score < 0.2:
+    print(f"Model is well-calibrated (Brier score: {brier_score:.4f} < 0.2)")
+else:
+    print(f"Model calibration could be improved (Brier score: {brier_score:.4f} >= 0.2)")
+
+Hints from documentation:
+- Verify that every class in `y` has at least two samples before calling a stratified splitter.
+- Remove or merge classes that appear only once to satisfy the minimum‑group requirement.
+- If using `StratifiedKFold`, reduce `n_splits` to no more than the smallest class size.
+- Switch to a non‑stratified split (e.g., `train_test_split` without `stratify`) if class balance is not critical.
+- Ensure `y` is an array‑like of discrete labels (e.g., integers or strings) rather than continuous floats.
