@@ -1,0 +1,130 @@
+Fix this Python code based on the runtime error.
+
+Traceback:
+Traceback (most recent call last):
+  File [35m"prediction.py"[0m, line [35m59[0m, in [35m<module>[0m
+    [31mDense[0m[1;31m(num_classes, activation='softmax')[0m
+    [31m~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"dense.py"[0m, line [35m101[0m, in [35m__init__[0m
+    raise ValueError(
+    )
+[1;35mValueError[0m: [35mReceived an invalid value for `units`, expected a positive integer. Received: units=46[0m
+
+Failing line from traceback:
+[31mDense[0m[1;31m(num_classes, activation='softmax')[0m
+
+Code:
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.datasets import reuters
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+from tensorflow.keras.utils import to_categorical
+from sklearn.metrics import f1_score
+
+# Set random seeds for reproducibility
+np.random.seed(42)
+tf.random.set_seed(42)
+
+# Load the Reuters dataset
+# num_words: only consider the top 10000 most common words
+num_words = 10000
+(x_train, y_train), (x_test, y_test) = reuters.load_data(num_words=num_words)
+
+# Get the number of classes
+num_classes = np.max(y_train) + 1
+
+print(f"Number of training samples: {len(x_train)}")
+print(f"Number of test samples: {len(x_test)}")
+print(f"Number of classes: {num_classes}")
+
+# Pad sequences to ensure uniform input length
+max_length = 200
+x_train_padded = pad_sequences(x_train, maxlen=max_length, padding='post', truncating='post')
+x_test_padded = pad_sequences(x_test, maxlen=max_length, padding='post', truncating='post')
+
+print(f"Shape of padded training data: {x_train_padded.shape}")
+print(f"Shape of padded test data: {x_test_padded.shape}")
+
+# Convert labels to categorical (one-hot encoding)
+y_train_cat = to_categorical(y_train, num_classes=num_classes)
+y_test_cat = to_categorical(y_test, num_classes=num_classes)
+
+print(f"Shape of one-hot encoded training labels: {y_train_cat.shape}")
+print(f"Shape of one-hot encoded test labels: {y_test_cat.shape}")
+
+# Build the LSTM model
+embedding_dim = 128
+lstm_units = 64
+
+model = Sequential([
+    # Embedding layer to convert word indices to dense vectors
+    Embedding(input_dim=num_words, output_dim=embedding_dim, input_length=max_length),
+    # LSTM layer for sequence processing
+    LSTM(units=lstm_units, dropout=0.2, recurrent_dropout=0.2),
+    # Dropout for regularization
+    Dropout(0.5),
+    # Dense output layer with softmax activation for multi-class classification
+    Dense(num_classes, activation='softmax')
+])
+
+# Compile the model with categorical cross-entropy loss
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+print("\nModel Summary:")
+model.summary()
+
+# Train the model
+# Using a small number of epochs to keep runtime reasonable
+epochs = 5
+batch_size = 128
+
+print("\nTraining the model...")
+history = model.fit(
+    x_train_padded,
+    y_train_cat,
+    epochs=epochs,
+    batch_size=batch_size,
+    validation_split=0.2,
+    verbose=1
+)
+
+# Evaluate the model on test data
+print("\nEvaluating the model on test data...")
+test_loss, test_accuracy = model.evaluate(x_test_padded, y_test_cat, verbose=0)
+print(f"Test Loss: {test_loss:.4f}")
+print(f"Test Accuracy: {test_accuracy:.4f}")
+
+# Make predictions on test data
+y_pred_probs = model.predict(x_test_padded, verbose=0)
+y_pred = np.argmax(y_pred_probs, axis=1)
+
+# Calculate macro-averaged F1 score
+macro_f1 = f1_score(y_test, y_pred, average='macro')
+print(f"\nMacro-averaged F1 Score: {macro_f1:.4f}")
+
+# Display some example predictions
+print("\nExample predictions (first 5 test samples):")
+for i in range(5):
+    print(f"Sample {i+1}: True label = {y_test[i]}, Predicted label = {y_pred[i]}")
+
+print("\nProject completed successfully!")
+
+Hints (use these to fix the failing line first; do NOT repeat them):
+• Ensure `num_classes` is a plain Python `int` (e.g., `num_classes = int(num_classes)`) since Keras `Dense` rejects NumPy integer types.
+• Verify that `num_classes` is a single positive integer (not zero, negative, or a tuple) before passing it to `Dense(units, …)`.
+
+Editing rules:
+1. Find the exact failing line from the traceback inside the code.
+2. Apply the hint to that line before making any other edits.
+3. If the hint gives a concrete replacement, use that exact replacement in every matching occurrence needed to fix the error.
+4. Keep the rest of the file unchanged unless another edit is required for correctness.
+5. Do not return the original code unchanged if the failing line still contains the invalid value or API usage.
+--- END OF REFERENCE ---
+
+<correct_code>

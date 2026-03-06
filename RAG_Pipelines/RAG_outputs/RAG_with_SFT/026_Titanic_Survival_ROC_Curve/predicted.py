@@ -5,6 +5,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import LabelEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import HistGradientBoostingClassifier
 
 # Set random seed for reproducibility
 np.random.seed(42)
@@ -58,7 +61,7 @@ missing_age_idx = np.random.choice(n_samples, size=int(0.15 * n_samples), replac
 df.loc[missing_age_idx, 'Age'] = np.nan
 
 # Fill missing ages with median
-df['Age'].fillna(df['Age'].median(), inplace=True)
+# df['Age'].fillna(df['Age'].median(), inplace=True)
 
 # Encode categorical variable (Sex)
 le = LabelEncoder()
@@ -74,13 +77,19 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
 )
 
-# Fit logistic regression model
-log_reg = LogisticRegression(random_state=42, max_iter=1000)
-log_reg.fit(X_train, y_train)
+# Use a pipeline with imputation to handle missing values
+# This ensures that the imputer is applied consistently during training and prediction
+pipeline = Pipeline([
+    ('imputer', SimpleImputer(strategy='median')),
+    ('classifier', LogisticRegression(random_state=42, max_iter=1000))
+])
+
+# Fit the pipeline
+pipeline.fit(X_train, y_train)
 
 # Compute predicted probabilities on test set
 # Get probabilities for the positive class (survived=1)
-y_pred_proba = log_reg.predict_proba(X_test)[:, 1]
+y_pred_proba = pipeline.named_steps['classifier'].predict_proba(X_test)[:, 1]
 
 # Compute ROC curve
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)

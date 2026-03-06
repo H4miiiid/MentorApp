@@ -1,22 +1,15 @@
-You fix Python programs.
-Input: a traceback tail, buggy Python code, and sometimes hints.
-Use the hints when helpful and fix the Python code.
-Return ONLY this format:
-<correct_code>
-(full corrected python code)
-</correct_code>
-<error_type>
-(one short line describing the original bug type)
-</error_type>
-No markdown, no backticks, no explanations, do not echo the prompt.
-
 Fix this Python code based on the runtime error.
 
 Traceback:
 Traceback (most recent call last):
-  File [35m"C:\Users\hbahmanyar\MentorApp\Fine-Tuning\Qwen\Fine-Tune_Results\fine_tuned_eval_runtime_A\patched\setting_A\046_Penguins_Migration_Time_Series_ARIMA\prediction.py"[0m, line [35m10[0m, in [35m<module>[0m
-    from statsmodels.tsa.arima.model import ARIMA
-[1;35mModuleNotFoundError[0m: [35mNo module named 'statsmodels'[0m
+  File "prediction.py", line 14, in <module>
+    time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='M')
+  File "datetimes.py", line 1442, in date_range
+    freq = to_offset(freq)
+ValueError: Invalid frequency: M. Failed to parse with error message: ValueError("'M' is no longer supported for offsets. Please use 'ME' instead.")
+
+Failing line from traceback:
+time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='M')
 
 Code:
 import numpy as np
@@ -146,9 +139,16 @@ print("\nModel diagnostics completed.")
 print(f"Mean Absolute Error (in-sample): {np.mean(np.abs(residuals)):.2f}")
 print(f"Root Mean Squared Error (in-sample): {np.sqrt(np.mean(residuals**2)):.2f}")
 
-Reference docs:
-• Use `np.prod` instead of the removed `stead.product` to avoid `AttributeError`.
-• Replace `np.recfromcsv`/`np.recfromtxt` with `np.genfromtxt(..., delimiter=',')` for correct CSV parsing.
-• Call `np.round` (not the deprecated `round_`) and supply the array and `decimals` argument to avoid `TypeError`.
-• Switch to `ast.literal_eval` in place of `np.safe_eval` to safely parse literals without `DeprecationWarning`.
-• Wrap error‑handling code in `with np.errstate(...):` instead of using the removed `seterrobj` function.
+Hints (use these to fix the failing line first; do NOT repeat them):
+• Replace the deprecated frequency string `'M'` with `'ME'` (month‑end) or `'MS'` (month‑start) when calling `to_offset` or any pandas date‑range function.
+• Verify you are using a recent pandas version where `'M'` has been removed; consult the release notes for the exact deprecation timeline.
+
+Editing rules:
+1. Find the exact failing line from the traceback inside the code.
+2. Apply the hint to that line before making any other edits.
+3. If the hint gives a concrete replacement, use that exact replacement in every matching occurrence needed to fix the error.
+4. Keep the rest of the file unchanged unless another edit is required for correctness.
+5. Do not return the original code unchanged if the failing line still contains the invalid value or API usage.
+--- END OF REFERENCE ---
+
+<correct_code>

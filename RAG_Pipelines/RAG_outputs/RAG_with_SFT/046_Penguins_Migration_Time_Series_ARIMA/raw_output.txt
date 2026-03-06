@@ -1,18 +1,3 @@
- Pass a dictionary to `errstate`.
-• Use `plt.tight_layout()` to automatically adjust subplot params for better visibility.
-• Replace `np.recarray` with `np.ndarray` and add a structured dtype for record arrays.
-• Call `plt.show()` to render the plot.
-• Use `plt.figure(figsize=(width, height))` to set the figure size.
-• Pass `alpha` to `plt.fill_between` for transparency.
-• Use `plt.axvline` to add vertical lines.
-• Set `label` for lines and call `plt.legend()` to display the legend.
-• Use `plt.grid(True, alpha=0.3)` for grid lines with transparency.
-• Call `plt.tight_layout()` to ensure all elements fit.
-• Use `plt.title`, `plt.xlabel`, and `plt.ylabel` to add labels.
-• Pass `bins` to `plt.hist` for histogram binning.
-• Use `plt.subplot(2, 2, i)` for multi‑subplot layouts.
-• Call `plt.show()` to display the plot.
-<correct_code>
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,7 +11,7 @@ np.random.seed(42)
 # Generate synthetic monthly penguin sighting counts
 # Create a time series with trend, seasonality, and noise
 n_months = 60  # 5 years of monthly data
-time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='M')
+time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='ME')
 
 # Create trend component
 trend = np.linspace(100, 150, n_months)
@@ -68,7 +53,7 @@ forecast_ci = forecast_df.conf_int(alpha=0.05)  # 95% confidence interval
 
 # Create forecast index
 forecast_index = pd.date_range(start=ts_data.index[-1] + pd.DateOffset(months=1), 
-                                periods=forecast_steps, freq='M')
+                                periods=forecast_steps, freq='ME')
 
 print("\nForecast for next 6 months:")
 for i, date in enumerate(forecast_index):
@@ -139,7 +124,4 @@ plt.show()
 print("\nModel diagnostics completed.")
 print(f"Mean Absolute Error (in-sample): {np.mean(np.abs(residuals)):.2f}")
 print(f"Root Mean Squared Error (in-sample): {np.sqrt(np.mean(residuals**2)):.2f}")
-</correct_code>
-<error_type>
-ModuleNotFoundError
-</error_type>
+

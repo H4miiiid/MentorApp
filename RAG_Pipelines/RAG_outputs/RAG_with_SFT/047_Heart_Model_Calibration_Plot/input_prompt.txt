@@ -1,0 +1,80 @@
+Fix this Python code based on the runtime error.
+
+Traceback:
+Traceback (most recent call last):
+  File [35m"prediction.py"[0m, line [35m13[0m, in [35m<module>[0m
+    import statsmodels.api as sm
+[1;35mModuleNotFoundError[0m: [35mNo module named 'statsmodels'[0m
+
+Failing line from traceback:
+import statsmodels.api as sm
+
+Code:
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.calibration import calibration_curve
+from sklearn.metrics import brier_score_loss
+import statsmodels.api as sm
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the heart disease dataset from statsmodels
+heart_data = sm.datasets.heart.load_pandas()
+X = heart_data.data
+y = heart_data.endog
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Train a Logistic Regression model
+model = LogisticRegression(max_iter=1000, random_state=42)
+model.fit(X_train, y_train)
+
+# Get predicted probabilities on the test set
+y_prob = model.predict_proba(X_test)[:, 1]
+
+# Compute the Brier score
+brier_score = brier_score_loss(y_test, y_prob)
+print(f"Brier Score: {brier_score:.4f}")
+
+# Generate calibration curve (reliability diagram)
+fraction_of_positives, mean_predicted_value = calibration_curve(
+    y_test, y_prob, n_bins=10, strategy='uniform'
+)
+
+# Plot the calibration curve
+plt.figure(figsize=(8, 6))
+plt.plot(mean_predicted_value, fraction_of_positives, marker='o', label='Logistic Regression')
+plt.plot([0, 1], [0, 1], linestyle='--', color='gray', label='Perfectly Calibrated')
+plt.xlabel('Mean Predicted Probability')
+plt.ylabel('Fraction of Positives')
+plt.title('Calibration Curve (Reliability Diagram)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Check if the model is well-calibrated
+if brier_score < 0.2:
+    print(f"Model is well-calibrated (Brier score: {brier_score:.4f} < 0.2)")
+else:
+    print(f"Model calibration could be improved (Brier score: {brier_score:.4f} >= 0.2)")
+
+Hints (use these to fix the failing line first; do NOT repeat them):
+• Install the missing package, e.g., `pip install statsmodels` (or `conda install -c conda-forge statsmodels`).
+• Ensure you run the script in the same Python environment/virtualenv where statsmodels was installed.
+
+Editing rules:
+1. Find the exact failing line from the traceback inside the code.
+2. Apply the hint to that line before making any other edits.
+3. If the hint gives a concrete replacement, use that exact replacement in every matching occurrence needed to fix the error.
+4. Keep the rest of the file unchanged unless another edit is required for correctness.
+5. Do not return the original code unchanged if the failing line still contains the invalid value or API usage.
+--- END OF REFERENCE ---
+
+<correct_code>

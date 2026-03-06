@@ -1,0 +1,185 @@
+Fix this Python code based on the runtime error.
+
+Traceback:
+Traceback (most recent call last):
+  File [35m"prediction.py"[0m, line [35m46[0m, in [35m<module>[0m
+    [31mbase_model.fit[0m[1;31m(X_train, y_train)[0m
+    [31m~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^[0m
+  File [35m"core.py"[0m, line [35m5245[0m, in [35mfit[0m
+    [31mself._fit[0m[1;31m(X, y, cat_features, text_features, embedding_features, None, graph, sample_weight, None, None, None, None, baseline, use_best_model,[0m
+    [31m~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+              [1;31meval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period,[0m
+              [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+              [1;31msilent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)[0m
+              [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"core.py"[0m, line [35m2395[0m, in [35m_fit[0m
+    train_params = self._prepare_train_params(
+        X=X, y=y, cat_features=cat_features, text_features=text_features, embedding_features=embedding_features,
+        callbacks=callbacks
+    )
+  File [35m"core.py"[0m, line [35m2275[0m, in [35m_prepare_train_params[0m
+    train_pool = _build_train_pool(X, y, cat_features, text_features, embedding_features, pairs, graph,
+                                   sample_weight, group_id, group_weight, subgroup_id, pairs_weight,
+                                   baseline, column_description)
+  File [35m"core.py"[0m, line [35m1513[0m, in [35m_build_train_pool[0m
+    train_pool = Pool(X, y, cat_features=cat_features, text_features=text_features, embedding_features=embedding_features, pairs=pairs, graph=graph, weight=sample_weight, group_id=group_id,
+                      group_weight=group_weight, subgroup_id=subgroup_id, pairs_weight=pairs_weight, baseline=baseline)
+  File [35m"core.py"[0m, line [35m855[0m, in [35m__init__[0m
+    [31mself._init[0m[1;31m(data, label, cat_features, text_features, embedding_features, embedding_features_data, pairs, graph, weight,[0m
+    [31m~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+               [1;31mgroup_id, group_weight, subgroup_id, pairs_weight, baseline, timestamp, feature_names, feature_tags, thread_count)[0m
+               [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"core.py"[0m, line [35m1491[0m, in [35m_init[0m
+    [31mself._init_pool[0m[1;31m(data, label, cat_features, text_features, embedding_features, embedding_features_data, pairs, graph, weight,[0m
+    [31m~~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+                    [1;31mgroup_id, group_weight, subgroup_id, pairs_weight, baseline, timestamp, feature_names, feature_tags, thread_count)[0m
+                    [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"_catboost.pyx"[0m, line [35m4329[0m, in [35m_catboost._PoolBase._init_pool[0m
+  File [35m"_catboost.pyx"[0m, line [35m4381[0m, in [35m_catboost._PoolBase._init_pool[0m
+  File [35m"_catboost.pyx"[0m, line [35m4190[0m, in [35m_catboost._PoolBase._init_features_order_layout_pool[0m
+  File [35m"_catboost.pyx"[0m, line [35m3075[0m, in [35m_catboost._set_features_order_data_pd_data_frame[0m
+  File [35m"_catboost.pyx"[0m, line [35m2953[0m, in [35m_catboost._set_features_order_data_pd_data_frame_categorical_column[0m
+  File [35m"_catboost.pyx"[0m, line [35m2898[0m, in [35m_catboost._set_hashed_cat_values[0m[1;35m_catboost.CatBoostError[0m: [35mInvalid type for cat_feature[object_idx=6,feature_idx=1]=NaN : cat_features must be integer or string, real number values and NaN values should be converted to string.[0m
+
+Failing line from traceback:
+[31mbase_model.fit[0m[1;31m(X_train, y_train)[0m
+
+Code:
+import numpy as np
+import pandas as pd
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import accuracy_score
+from catboost import CatBoostClassifier
+import matplotlib.pyplot as plt
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Fetch the adult dataset from OpenML
+print("Fetching adult dataset...")
+adult_data = fetch_openml('adult', version=2, as_frame=True, parser='auto')
+X = adult_data.data
+y = adult_data.target
+
+# Identify categorical features
+categorical_features = X.select_dtypes(include=['category', 'object']).columns.tolist()
+print(f"Categorical features: {categorical_features}")
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print(f"Training set size: {X_train.shape[0]}")
+print(f"Test set size: {X_test.shape[0]}")
+
+# Initialize CatBoostClassifier with basic parameters
+# CatBoost handles categorical features natively
+print("\nTraining initial CatBoost model...")
+base_model = CatBoostClassifier(
+    iterations=100,
+    random_seed=42,
+    verbose=0,
+    cat_features=categorical_features
+)
+
+base_model.fit(X_train, y_train)
+y_pred_base = base_model.predict(X_test)
+base_accuracy = accuracy_score(y_test, y_pred_base)
+print(f"Base model accuracy: {base_accuracy:.4f}")
+
+# Hyperparameter tuning: depth and learning_rate
+print("\nTuning hyperparameters (depth and learning_rate)...")
+param_grid = {
+    'depth': [4, 6, 8],
+    'learning_rate': [0.01, 0.05, 0.1]
+}
+
+# Use a smaller subset for faster tuning in this example
+tuning_model = CatBoostClassifier(
+    iterations=50,
+    random_seed=42,
+    verbose=0,
+    cat_features=categorical_features
+)
+
+grid_search = GridSearchCV(
+    estimator=tuning_model,
+    param_grid=param_grid,
+    cv=3,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=0
+)
+
+grid_search.fit(X_train, y_train)
+
+print(f"Best parameters: {grid_search.best_params_}")
+print(f"Best cross-validation accuracy: {grid_search.best_score_:.4f}")
+
+# Train final model with best parameters
+print("\nTraining final model with best parameters...")
+final_model = CatBoostClassifier(
+    iterations=100,
+    depth=grid_search.best_params_['depth'],
+    learning_rate=grid_search.best_params_['learning_rate'],
+    random_seed=42,
+    verbose=0,
+    cat_features=categorical_features
+)
+
+final_model.fit(X_train, y_train)
+y_pred_final = final_model.predict(X_test)
+final_accuracy = accuracy_score(y_test, y_pred_final)
+print(f"Final model accuracy: {final_accuracy:.4f}")
+
+# Feature importance
+print("\nExtracting feature importance...")
+feature_importance = final_model.get_feature_importance()
+feature_names = X.columns.tolist()
+
+# Create a DataFrame for better visualization
+importance_df = pd.DataFrame({
+    'feature': feature_names,
+    'importance': feature_importance
+}).sort_values('importance', ascending=False)
+
+print("\nTop 10 most important features:")
+print(importance_df.head(10))
+
+# Visualize feature importance
+plt.figure(figsize=(10, 6))
+top_n = 10
+top_features = importance_df.head(top_n)
+plt.barh(range(top_n), top_features['importance'].values)
+plt.yticks(range(top_n), top_features['feature'].values)
+plt.xlabel('Feature Importance')
+plt.ylabel('Feature')
+plt.title('Top 10 Feature Importances (CatBoost)')
+plt.gca().invert_yaxis()
+plt.tight_layout()
+plt.show()
+
+print("\n=== Summary ===")
+print(f"Base model accuracy: {base_accuracy:.4f}")
+print(f"Tuned model accuracy: {final_accuracy:.4f}")
+print(f"Best depth: {grid_search.best_params_['depth']}")
+print(f"Best learning rate: {grid_search.best_params_['learning_rate']}")
+print(f"Most important feature: {importance_df.iloc[0]['feature']}")
+
+Hints (use these to fix the failing line first; do NOT repeat them):
+• Convert any NaN/ <NA> entries in categorical columns to a string (e.g., `df[col] = df[col].fillna('NaN').astype(str)`) before passing the DataFrame to CatBoost.
+• Ensure categorical features are of dtype `object` or `string`; avoid nullable float dtypes (`Float64Dtype`) for cat columns.
+• When specifying `cat_features`, list column names or indices that refer only to columns without missing values after the conversion.
+• If you need to keep numeric NaNs, create a separate placeholder column (e.g., `"missing"`) and include it as a categorical feature instead of the original column.
+
+Editing rules:
+1. Find the exact failing line from the traceback inside the code.
+2. Apply the hint to that line before making any other edits.
+3. If the hint gives a concrete replacement, use that exact replacement in every matching occurrence needed to fix the error.
+4. Keep the rest of the file unchanged unless another edit is required for correctness.
+5. Do not return the original code unchanged if the failing line still contains the invalid value or API usage.
+--- END OF REFERENCE ---
+
+<correct_code>

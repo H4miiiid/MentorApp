@@ -11,7 +11,7 @@ np.random.seed(42)
 # Generate synthetic monthly penguin sighting counts
 # Create a time series with trend, seasonality, and noise
 n_months = 60  # 5 years of monthly data
-time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='ME')
+time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='M')
 
 # Create trend component
 trend = np.linspace(100, 150, n_months)
@@ -53,7 +53,7 @@ forecast_ci = forecast_df.conf_int(alpha=0.05)  # 95% confidence interval
 
 # Create forecast index
 forecast_index = pd.date_range(start=ts_data.index[-1] + pd.DateOffset(months=1), 
-                                periods=forecast_steps, freq='ME')
+                                periods=forecast_steps, freq='M')
 
 print("\nForecast for next 6 months:")
 for i, date in enumerate(forecast_index):
