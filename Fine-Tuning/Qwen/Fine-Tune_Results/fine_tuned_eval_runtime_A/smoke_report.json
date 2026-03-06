@@ -510,7 +510,7 @@
     "returncode": 1,
     "seconds": 4.446,
     "stdout_tail": "",
-    "stderr_tail": "Traceback (most recent call last):\n  File \u001b[35m\"C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py\"\u001b[0m, line \u001b[35m10\u001b[0m, in \u001b[35m<module>\u001b[0m\n    from statsmodels.tsa.arima.model import ARIMA\n\u001b[1;35mModuleNotFoundError\u001b[0m: \u001b[35mNo module named 'statsmodels'\u001b[0m",
+    "stderr_tail": "Traceback (most recent call last):\n  File \"c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs_A\\setting_A\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py\", line 14, in <module>\n    time_index = pd.date_range(start='2019-01-01', periods=n_months, freq='M')\n  File \"C:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\pandas\\core\\indexes\\datetimes.py\", line 1442, in date_range\n    freq = to_offset(freq)\nValueError: Invalid frequency: M. Failed to parse with error message: ValueError(\"'M' is no longer supported for offsets. Please use 'ME' instead.\")",
     "idx": 47,
     "file": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_outputs\\setting_A\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py",
     "patched": "C:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Qwen\\Fine-Tune_Results\\fine_tuned_eval_runtime_A\\patched\\setting_A\\046_Penguins_Migration_Time_Series_ARIMA\\prediction.py",

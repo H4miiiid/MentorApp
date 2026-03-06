@@ -31,16 +31,13 @@ httpx
 # Utilities
 tqdm
 truststore; platform_system == "Windows"
-
 torch
 torchvision
 torchaudio
-
 tensorflow
-
 opencv-python
 scikit-image
-
 xgboost
 lightgbm
 catboost
+statsmodels
