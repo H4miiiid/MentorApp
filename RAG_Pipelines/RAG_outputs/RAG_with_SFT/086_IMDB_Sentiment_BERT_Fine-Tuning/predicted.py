@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score
 import torch
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizer, BertForSequenceClassification, AdamW
+from transformers import BertTokenizer, BertForSequenceClassification
+from torch.optim import AdamW
 from datasets import load_dataset
 
 # Set random seeds for reproducibility
@@ -140,7 +141,7 @@ def evaluate(model, data_loader, device):
     return accuracy, f1
 
 # Training loop
-num_epochs = 3
+num_epochs = 1
 train_losses = []
 val_accuracies = []
 val_f1_scores = []

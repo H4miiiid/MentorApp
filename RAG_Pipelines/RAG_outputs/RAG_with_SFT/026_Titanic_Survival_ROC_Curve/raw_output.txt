@@ -89,7 +89,7 @@ pipeline.fit(X_train, y_train)
 
 # Compute predicted probabilities on test set
 # Get probabilities for the positive class (survived=1)
-y_pred_proba = pipeline.named_steps['classifier'].predict_proba(X_test)[:, 1]
+y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
 # Compute ROC curve
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)

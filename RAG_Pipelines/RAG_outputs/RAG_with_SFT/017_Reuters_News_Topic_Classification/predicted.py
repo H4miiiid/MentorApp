@@ -42,6 +42,7 @@ print(f"TF-IDF feature shape: {x_train_tfidf.shape}")
 
 # Convert labels to categorical (one-hot encoding)
 num_classes = np.max(y_train) + 1
+num_classes = int(num_classes)  # Ensure it's an integer
 y_train_cat = to_categorical(y_train, num_classes)
 y_test_cat = to_categorical(y_test, num_classes)
 

@@ -14,7 +14,7 @@ y = iris.target
 target_names = iris.target_names
 
 # Apply t-SNE to reduce dimensions to 2
-tsne = TSNE(n_components=2, random_state=42, perplexity=30, max_iter=1000)
+tsne = TSNE(n_components=2, random_state=42, perplexity=30, n_iter=1000)
 X_tsne = tsne.fit_transform(X)
 
 # Perform K-Means clustering to find centroids (k=3 for 3 species)
