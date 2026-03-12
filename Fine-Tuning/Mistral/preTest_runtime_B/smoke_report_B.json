@@ -10,6 +10,17 @@
     "patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\008_Breast_Cancer_SVM_Classifier\\prediction.py",
     "skipped": false
   },
+    {
+    "ok": false,
+    "returncode": 1,
+    "seconds": 23.618,
+    "stdout_tail": "weighted avg       0.98      0.98      0.98       171\n\n\nConfusion Matrix:\n[[ 62   2]\n [  2 105]]\n\n==================================================\n\nLogistic Regression Baseline Results:\nROC-AUC Score: 0.9981\n\nClassification Report:\n              precision    recall  f1-score   support\n\n   malignant       0.98      0.98      0.98        64\n      benign       0.99      0.99      0.99       107\n\n    accuracy                           0.99       171\n   macro avg       0.99      0.99      0.99       171\nweighted avg       0.99      0.99      0.99       171\n\n\nConfusion Matrix:\n[[ 63   1]\n [  1 106]]\n\n==================================================\n\nComparison: SVM ROC-AUC (0.9978) vs Logistic Regression ROC-AUC (0.9981)",
+    "stderr_tail": "Traceback (most recent call last):\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\axes\\_axes.py\"\u001b[0m, line \u001b[35m4761\u001b[0m, in \u001b[35m_parse_scatter_color_args\u001b[0m\n    colors = mcolors.to_rgba_array(c)\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\colors.py\"\u001b[0m, line \u001b[35m515\u001b[0m, in \u001b[35mto_rgba_array\u001b[0m\n    rgba = np.array([\u001b[31mto_rgba\u001b[0m\u001b[1;31m(cc)\u001b[0m for cc in c])\n                     \u001b[31m~~~~~~~\u001b[0m\u001b[1;31m^^^^\u001b[0m\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\colors.py\"\u001b[0m, line \u001b[35m317\u001b[0m, in \u001b[35mto_rgba\u001b[0m\n    rgba = _to_rgba_no_colorcycle(c, alpha)\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\colors.py\"\u001b[0m, line \u001b[35m401\u001b[0m, in \u001b[35m_to_rgba_no_colorcycle\u001b[0m\n    raise ValueError(f\"Invalid RGBA argument: {orig_c!r}\")\n\u001b[1;35mValueError\u001b[0m: \u001b[35mInvalid RGBA argument: np.float64(0.0)\u001b[0m\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\008_Breast_Cancer_SVM_Classifier\\prediction.py\"\u001b[0m, line \u001b[35m109\u001b[0m, in \u001b[35m<module>\u001b[0m\n    \u001b[31mplt.scatter\u001b[0m\u001b[1;31m(X_test_2d[:, 0], X_test_2d[:, 1], c=svm_2d.predict(np.c_[xx.ravel(), yy.ravel()]), cmap='RdYlBu', edgecolors='k', s=50, alpha=0.7)\u001b[0m\n    \u001b[31m~~~~~~~~~~~\u001b[0m\u001b[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\u001b[0m\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\_api\\deprecation.py\"\u001b[0m, line \u001b[35m453\u001b[0m, in \u001b[35mwrapper\u001b[0m\n    return func(*args, **kwargs)\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\pyplot.py\"\u001b[0m, line \u001b[35m3948\u001b[0m, in \u001b[35mscatter\u001b[0m\n    __ret = gca().scatter(\n        x,\n    ...<14 lines>...\n        **kwargs,\n    )\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\_api\\deprecation.py\"\u001b[0m, line \u001b[35m453\u001b[0m, in \u001b[35mwrapper\u001b[0m\n    return func(*args, **kwargs)\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\__init__.py\"\u001b[0m, line \u001b[35m1524\u001b[0m, in \u001b[35minner\u001b[0m\n    return func(\n        ax,\n        *map(cbook.sanitize_sequence, args),\n        **{k: cbook.sanitize_sequence(v) for k, v in kwargs.items()})\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\axes\\_axes.py\"\u001b[0m, line \u001b[35m4954\u001b[0m, in \u001b[35mscatter\u001b[0m\n    \u001b[31mself._parse_scatter_color_args\u001b[0m\u001b[1;31m(\u001b[0m\n    \u001b[31m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\u001b[0m\u001b[1;31m^\u001b[0m\n        \u001b[1;31mc, edgecolors, kwargs, x.size,\u001b[0m\n        \u001b[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\u001b[0m\n        \u001b[1;31mget_next_color_func=self._get_patches_for_fill.get_next_color)\u001b[0m\n        \u001b[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\u001b[0m\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\.venv\\Lib\\site-packages\\matplotlib\\axes\\_axes.py\"\u001b[0m, line \u001b[35m4767\u001b[0m, in \u001b[35m_parse_scatter_color_args\u001b[0m\n    raise invalid_shape_exception(c.size, xsize) from err\n\u001b[1;35mValueError\u001b[0m: \u001b[35m'c' argument has 158301 elements, which is inconsistent with 'x' and 'y' with size 171.\u001b[0m",
+    "idx": 1,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_B_outputs\\010_MNIST_Digit_Distribution_Check\\prediction.py",
+    "patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\010_MNIST_Digit_Distribution_Check\\prediction.py",
+    "skipped": false
+  },
   {
     "ok": false,
     "returncode": null,
@@ -65,6 +76,17 @@
     "patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\026_Titanic_Survival_ROC_Curve\\prediction.py",
     "skipped": false
   },
+    {
+    "ok": false,
+    "returncode": 1,
+    "seconds": 9.742,
+    "stdout_tail": "Reconstruction loss on test set: 0.024549",
+    "stderr_tail": "Traceback (most recent call last):\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\033_Digits_Autoencoder_Reconstruction\\prediction.py\"\u001b[0m, line \u001b[35m68\u001b[0m, in \u001b[35m<module>\u001b[0m\n    assert \u001b[1;31mreconstruction_loss < 0.02\u001b[0m, f\"Reconstruction loss {reconstruction_loss:.6f} is not below 0.02\"\n           \u001b[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^\u001b[0m\n\u001b[1;35mAssertionError\u001b[0m: \u001b[35mReconstruction loss 0.024549 is not below 0.02\u001b[0m",
+    "idx": 7,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_B_outputs\\030_Breast_Cancer_Confusion_Matrix_Study\\prediction.py",
+    "patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\030_Breast_Cancer_Confusion_Matrix_Study\\prediction.py",
+    "skipped": false
+  },
   {
     "ok": false,
     "returncode": 1,
@@ -74,6 +96,28 @@
     "idx": 7,
     "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_B_outputs\\033_Digits_Autoencoder_Reconstruction\\prediction.py",
     "patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\033_Digits_Autoencoder_Reconstruction\\prediction.py",
+    "skipped": false
+  },
+    {
+    "ok": false,
+    "returncode": 1,
+    "seconds": 9.742,
+    "stdout_tail": "Reconstruction loss on test set: 0.024549",
+    "stderr_tail": "Traceback (most recent call last):\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\033_Digits_Autoencoder_Reconstruction\\prediction.py\"\u001b[0m, line \u001b[35m68\u001b[0m, in \u001b[35m<module>\u001b[0m\n    assert \u001b[1;31mreconstruction_loss < 0.02\u001b[0m, f\"Reconstruction loss {reconstruction_loss:.6f} is not below 0.02\"\n           \u001b[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^\u001b[0m\n\u001b[1;35mAssertionError\u001b[0m: \u001b[35mReconstruction loss 0.024549 is not below 0.02\u001b[0m",
+    "idx": 7,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_B_outputs\\035_IMDB_Sentiment_Classification_Naive_Baye\\prediction.py",
+    "patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\035_IMDB_Sentiment_Classification_Naive_Baye\\prediction.py",
+    "skipped": false
+  },
+    {
+    "ok": false,
+    "returncode": 1,
+    "seconds": 9.742,
+    "stdout_tail": "Reconstruction loss on test set: 0.024549",
+    "stderr_tail": "Traceback (most recent call last):\n  File \u001b[35m\"c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\033_Digits_Autoencoder_Reconstruction\\prediction.py\"\u001b[0m, line \u001b[35m68\u001b[0m, in \u001b[35m<module>\u001b[0m\n    assert \u001b[1;31mreconstruction_loss < 0.02\u001b[0m, f\"Reconstruction loss {reconstruction_loss:.6f} is not below 0.02\"\n           \u001b[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^\u001b[0m\n\u001b[1;35mAssertionError\u001b[0m: \u001b[35mReconstruction loss 0.024549 is not below 0.02\u001b[0m",
+    "idx": 7,
+    "file": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\Pre_Test_B_outputs\\040_Wine_Stacking_Ensemble_Evaluation\\prediction.py",
+    "patched": "c:\\Users\\hbahmanyar\\MentorApp\\Fine-Tuning\\Mistral\\preTest_runtime_B\\patched\\040_Wine_Stacking_Ensemble_Evaluation\\prediction.py",
     "skipped": false
   },
   {

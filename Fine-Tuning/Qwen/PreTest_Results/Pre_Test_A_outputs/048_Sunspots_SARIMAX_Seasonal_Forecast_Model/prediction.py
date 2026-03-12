@@ -5,7 +5,7 @@ from statsmodels.datasets import sunspots
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.graphics.tsaplots import plot_acf
 import warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore'
 
 # Set random seed for reproducibility
 np.random.seed(42)

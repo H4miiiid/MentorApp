@@ -1,0 +1,1 @@
+Variable name inconsistency: 'stackingclf' was used instead of 'stacking_clf' when calling fit() and predict()

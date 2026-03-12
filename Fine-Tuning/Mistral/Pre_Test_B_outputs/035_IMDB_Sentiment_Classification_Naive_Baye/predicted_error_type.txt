@@ -1,0 +1,1 @@
+The original code had an incorrect word index mapping that didn't account for the vocabulary size limit (num_words) and didn't include padding/start/unknown tokens.

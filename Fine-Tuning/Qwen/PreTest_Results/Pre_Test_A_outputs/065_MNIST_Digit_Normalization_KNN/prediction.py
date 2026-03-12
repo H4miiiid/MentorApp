@@ -16,7 +16,7 @@ X_train_full = X_train_full.reshape(X_train_full.shape[0], -1)
 X_test = X_test.reshape(X_test.shape[0], -1)
 
 # Normalize pixel values to [0, 1]
-X_train_full = X_train_full.astype('float32') / 255.0
+X_train_full = X_train_full.astype('float32' / 255.0
 X_test = X_test.astype('float32') / 255.0
 
 # Use a subset of training data for faster runtime

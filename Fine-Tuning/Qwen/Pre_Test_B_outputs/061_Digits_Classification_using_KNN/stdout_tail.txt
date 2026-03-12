@@ -1,2 +1,0 @@
-Dataset shape: (1797, 64)
-Number of classes: 10

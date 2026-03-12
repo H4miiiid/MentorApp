@@ -186,7 +186,7 @@
     "skipped": false
   },
   {
-    "ok": true,
+    "ok": false,
     "returncode": 0,
     "seconds": 0.057,
     "stdout_tail": "",
@@ -230,7 +230,7 @@
     "skipped": false
   },
   {
-    "ok": true,
+    "ok": false,
     "returncode": 0,
     "seconds": 3.43,
     "stdout_tail": "Test set size: 143\n\nTraining the Decision Tree Classifier...\n\n==================================================\nMODEL EVALUATION RESULTS\n==================================================\nTest Set Accuracy: 0.7133\nTest Set Accuracy (%): 71.33%\n\nSample Predictions (first 10 test samples):\n   Actual  Predicted\n0       1          1\n1       1          1\n2       0          0\n3       1          1\n4       0          0\n5       1          0\n6       1          1\n7       1          0\n8       0          0\n9       1          0\n\nTop 5 Most Important Features:\n    Feature  Importance\n5  sex_male    0.311786\n1       age    0.267162\n4      fare    0.223664\n0    pclass    0.128361\n2     sibsp    0.049794",
@@ -512,7 +512,7 @@
     "skipped": false
   },
   {
-    "ok": true,
+    "ok": false,
     "returncode": 0,
     "seconds": 14.473,
     "stdout_tail": "                                       - 01-01-1984                                         \nCovariance Type:                                opg                                         \n==============================================================================\n                 coef    std err          z      P>|z|      [0.025      0.975]\n------------------------------------------------------------------------------\nar.L1          1.5996      0.035     45.501      0.000       1.531       1.669\nar.L2         -0.9345      0.029    -32.628      0.000      -0.991      -0.878\nma.L1         -1.5166      0.065    -23.423      0.000      -1.643      -1.390\nma.L2          0.6422      0.070      9.199      0.000       0.505       0.779\nar.S.L12   -9.268e-05      0.088     -0.001      0.999      -0.173       0.173\nma.S.L12      -1.0001     85.685     -0.012      0.991    -168.940     166.940\nsigma2       247.3120   2.12e+04      0.012      0.991   -4.13e+04    4.18e+04\n===================================================================================\nLjung-Box (L1) (Q):                   2.46   Jarque-Bera (JB):                31.71\nProb(Q):                              0.12   Prob(JB):                         0.00\nHeteroskedasticity (H):               1.21   Skew:                             0.56\nProb(H) (two-sided):                  0.38   Kurtosis:                         4.31\n===================================================================================\n\nWarnings:\n[1] Covariance matrix calculated using the outer product of gradients (complex-step).\n\nMean Absolute Percentage Error (MAPE): 233.11%\n[FAST_EVAL] plt.show() skipped\n[FAST_EVAL] plt.show() skipped\n\n=== Sunspots SARIMAX Forecast Complete ===\nForecast period: 1985-01-01 00:00:00 to 2008-01-01 00:00:00\nMAPE: 233.11%\nNumber of forecasted points: 24",
@@ -699,7 +699,7 @@
     "skipped": false
   },
   {
-    "ok": true,
+    "ok": false,
     "returncode": 0,
     "seconds": 13.208,
     "stdout_tail": "Training KNN classifier with k=3...\nTest Accuracy: 0.9370\n[FAST_EVAL] plt.show() skipped\n[FAST_EVAL] plt.show() skipped\n\nMNIST KNN classification complete.",
@@ -787,7 +787,7 @@
     "skipped": false
   },
   {
-    "ok": true,
+    "ok": false,
     "returncode": 0,
     "seconds": 5.505,
     "stdout_tail": "Random Forest Regressor Performance:\nMean Absolute Error (MAE): 44.3826\nR\u00b2 Score: 0.4386\n\nDecision Tree Regressor (Baseline) Performance:\nMean Absolute Error (MAE): 52.4512\nR\u00b2 Score: 0.1718\n\nPerformance Comparison:\nRandom Forest MAE improvement: 8.0686\nRandom Forest R\u00b2 improvement: 0.2668\n\nFeature Importances:\n  Feature  Importance\n2     bmi    0.357678\n8      s5    0.232822\n3      bp    0.088534\n9      s6    0.069799\n0     age    0.057971\n5      s2    0.057823\n4      s1    0.051422\n6      s3    0.051128\n7      s4    0.023558\n1     sex    0.009265\n\n[FAST_EVAL] plt.show() skipped\n[FAST_EVAL] plt.show() skipped\n[FAST_EVAL] plt.show() skipped",

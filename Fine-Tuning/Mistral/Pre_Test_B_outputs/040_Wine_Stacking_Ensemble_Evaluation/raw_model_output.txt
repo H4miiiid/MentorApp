@@ -1,0 +1,96 @@
+```xml
+<correct_code>
+import numpy as np
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, StackingClassifier
+from sklearn.metrics import accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the wine dataset
+wine = load_wine()
+X = wine.data
+y = wine.target
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Define base learners
+base_learners = [
+    ('logistic_regression', LogisticRegression(max_iter=1000, random_state=42)),
+    ('random_forest', RandomForestClassifier(n_estimators=100, random_state=42)),
+    ('gradient_boosting', GradientBoostingClassifier(n_estimators=100, random_state=42))
+]
+
+# Define the meta-learner
+meta_learner = LogisticRegression(max_iter=1000, random_state=42)
+
+# Create the stacking classifier
+stacking_clf = StackingClassifier(
+    estimators=base_learners,
+    final_estimator=meta_learner,
+    cv=5
+)
+
+# Train and evaluate each base learner individually
+print("Base Learner Performance:")
+print("=" * 50)
+base_accuracies = {}
+
+for name, model in base_learners:
+    # Train the base learner
+    model.fit(X_train, y_train)
+
+    # Make predictions
+    y_pred = model.predict(X_test)
+
+    # Calculate accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+    base_accuracies[name] = accuracy
+
+    print(f"{name}: Accuracy = {accuracy:.4f}")
+
+print("\n" + "=" * 50)
+
+# Train the stacking classifier
+print("\nTraining Stacking Classifier...")
+stacking_clf.fit(X_train, y_train)
+
+# Make predictions with the stacking classifier
+y_pred_stacking = stacking_clf.predict(X_test)
+
+# Calculate accuracy for the stacking classifier
+stacking_accuracy = accuracy_score(y_test, y_pred_stacking)
+
+print("\nStacking Classifier Performance:")
+print("=" * 50)
+print(f"Stacking Classifier: Accuracy = {stacking_accuracy:.4f}")
+
+# Compare stacking classifier to base learners
+print("\nComparison Summary:")
+print("=" * 50)
+for name, accuracy in base_accuracies.items():
+    improvement = stacking_accuracy - accuracy
+    print(f"{name}: {accuracy:.4f} (Difference: {improvement:+.4f})")
+print(f"Stacking Classifier: {stacking_accuracy:.4f}")
+
+# Determine if stacking improved performance
+max_base_accuracy = max(base_accuracies.values())
+if stacking_accuracy > max_base_accuracy:
+    print(f"\nStacking improved performance by {stacking_accuracy - max_base_accuracy:.4f}")
+elif stacking_accuracy == max_base_accuracy:
+    print("\nStacking matched the best base learner performance")
+else:
+    print(f"\nStacking did not improve over the best base learner (difference: {max_base_accuracy - stacking_accuracy:.4f})")
+
+print("\nEvaluation complete!")
+</correct_code>
+<error_type>
+Variable name inconsistency: 'stackingclf' was used instead of 'stacking_clf' when calling fit() and predict()
+</error_type>
+```
