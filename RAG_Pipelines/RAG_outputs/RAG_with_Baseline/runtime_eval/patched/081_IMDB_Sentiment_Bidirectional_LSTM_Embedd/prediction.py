@@ -23,7 +23,7 @@ maxlen = 200  # Cut texts after this number of words
 embedding_dim = 128
 lstm_units = 64
 batch_size = 32
-epochs = 2
+epochs = 5
 
 # Load the IMDB dataset
 print("Loading IMDB dataset...")

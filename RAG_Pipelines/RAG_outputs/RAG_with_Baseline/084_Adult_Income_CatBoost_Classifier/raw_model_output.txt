@@ -20,9 +20,6 @@ y = adult_data.target
 categorical_features = X.select_dtypes(include=['category', 'object']).columns.tolist()
 print(f"Categorical features: {categorical_features}")
 
-# Convert NaN values in categorical columns to a string placeholder
-X[categorical_features] = X[categorical_features].fillna('missing')
-
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
@@ -114,15 +111,5 @@ plt.yticks(range(top_n), top_features['feature'].values)
 plt.xlabel('Feature Importance')
 plt.ylabel('Feature')
 plt.title('Top 10 Feature Importances (CatBoost)')
-plt.gca().invert_yaxis()
-plt.tight_layout()
-plt.show()
-
-print("\n=== Summary ===")
-print(f"Base model accuracy: {base_accuracy:.4f}")
-print(f"Tuned model accuracy: {final_accuracy:.4f}")
-print(f"Best depth: {grid_search.best_params_['depth']}")
-print(f"Best learning rate: {grid_search.best_params_['learning_rate']}")
-print(f"Most important feature: {importance_df.iloc[0]['feature']}")
-
+plt.gca().invert_y尾行
 </correct_code>

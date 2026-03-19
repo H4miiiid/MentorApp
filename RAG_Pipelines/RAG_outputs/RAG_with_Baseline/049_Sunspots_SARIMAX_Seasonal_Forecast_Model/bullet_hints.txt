@@ -1,0 +1,2 @@
+- Replace the removed `parameter` argument in `numpy.ma.mrecords.fromtextfile` with the `delimiter` keyword.
+- Convert generator inputs to arrays (e.g., via `np.fromiter`) before calling `np.sum`, or use Python's built‑in `sum`.

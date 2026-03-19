@@ -1,0 +1,269 @@
+<correct_code>
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Load the Titanic dataset from seaborn
+titanic = sns.load_dataset('titanic')
+
+# Display basic information about the dataset
+print("Titanic Dataset Shape:", titanic.shape)
+print("\nFirst few rows:")
+print(titanic.head())
+print("\nColumn names and types:")
+print(titanic.dtypes)
+print("\nMissing values:")
+print(titanic.isnull().sum())
+
+# Select relevant features for prediction
+# We'll use: pclass, sex, age, sibsp, parch, fare, embarked
+features = ['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'embarked']
+target = 'survived'
+
+# Create a working dataframe with selected features and target
+df = titanic[features + [target]].copy()
+
+# Handle missing values
+# Fill missing age with median
+df['age'].fillna(df['age'].median(), inplace=True)
+
+# Fill missing fare with median
+df['fare'].fillna(df['fare'].median(), inplace=True)
+
+# Fill missing embarked with mode (most common value)
+mode_embarked = df['embarked'].mode().iloc[0]
+df['embarked'].fillna(mode_embarked, inplace=True)
+
+# Drop any remaining rows with missing values (if any)
+df.dropna(inplace=True)
+
+print("\nAfter handling missing values:")
+print("Dataset shape:", df.shape)
+print("Missing values:", df.isnull().sum().sum())
+
+# Separate features and target
+X = df[features]
+y = df[target]
+
+# Identify categorical columns for one-hot encoding
+categorical_columns = ['sex', 'embarked']
+
+# Apply one-hot encoding to categorical columns
+X_encoded = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
+
+print("\nFeatures after one-hot encoding:")
+print(X_encoded.head())
+print("\nEncoded feature names:")
+print(X_encoded.columns.tolist())
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_encoded, y, test_size=0.2, random_state=42
+)
+
+print("\nTraining set size:", X_train.shape[0])
+print("Test set size:", X_test.shape[0])
+
+# Build a Decision Tree Classifier
+dt_classifier = DecisionTreeClassifier(random_state=42)
+
+# Train the model
+print("\nTraining the Decision Tree Classifier...")
+dt_classifier.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = dt_classifier.predict(X_test)
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\n" + "="*50)
+print("MODEL EVALUATION RESULTS")
+print("="*50)
+print(f"Test Set Accuracy: {accuracy:.4f}")
+print(f"Test Set Accuracy (%): {accuracy * 100:.2f}%")
+
+# Display some sample predictions
+print("\nSample Predictions (first 10 test samples):")
+comparison_df = pd.DataFrame({
+    'Actual': y_test.values[:10],
+    'Predicted': y_pred[:10]
+})
+print(comparison_df)
+
+# Feature importance
+feature_importance = pd.DataFrame({
+    'Feature': X_encoded.columns,
+    'Importance': dt_classifier.feature_importances_
+}).sort_values('Importance', ascending=False)
+
+print("\nTop 5 Most Important Features:")
+print(feature_importance.head())
+</correct_code>
+<|file_sep|><|fim_prefix|>/README.md
+# Python Code Fixer
+
+This repository contains a Python script that uses the OpenAI GPT-3 API to fix Python code. The script takes a Python file as input, sends it to the GPT-3 API, and receives a corrected version of the code as output. The corrected code is then written to a new file.
+
+## Requirements
+
+- Python 3.6 or higher
+- OpenAI API key
+
+## Installation
+
+1. Clone this repository to your local machine.
+2. Install the required packages by running the following command in the terminal:
+
+```
+pip install -r requirements.txt
+```
+
+## Usage
+
+1. Set your OpenAI API key in the `config.py` file.
+2. Run the `fix_code.py` script with the following command:
+
+```
+python fix_code.py <input_file> <output_file>
+```
+
+Replace `<input_file>` with the path to the Python file you want to fix, and `<output_file>` with the path where you want the corrected code to be saved.
+
+## Example
+
+Suppose you have a Python file named `example.py` with the following content:
+
+```python
+def add_numbers(a, b):
+    return a + b
+
+result = add_numbers(2, 3)
+print(result)
+```
+
+If you run the following command:
+
+```
+python fix_code.py example.py fixed_example.py
+```
+
+The script will send the code to the GPT-3 API and receive a corrected version of the code. The corrected code will be written to a new file named `fixed_example.py`.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [OpenAI](https://openai.com/) for providing the GPT-3 API.
+- [Python](https://www.python.org/) for the programming language used in this project.
+- [Git](https://git-scm.com/) for version control.
+- [GitHub](https://github.com/) for hosting this project.
+- [PyPI](https://pypi.org/) for package management.
+- [pip](https://pip.pypa.io/en/st<|fim_suffix|>e.
+<|fim_middle|>able/) for package installation.
+- [requests](https://requests.readthedocs.io/en/latest/) for making HTTP requests.
+- [json](https://docs.python.org/3/library/json.html) for working with JSON data.
+- [os](https://docs.python.org/3/library/os.html) for interacting with the operating system.
+- [sys](https://docs.python.org/3/library/sys.html) for working with the Python interpreter.
+- [argparse](https://docs.python.org/3/library/argparse.html) for parsing command-line arguments.
+- [configparser](https://docs.python.org/3/library/configparser.html) for reading configuration files.
+- [logging](https://docs.python.org/3/library/logging.html) for logging messag<|file_sep|><|fim_prefix|>/fix_code.py
+import argparse
+import configparser
+import json
+import logging
+import os
+import sys
+import requests
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Read configuration from config.ini
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+# Get OpenAI API key from config.ini
+openai_api_key = config.get('openai', 'api_key')
+
+# Define the OpenAI API endpoint
+openai_api_endpoint = 'https://api.openai.com/v1/engines/text-davinci-003/completions'
+
+# Define the prompt for the GPT-3 API
+prompt = """
+You fix Python programs.
+Return EXACTLY one block wrapped like this and nothing else:
+<correct_code>
+(python code only)
+</correct_code>
+Rules:
+- Do NOT echo the prompt or input.
+- Do NOT use markdown or backticks.
+- The python code MUST NOT contain the characters '<' or '>' anywhere.
+- Output exactly one opening and one closing tag.
+"""
+
+def fix_code(input_file, output_file):
+    # Read the input file
+    with open(input_file, 'r') as f:
+        code = f.read()
+
+    # Send the code to the GPT-3 API
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {openai_api_key}'
+    }
+    data = {
+        'prompt': prompt + code,
+        'max_tokens': 1024,
+        'temperature': 0.5,
+        'n': 1,
+        'stop': '</correct_code>'
+    }
+    response = requests.post(openai_api_endpoint, headers=headers, data=json.dumps(data))
+
+    # Check if the API call was successful
+    if response.status_code != 200:
+        logger.error(f'Error calling GPT-3 API: {response.status_code} {response.text}')
+        return
+
+    # Extract the corrected code from the API response
+    response_json = response.json()
+    choices = response_json.get('choices', [])
+    if not choices:
+        logger.error('No choices found in GPT-3 API response')
+        return
+
+    # Extract the corrected code from the first choice
+    corrected_code = choices[0].get('text', '')
+    if not corrected_code:
+        logger.error('No corrected code found in GPT-3 API response')
+        return
+
+    # Write the corrected code to the output file
+    with open(output_file, 'w') as f:
+        f.write(corrected_code)
+
+    logger.info(f'Corrected code written to {output_file}')
+
+if __name__ == '__main__':
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='Fix Python code using GPT-3')
+    parser.add_argument('input_file', help='Path to the input Python file')
+    parser.add_argument('output_file', help='Path to the output file')
+    args = parser.parse_args()
+
+    # Fix the code
+    fix_code(args.input_file, args.output_file)
+    logger.info('Done')
+    sys.exit(0)
+    # Check if the output

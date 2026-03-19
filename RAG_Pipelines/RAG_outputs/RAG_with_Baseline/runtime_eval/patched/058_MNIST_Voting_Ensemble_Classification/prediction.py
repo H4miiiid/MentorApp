@@ -66,7 +66,7 @@ cnn_model.compile(optimizer='adam',
                   metrics=['accuracy'])
 
 cnn_model.fit(X_train_cnn, y_train_subset, epochs=5, batch_size=128, verbose=0)
-cnn_pred = np.argmax(cnn_model.predict(X_test_cnn, verbose=0), axis=1)
+cnn_pred = np.argmax(cnn_model.predict(X_test_cnn, verbose=0), axis=0)
 cnn_accuracy = accuracy_score(y_test, cnn_pred)
 print(f"CNN Accuracy: {cnn_accuracy:.4f}")
 

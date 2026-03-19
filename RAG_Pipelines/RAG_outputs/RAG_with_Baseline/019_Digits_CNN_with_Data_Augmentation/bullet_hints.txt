@@ -1,0 +1,5 @@
+- If you called `np.sum` on a generator, replace it with the built‑in `sum` or first convert the generator to an array via `np.fromiter(..., dtype=…)` before summing.
+- Remove any `style` argument passed to `np.array2string`; it has been removed—use only the remaining keyword‑only arguments.
+- When using `numpy.ma.mrecords.fromtextfile`, drop the deprecated parameter and provide `delimiter=` instead.
+- Pass arguments after `style` (e.g., `formatter`) as keyword‑only parameters to `np.array2string`.
+- Specify the appropriate `dtype` when calling `np.fromiter` on

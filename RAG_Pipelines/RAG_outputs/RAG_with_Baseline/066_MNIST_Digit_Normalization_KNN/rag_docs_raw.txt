@@ -1,0 +1,42 @@
+[numpy v2.4.0  score=0.60]
+parameter was deprecated in NumPy 1.22.0 and has been
+removed from numpy.ma.mrecords.fromtextfile() . Use delimiter instead.
+( gh-30021 )
+
+### numpy.array2string and numpy.sum deprecations finalized #
+
+The following long-deprecated APIs have been removed or converted to errors:
+The style parameter has been removed from numpy.array2string .
+This argument had no effect since Numpy 1.14.0. Any arguments following
+it, such as formatter have now been made keyword-only.
+Calling np.sum(generator) directly on a generator object now raises a TypeError . This behavior was deprecated in NumPy 1.15.0. Use np.sum(np.fromiter(generator)) or the python sum builtin instead.
+( gh-30068 )
+
+## Compatibility notes #
+---
+[tensorflow v2.x  score=0.56]
+models from tf.keras.applications or TF Hub 's TF2 SavedModel s exported
+from the original Slim code.
+
+## Make TF1.x model forward passes run with TF2 behaviors enabled
+
+### Track variables and losses
+
+TF2 does not support global collections.
+Eager execution in TF2 does not support tf.Graph collection-based APIs. This
+affects how you construct and track variables.
+For new TF2 code you would use tf.Variable instead of v1.get_variable and
+use Python objects to collect and track variables instead of tf.compat.v1.variable_scope . Typically this would be one of:
+tf.keras.layers.Layer
+tf.keras.Model
+tf.Module
+Aggregate lists of variables (like tf.Graph.get_collection(tf.GraphKeys.VARIABLES) ) with the .variables and .trainable_variables attributes of the Layer , Module , or Model objects.
+The Layer and Model classes implement several other properties that remove
+the need for global collections. Their .losses property can be a replacement
+for using the tf.GraphKeys.LOSSES collection.
+Read the model mapping guide to find out more about
+using the TF2 code modeling shims to embed your existing get_variable and variable_scope based code inside of Layers , Models , and Modules . This
+will let you the execute forward passes with eager execution enabled without
+major rewrites.
+
+### Adapting to other behavior changes

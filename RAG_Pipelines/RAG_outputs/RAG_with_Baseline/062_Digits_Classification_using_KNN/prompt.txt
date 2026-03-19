@@ -108,9 +108,8 @@ plt.show()
 
 print("\nDigits classification completed successfully!")
 
+
 Hints from documentation:
-- Verify that the `test_size` argument is a float in (0.0, 1.0), an int ≥ 1, or `None`; 1.5 is invalid.
-- Replace `test_size=1.5` with a valid value such as `test_size=0.25` or an integer number of samples.
-- Ensure the parameter name is spelled correctly (`test_size`) and not mistyped.
-- If you intended a 15% split, use `test_size=0.15` instead of 1.5.
-- Double‑check that no other code path is overriding `test_size` with an invalid value.
+- Pass a float between 0.0 and 1.0 (e.g., 0.2) for `test_size` to specify a proportion of the dataset.
+- If you want a fixed number of test samples, provide an integer ≥ 1 instead of a decimal value.
+- Set `test_size=None` to use the default split (typically 0.25) when you don’t need a custom size.

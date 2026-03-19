@@ -1,1 +1,2 @@
-- No relevant hints found.
+- Verify that the feature matrix and target vector passed to the estimator have the same length (e.g., both shape (n_samples, …)).
+- If you sliced or reshaped one array, recompute its shape so its first dimension matches the other’s sample count.

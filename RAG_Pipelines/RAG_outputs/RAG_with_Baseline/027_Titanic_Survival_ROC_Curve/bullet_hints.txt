@@ -1,5 +1,5 @@
-- Verify that the input array `X` contains no NaN values before calling the estimator; use `np.isnan` or `pd.isna` to locate them.
-- If missing values are present, apply `sklearn.impute.SimpleImputer` to replace NaNs with a suitable statistic (mean, median, etc.) before fitting.
-- For transformers that support missing values, set the `handle_missing` parameter (e.g., `SplineTransformer(handle_missing='impute')`) to enable automatic handling.
-- Ensure that `X` is a 2‑D numeric array; converting a pandas Series or DataFrame with missing entries to a NumPy array may still carry NaNs.
-- If the estimator is a scikit‑learn model that does not accept NaNs, consider dropping rows with missing values (`df.dropna()`) or using a pipeline that includes an imputer step.
+- Verify that your feature matrix X has no NaN entries; use `X.isnull().any()` to locate them.
+- Remove or fill NaNs before fitting, e.g., with `sklearn.impute.SimpleImputer`.
+- If using `SplineTransformer`, set its `handle_missing` parameter to an appropriate strategy (e.g., `'error'` or `'impute'`).
+- Choose an estimator that natively supports missing values (e.g., `HistGradientBoostingRegressor`).
+- Ensure any preprocessing steps (e.g., scaling) are applied after imputation to avoid propagating NaNs.

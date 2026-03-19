@@ -225,6 +225,3 @@ with torch.no_grad():
 sentiment = "Positive" if prediction == 1 else "Negative"
 print(f"Text: {sample_text}")
 print(f"Predicted Sentiment: {sentiment}")
-
-Hints from documentation:
-- No relevant hints found.

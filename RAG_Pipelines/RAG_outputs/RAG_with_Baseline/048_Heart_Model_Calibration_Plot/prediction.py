@@ -14,12 +14,11 @@ heart_data = sm.datasets.heart.load_pandas()
 X = heart_data.data
 y = heart_data.endog
 
-# Remove classes with only one sample
-unique_classes = np.unique(y)
-class_counts = np.bincount(y)
-classes_to_remove = unique_classes[class_counts == 1]
-y = np.where(np.isin(y, classes_to_remove), -1, y)
-y[y == -1] = np.max(y) + 1
+# Drop or merge target classes that appear only once
+unique_classes, class_counts = np.unique(y, return_counts=True)
+classes_to_drop = unique_classes[class_counts == 1]
+y = np.where(np.isin(y, classes_to_drop), np.nan, y)
+y = y[~np.isnan(y)]
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(

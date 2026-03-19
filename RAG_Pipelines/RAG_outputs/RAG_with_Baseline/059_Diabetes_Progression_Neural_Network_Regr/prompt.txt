@@ -173,5 +173,7 @@ plt.show()
 
 print("\nModel training and evaluation complete.")
 
+
 Hints from documentation:
-- No relevant hints found.
+- Remove the `random_state` argument from `TensorFlowTrainer.fit()` as it isn’t part of the method’s signature.
+- Set the TensorFlow random seed (e.g., `tf.random.set_seed(...)`) before calling `fit()` to control reproducibility.

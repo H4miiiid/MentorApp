@@ -168,9 +168,10 @@ print(f"Best depth: {grid_search.best_params_['depth']}")
 print(f"Best learning rate: {grid_search.best_params_['learning_rate']}")
 print(f"Most important feature: {importance_df.iloc[0]['feature']}")
 
+
 Hints from documentation:
-- Convert NaN values in the categorical columns to a string placeholder (e.g., `'missing'`) before creating the Pool.
-- Ensure the `cat_features` list contains only integer indices or column names that reference columns of type int or str.
-- Verify that the DataFrame or array passed to `Pool` has no NaN in the specified categorical columns.
-- If using a DataFrame, pass `cat_features` as column names instead of indices to avoid misalignment.
-- Recreate the `Pool` after cleaning the data and re‑run `model.fit`.
+- Replace NaN entries in categorical columns with a placeholder string (e.g., `fillna('NaN')`).
+- Convert all categorical columns to string/object dtype before building the Pool.
+- Ensure `cat_features` is a list of column indices or names, not containing NaN values.
+- If using NumPy arrays, cast categorical columns to `object` dtype and fill missing values with a string.
+- Recreate the Pool after cleaning the data, then call `model.fit`.

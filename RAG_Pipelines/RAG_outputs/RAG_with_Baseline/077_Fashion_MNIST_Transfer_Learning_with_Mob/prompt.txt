@@ -194,5 +194,7 @@ plt.show()
 print("\nTransfer learning with MobileNet completed successfully!")
 print(f"Final test accuracy: {test_accuracy:.4f}")
 
+
 Hints from documentation:
-- No relevant hints found.
+- Reduce the batch size (e.g., from 10000 to a much smaller number) to lower memory demand.
+- Enable GPU execution or set TensorFlow’s memory growth (tf.config.experimental.set_memory_growth) to prevent CPU OOM.

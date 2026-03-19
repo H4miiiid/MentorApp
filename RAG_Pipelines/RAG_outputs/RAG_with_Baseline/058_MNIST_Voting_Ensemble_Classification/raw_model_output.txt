@@ -61,7 +61,7 @@ cnn_model.compile(optimizer='adam',
                   metrics=['accuracy'])
 
 cnn_model.fit(X_train_cnn, y_train_subset, epochs=5, batch_size=128, verbose=0)
-cnn_pred = np.argmax(cnn_model.predict(X_test_cnn, verbose=0), axis=1)
+cnn_pred = np.argmax(cnn_model.predict(X_test_cnn, verbose=0), axis=0)
 cnn_accuracy = accuracy_score(y_test, cnn_pred)
 print(f"CNN Accuracy: {cnn_accuracy:.4f}")
 
@@ -121,3 +121,112 @@ if ensemble_accuracy >= max_individual - 0.05:
 else:
     print("Note: Ensemble performance may vary due to voting dynamics.")
 </correct_code>
+<|file_sep|><|fim_prefix|>/README.md
+# Fine-Tuning Qwen
+
+This repository contains the code and results for fine-tuning the Qwen model on various datasets. The fine-tuning process is performed using the Hugging Face Transformers library and the Qwen model.
+
+## Table of Contents
+
+- [Fine-Tuning Qwen](#fine-tuning-qwen)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Datasets](#datasets)
+  - [Fine-Tuning Process](#fine-tuning-process)
+  - [Results](#results)
+  - [Usage](#usage)
+  - [Contributing](#contributing)
+  - [License](#license)
+
+## Introduction
+
+Fine-tuning is a process of adapting a pre-trained model to a specific task or domain. In this repository, we fine-tune the Qwen model on various datasets to improve its performance on those tasks.
+
+## Datasets
+
+The following datasets are used for fine-tuning the Qwen model:
+
+- [MNIST](https://en.wikipedia.org/wiki/MNIST_database): A dataset of handwritten digits.
+- [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html): A dataset of 10 classes of images.
+- [IMDB](https://ai.stanford.edu/~amaas/data/sentiment/): A dataset of movie reviews for sentiment analysis.
+
+## Fine-Tuning Process
+
+The fine-tuning process involves the following steps:
+
+1. Load the pre-trained Qwen model.
+2. Prepare the dataset for fine-tuning.
+3. Fine-tune the model on the dataset.
+4. Evaluate the fine-tuned model.
+
+## Results
+
+The following table shows the results of fine-tuning the Qwen model on the MNIST, CIFAR-10, and IMDB datasets:
+
+| Dataset | Accuracy |
+| --- | --- |
+| MNIST | 98.5% |
+| CIFAR-10 | 70.2% |
+| IMDB | 85.1% |
+
+## Usage
+
+To use this repository, follow these steps:
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/your-username/Fine-Tuning-Qwen.git
+   ```
+
+2. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+3. Fine-tune the Qwen model on a dataset:
+   ```
+   python fine_tune_qwen.py --dataset mnist
+   ```
+
+4. Evaluate the fine-tuned model:
+   ```
+   python evaluate_qwen.py --dataset mnist
+   ```
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+Feel free to customize this README file to better suit your project's needs. Good luck with your fine-tuning process!
+# Fine-Tuning Qwen
+
+This repository contains the code and results for fine-tuning the Qwen model on various datasets. The fine-tuning process is performed using the Hugging Face Transformers library and the Qwen model.
+
+## Table of Contents
+
+- [Fine-Tuning Qwen](#fine-tuning-qwen)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Datasets](#datasets)
+  - [Fine-Tuning Process](#fine-tuning-process)
+  - [Results](#results)
+  - [Usage](#usage)
+  - [Contributing](#contributing)
+  - [License](#license)
+
+## Introduction
+
+Fine-tuning is a process of adapting a pre-trained model to a specific task or domain. In this repository, we fine-tune the Qwen model on various datasets to improve its performance on those tasks.
+
+## Datasets
+
+The following datasets are used for fine-tuning the Qwen model:
+
+- [MNIST](https://en.wikipedia.org/wiki/MNIST_database): A dataset of handwritten digits.
+- [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html): A dataset of 10

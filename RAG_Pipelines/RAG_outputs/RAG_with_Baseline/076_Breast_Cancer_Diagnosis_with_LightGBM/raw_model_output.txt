@@ -109,3 +109,5 @@ plt.show()
 
 print("\nBreast Cancer Diagnosis with LightGBM completed successfully!")
 </correct_code>
+<|fim_middle|>
+    y_pred_proba = modle.predict(X_test, num_iteration=modle.best_iteration)

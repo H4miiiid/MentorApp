@@ -17,7 +17,7 @@ num_words = 10000
 
 print(f"Training samples: {len(x_train)}")
 print(f"Test samples: {len(x_test)}")
-print(f"Number of classes: {np.max(y_train) + 1}")
+print(f"Number of classes: int({np.max(y_train) + 1})")
 
 # Convert sequences back to text for TF-IDF vectorization
 # Get word index mapping

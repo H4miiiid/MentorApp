@@ -1,1 +1,2 @@
-- No relevant hints found.
+- Ensure the `units` argument you provide is a positive integer (e.g., cast or round any non‑integer value).
+- Confirm you’re using the correct parameter name and that no negative or non‑numeric value is being passed as `units`.

@@ -1,0 +1,5 @@
+- In calls to numpy.ma.mrecords.fromtextfile, replace the removed argument with the keyword delimiter.
+- Omit the now‑removed style positional argument from numpy.array2string; use only keyword‑only arguments such as formatter.
+- Do not pass a generator directly to np.sum; wrap it with np.fromiter or use Python’s built‑in sum instead.
+- Convert any formerly positional parameters that became keyword‑only (e.g., formatter in array2string) to explicit keyword usage.
+- Confirm your code targets NumPy 2.x where these deprecations are enforced and adjust imports accordingly.

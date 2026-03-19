@@ -1,1 +1,2 @@
-- No relevant hints found.
+- Lower the learning rate or increase the number of training epochs so the model can further minimize reconstruction loss.
+- Verify that the model architecture has sufficient capacity (e.g., more latent dimensions or layers) and that regularization isn’t overly restricting learning.

@@ -78,5 +78,7 @@ print("\nExplained variance ratio for first 10 components:")
 for i in range(min(10, len(pca.explained_variance_ratio_))):
     print(f"  Component {i+1}: {pca.explained_variance_ratio_[i]:.4f} (Cumulative: {cumulative_variance[i]:.4f})")
 
+
 Hints from documentation:
-- No relevant hints found.
+- Verify that the dictionary you are indexing actually contains the key `'invalid'` (check spelling and case).
+- Use `dict.get('invalid')` or a conditional check (`if 'invalid' in my_dict`) to handle missing keys gracefully.

@@ -1,0 +1,50 @@
+[scipy v1.17.0  score=0.90]
+meaningful error messages for invalid…
+#23609 : BUG: signal.deconvolve: More meaningful error messages for invalid…
+#23610 : TYP: more generic integrate types
+#23614 : TST: shim for NumPy warning changes
+#23616 : BUG: ndimage: fix handling of memory allocation failures.
+#23618 : BUG: sparse.csgraph.yen: Validate source and sink to avoid seg….
+#23620 : MAINT: io: Improve spmatrix arg handling and description…
+#23621 : DOC/BUG: signal.firwin: Improve documentation
+#23623 : DOC: stats.levy_stable: improvements
+#23625 : ENH: sparse: Add DOK update method and tests
+#23626 : BUG:sparse: allow setting a singleton via a sparse container
+#23627 : DOC: spatial: Rotation.random: mention distribution in docstring
+#23629 : CI: use asv<0.6.5 to avoid problem with that release - fixes…
+#23630 : DEV: drop shallow from submodules
+#23632 : MAINT: spatial.transform.Rotation: from_euler/from_davenport …
+#23633 : MAINT/TST: stats: loosen a test tolerance.
+#23636 : TST: stats: test against marray backend again
+#23638 : CI: adapt gpu-ci.yml to new Pixi workspace
+#23645 : MAINT:optimize: Fix missing pointer dereference in MINPACK
+#23646 : CI: fix issue with spin broken due to new click release
+#23647 : CI: fix issue with spin broken due to new click release (follow-up)
+#23649 : CI: use Pixi for array_api.yml and lint.yml
+#23650 : DOC: Update a reference link in scipy.optimize.root
+#23653 : MAINT: Fix spatial.transform.RigidTransform xp backend comments
+#23654 : CI: use Pixi for macos.yml
+#23655 : EN
+---
+[numpy v2.4.0  score=0.60]
+parameter was deprecated in NumPy 1.22.0 and has been
+removed from numpy.ma.mrecords.fromtextfile() . Use delimiter instead.
+( gh-30021 )
+
+### numpy.array2string and numpy.sum deprecations finalized #
+
+The following long-deprecated APIs have been removed or converted to errors:
+The style parameter has been removed from numpy.array2string .
+This argument had no effect since Numpy 1.14.0. Any arguments following
+it, such as formatter have now been made keyword-only.
+Calling np.sum(generator) directly on a generator object now raises a TypeError . This behavior was deprecated in NumPy 1.15.0. Use np.sum(np.fromiter(generator)) or the python sum builtin instead.
+( gh-30068 )
+
+## Compatibility notes #
+---
+[scipy v1.17.0  score=0.57]
+ction is an array API compatible substitute for spearmanr .
+The median_abs_deviation function has gained a keepdims parameter.
+The trim_mean function has gained new nan_policy and keepdims parameters.
+
+## Array API Standard Support #

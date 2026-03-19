@@ -81,6 +81,3 @@ print("   - Good separation for setosa (easily distinguishable)")
 print("   - Moderate separation for versicolor and virginica")
 print("   - The visualization effectively shows the three-class structure")
 print("=" * 60)
-
-Hints from documentation:
-- No relevant hints found.

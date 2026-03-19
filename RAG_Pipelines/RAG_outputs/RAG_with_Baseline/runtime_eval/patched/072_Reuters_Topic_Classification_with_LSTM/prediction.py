@@ -1,0 +1,106 @@
+
+import os
+FAST_EVAL = os.environ.get("FAST_EVAL", "0") == "1"
+if FAST_EVAL:
+    os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.datasets import reuters
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+from tensorflow.keras.utils import to_categorical
+from sklearn.metrics import f1_score
+
+# Set random seeds for reproducibility
+np.random.seed(42)
+tf.random.set_seed(42)
+
+# Load the Reuters dataset
+# num_words: only consider the top 10000 most common words
+num_words = 10000
+(x_train, y_train), (x_test, y_test) = reuters.load_data(num_words=num_words)
+
+# Get the number of classes
+num_classes = np.max(y_train) + 1
+
+print(f"Number of training samples: {len(x_train)}")
+print(f"Number of test samples: {len(x_test)}")
+print(f"Number of classes: {num_classes}")
+
+# Pad sequences to ensure uniform input length
+max_length = 200
+x_train_padded = pad_sequences(x_train, maxlen=max_length, padding='post', truncating='post')
+x_test_padded = pad_sequences(x_test, maxlen=max_length, padding='post', truncating='post')
+
+print(f"Shape of padded training data: {x_train_padded.shape}")
+print(f"Shape of padded test data: {x_test_padded.shape}")
+
+# Convert labels to categorical (one-hot encoding)
+y_train_cat = to_categorical(y_train, num_classes=num_classes)
+y_test_cat = to_categorical(y_test, num_classes=num_classes)
+
+print(f"Shape of one-hot encoded training labels: {y_train_cat.shape}")
+print(f"Shape of one-hot encoded test labels: {y_test_cat.shape}")
+
+# Build the LSTM model
+embedding_dim = 128
+lstm_units = 64
+
+model = Sequential([
+    # Embedding layer to convert word indices to dense vectors
+    Embedding(input_dim=num_words, output_dim=embedding_dim, input_length=max_length),
+    # LSTM layer for sequence processing
+    LSTM(units=lstm_units, dropout=0.2, recurrent_dropout=0.2),
+    # Dropout for regularization
+    Dropout(0.5),
+    # Dense output layer with softmax activation for multi-class classification
+    Dense(num_classes, activation='softmax')
+])
+
+# Compile the model with categorical cross-entropy loss
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+print("\nModel Summary:")
+model.summary()
+
+# Train the model
+# Using a small number of epochs to keep runtime reasonable
+epochs = 5
+batch_size = 128
+
+print("\nTraining the model...")
+history = model.fit(
+    x_train_padded,
+    y_train_cat,
+    epochs=epochs,
+    batch_size=batch_size,
+    validation_split=0.2,
+    verbose=1
+)
+
+# Evaluate the model on test data
+print("\nEvaluating the model on test data...")
+test_loss, test_accuracy = model.evaluate(x_test_padded, y_test_cat, verbose=0)
+print(f"Test Loss: {test_loss:.4f}")
+print(f"Test Accuracy: {test_accuracy:.4f}")
+
+# Make predictions on test data
+y_pred_probs = model.predict(x_test_padded, verbose=0)
+y_pred = np.argmax(y_pred_probs, axis=1)
+
+# Calculate macro-averaged F1 score
+macro_f1 = f1_score(y_test, y_pred, average='macro')
+print(f"\nMacro-averaged F1 Score: {macro_f1:.4f}")
+
+# Display some example predictions
+print("\nExample predictions (first 5 test samples):")
+for i in range(5):
+    print(f"Sample {i+1}: True label = {y_test[i]}, Predicted label = {y_pred[i]}")
+
+print("\nProject completed successfully!")

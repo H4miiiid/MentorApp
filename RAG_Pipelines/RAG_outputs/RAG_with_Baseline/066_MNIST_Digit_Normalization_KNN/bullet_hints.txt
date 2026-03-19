@@ -1,0 +1,4 @@
+- Replace the deprecated argument in `numpy.ma.mrecords.fromtextfile` with the `delimiter` keyword.
+- Omit the `style` parameter when calling `numpy.array2string`; it has been removed.
+- Pass `formatter` as a keyword‑only argument to `numpy.array2string` (no positional arguments after it).
+- Use `np.sum(np.fromiter(your_generator, dtype=desired_type))` or Python’s built‑in `sum(your_generator)` instead of `np.sum(your_generator)`.

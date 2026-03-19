@@ -1,0 +1,34 @@
+[pandas v3.0.0  score=0.02]
+preserving the original name. ( GH 60522 )
+Bug in Series.map() with a timestamp[pyarrow] dtype or duration[pyarrow] dtype incorrectly returning all- NaN entries ( GH 61231 )
+Bug in Series.mode() where an exception was raised when taking the mode with nullable types with no null values in the series. ( GH 58926 )
+Bug in Series.rank() that doesn’t preserve missing values for nullable integers when na_option='keep' . ( GH 56976 )
+Bug in Series.replace() and DataFrame.replace() throwing ValueError when regex=True and all NA values. ( GH 60688 )
+Bug in Series.replace() when the Series was created from an Index and Copy-On-Write is enabled ( GH 61622 )
+Bug in Series.to_string() when series contains complex floats with exponents ( GH 60405 )
+Bug in Dataframe Interchange Protocol implementation was returning incorrect results for data buffers’ associated dtype, for string and datetime columns ( GH 54781 )
+Bug in divmod and rdivmod with DataFrame , Series , and Index with bool dtypes failing to raise, which was inconsistent with __floordiv__ behavior ( GH 46043 )
+Bug in printing a DataFrame with a DataFrame stored in DataFrame.attrs raised a ValueError ( GH 60455 )
+Bug in printing a Series with a DataFrame stored in Series.attrs raised a ValueError ( GH 60568 )
+Bug when calling copy.copy() on a DataFrame or Series which would return a deep copy instead of a shallow copy ( GH 62971 )
+Fixed bug in the Series.rank() with object dtype and extremely small float values ( GH 62036 )
+Fixed bu
+---
+[pandas v3.0.0  score=0.01]
+None ( GH 61780 )
+Fixed bug in date_range() where tz-aware endpoints with calendar offsets (e.g. "MS" ) failed on DST fall-back. These now respect ambiguous / nonexistent . ( GH 52908 )
+
+### Numeric #
+
+Bug in api.types.infer_dtype() returning “mixed” for complex and pd.NA mix ( GH 61976 )
+Bug in api.types.infer_dtype() returning “mixed-integer-float” for float and pd.NA mix ( GH 61621 )
+Bug in DataFrame.combine_first() where Int64 and UInt64 integers with absolute value greater than 2**53 would lose precision after the operation. ( GH 60128 )
+Bug in DataFrame.corr() where numerical precision errors resulted in correlations above 1.0 ( GH 61120 )
+Bug in DataFrame.cov() raises a TypeError instead of returning potentially incorrect results or other errors ( GH 53115 )
+Bug in DataFrame.quantile() where the column type was not preserved when numeric_only=True with a list-like q produced an empty result ( GH 59035 )
+Bug in Series.dot() returning object dtype for ArrowDtype and nullable-dtype data ( GH 61375 )
+Bug in Series.std() and Series.var() when using complex-valued data ( GH 61645 )
+Bug in np.matmul with Index inputs raising a TypeError ( GH 57079 )
+Bug in arithmetic operations between objects with numpy-nullable dtype and ArrowDtype incorrectly raising ( GH 58602 )
+
+### Conversion #

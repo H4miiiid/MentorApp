@@ -114,5 +114,7 @@ for i in range(5):
 
 print("\nProject completed successfully!")
 
+
 Hints from documentation:
-- No relevant hints found.
+- Ensure the `units` argument is a positive integer (e.g., cast floats or strings to `int` and confirm it’s > 0).
+- Verify you’re using the correct parameter name and that no extra or misspelled arguments are being passed as `units`.

@@ -1,0 +1,5 @@
+- Verify that `df['embarked']` contains at least one non‑missing value; otherwise `df['embarked'].mode()` is empty and indexing `[0]` fails.
+- Guard the `fillna` call by checking `df['embarked'].mode().size` and provide a fallback value when the mode series is empty.
+- After confirming the mode is non‑empty, use `.iloc[0]` (or `.iat[0]`) to retrieve the value instead of direct `[0]`.
+- If the column uses a nullable dtype, cast it to a regular dtype (e.g., `.astype(str)`) before calling `mode()` to avoid known bugs.
+- Assign the result back without

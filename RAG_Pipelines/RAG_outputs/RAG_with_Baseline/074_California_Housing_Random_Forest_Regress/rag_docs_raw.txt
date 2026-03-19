@@ -1,0 +1,49 @@
+[numpy v2.4.0  score=0.60]
+parameter was deprecated in NumPy 1.22.0 and has been
+removed from numpy.ma.mrecords.fromtextfile() . Use delimiter instead.
+( gh-30021 )
+
+### numpy.array2string and numpy.sum deprecations finalized #
+
+The following long-deprecated APIs have been removed or converted to errors:
+The style parameter has been removed from numpy.array2string .
+This argument had no effect since Numpy 1.14.0. Any arguments following
+it, such as formatter have now been made keyword-only.
+Calling np.sum(generator) directly on a generator object now raises a TypeError . This behavior was deprecated in NumPy 1.15.0. Use np.sum(np.fromiter(generator)) or the python sum builtin instead.
+( gh-30068 )
+
+## Compatibility notes #
+---
+[numpy v2.4.0  score=0.36]
+# NumPy 2.4.0 Release Notes #
+
+The NumPy 2.4.0 release continues the work to improve free threaded Python
+support, user dtypes implementation, and annotations. There are many expired
+deprecations and bug fixes as well.
+This release supports Python versions 3.11-3.14
+
+## Highlights #
+
+Apart from annotations and same_value kwarg, the 2.4 highlights are mostly
+of interest to downstream developers. They should help in implementing new user
+dtypes.
+Many annotation improvements. In particular, runtime signature introspection.
+New casting kwarg 'same_value' for casting by value.
+New PyUFunc_AddLoopsFromSpec function that can be used to add user sort
+loops using the ArrayMethod API.
+New __numpy_dtype__ protocol.
+
+## Deprecations #
+
+### Setting the strides attribute is deprecated #
+
+Setting the strides attribute is now deprecated since mutating
+an array is unsafe if an array is shared, especially by multiple
+threads. As an alternative, you can create a new view (no copy) via:
+np.lib.stride_tricks.strided_window_view if applicable,
+np.lib.stride_tricks.as_strided for the general case,
+or the np.ndarray constructor ( buffer is the original array) for a
+light-weight version.
+( gh-28925 )
+
+### Positional out argument to np.maximum , np.minimum is deprecated #

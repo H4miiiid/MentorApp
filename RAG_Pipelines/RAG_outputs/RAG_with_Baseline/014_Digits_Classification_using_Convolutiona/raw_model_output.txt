@@ -105,7 +105,7 @@ print(f"Autoencoder final loss: {history_ae.history['loss'][-1]:.4f}")
 # ============================================
 
 # Extract encoded features from the bottleneck layer
-X_train_encoded = encodr.predict(X_train, verbose=0)
+X_train_encoded = encoder.predict(X_train, verbose=0)
 X_test_encoded = encoder.predict(X_test, verbose=0)
 
 print(f"\nBottleneck feature shape: {X_train_encoded.shape}")
@@ -203,5 +203,54 @@ plt.savefig('autoencoder_reconstruction.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 print("Reconstruction visualization saved as 'autoencoder_reconstruction.png'")
-print("\nProject completed successfully!")<|fim_middle|>
-    return X_train_encoded, X_test_encoded, accuracy_lr, accuracy_cnn
+print("\nProject completed successfully!")
+<correct_code>
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.models import Model
+
+# Set random seeds for reproducibility
+np.random.seed(42)
+import tensorflow as tf
+tf.random.set_seed(42)
+
+# Load the digits dataset
+digits = load_digits()
+X = digits.data
+y = digits.target
+
+# Normalize pixel values to [0, 1]
+X = X / 16.0
+
+# Reshape for CNN input (samples, height, width, channels)
+X_images = X.reshape(-1, 8, 8, 1)
+
+# Split into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_images, y, test_size=0.2, random_state=42
+)
+
+# ============================================
+# Part 1: Build and train Convolutional Autoencoder
+# ============================================
+
+def build_convolutional_autoencoder(input_shape=(8, 8, 1), encoding_dim=16):
+    """
+    Build a convolutional autoencoder.
+
+    Args:
+        input_shape: Shape of input images
+        encoding_dim: Dimension of the bottleneck layer
+
+    Returns:
+        autoencoder: Full autoencoder model
+        encoder: Encoder part only
+    """
+    # Encoder
+    input_img = layers.Input(shape=input_shape)
