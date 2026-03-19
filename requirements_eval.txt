@@ -41,3 +41,6 @@ xgboost
 lightgbm
 catboost
 statsmodels
+ddgs
+chromadb
+sentence-transformers
