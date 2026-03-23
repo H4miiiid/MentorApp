@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/app.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+
+    <main class="shell dashboard-shell">
+      <header class="topbar glass">
+        <div>
+          <p class="kicker">Student Workspace</p>
+          <h2 id="student-name">Welcome</h2>
+          <p id="student-meta" class="subtitle"></p>
+        </div>
+        <button id="logout-btn" class="btn btn-ghost">Logout</button>
+      </header>
+
+      <section class="grid-2">
+        <article class="glass panel">
+          <h3>Assigned Project</h3>
+          <div class="inline-actions">
+            <select id="project-select"></select>
+            <button id="refresh-projects" class="btn btn-small">Refresh</button>
+          </div>
+          <label>Project Description</label>
+          <textarea id="project-description" rows="7" readonly></textarea>
+
+          <label>Your Python Code</label>
+          <div id="student-code-editor" class="code-console"></div>
+
+          <div class="inline-actions">
+            <button id="submit-code" class="btn btn-primary">Check Code</button>
+          </div>
+        </article>
+
+        <article class="glass panel">
+          <h3>Results</h3>
+          <label>Corrected Code</label>
+          <textarea id="corrected-code" rows="12" class="mono" readonly></textarea>
+
+          <div class="inline-stat">
+            <span>Grade</span>
+            <strong id="grade">-</strong>
+          </div>
+
+          <div class="inline-stat">
+            <span>Status</span>
+            <strong id="result-status">-</strong>
+          </div>
+
+          <label>Mistakes (diff)</label>
+          <pre id="mistakes" class="diff-box"></pre>
+        </article>
+      </section>
+
+      <p id="student-message" class="status"></p>
+    </main>
+
+    <script src="/static/js/common.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+    <script src="/static/js/student.js"></script>
+  </body>
+</html>

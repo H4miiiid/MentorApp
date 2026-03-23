@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/app.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+
+    <main class="shell dashboard-shell">
+      <header class="topbar glass">
+        <div>
+          <p class="kicker">Professor Console</p>
+          <h2 id="professor-name">Welcome</h2>
+          <p id="professor-meta" class="subtitle"></p>
+        </div>
+        <button id="logout-btn" class="btn btn-ghost">Logout</button>
+      </header>
+
+      <section class="grid-2">
+        <article class="glass panel">
+          <h3>Assign Project</h3>
+          <label>Student ID Number</label>
+          <input id="assign-student-id" type="text" placeholder="e.g. S123456" />
+
+          <label>Project Title</label>
+          <input id="assign-title" type="text" placeholder="Project title" />
+
+          <label>Project Description</label>
+          <textarea id="assign-description" rows="8" placeholder="Describe project goals and requirements..."></textarea>
+
+          <button id="assign-project" class="btn btn-primary">Assign Project</button>
+          <p id="assign-message" class="status"></p>
+        </article>
+
+        <article class="glass panel">
+          <h3>Student Results</h3>
+          <div class="inline-actions">
+            <button id="refresh-submissions" class="btn btn-small">Refresh Results</button>
+            <select id="submission-select"></select>
+            <button id="load-submission" class="btn btn-small">Load Detail</button>
+          </div>
+
+          <div class="table-wrap">
+            <table id="submissions-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Student</th>
+                  <th>Student ID</th>
+                  <th>Project</th>
+                  <th>Grade</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="inline-stat">
+            <span>Grade</span>
+            <strong id="detail-grade">-</strong>
+          </div>
+          <div class="inline-stat">
+            <span>Status</span>
+            <strong id="detail-status">-</strong>
+          </div>
+
+          <label>Student Code</label>
+          <textarea id="detail-student-code" rows="8" class="mono" readonly></textarea>
+
+          <label>Corrected Code</label>
+          <textarea id="detail-corrected-code" rows="8" class="mono" readonly></textarea>
+
+          <label>Mistakes (diff)</label>
+          <pre id="detail-mistakes" class="diff-box"></pre>
+        </article>
+      </section>
+    </main>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/professor.js"></script>
+  </body>
+</html>
