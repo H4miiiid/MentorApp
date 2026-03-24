@@ -7,7 +7,155 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/css/app.css" />
+    <link rel="stylesheet" href="/static/css/app.css?v=3" />
+    <style>
+      .prof-layout {
+        grid-template-columns: 290px 1fr;
+        gap: 22px;
+      }
+
+      .menu-card {
+        padding: 16px;
+        border-radius: 22px;
+        border: 1px solid #acd4f1;
+        background:
+          radial-gradient(120% 120% at 0% 0%, rgba(87, 186, 255, 0.28), rgba(87, 186, 255, 0) 45%),
+          linear-gradient(165deg, #fcfeff, #eef8ff);
+        box-shadow: 0 20px 40px rgba(13, 84, 129, 0.14);
+      }
+
+      .menu-head {
+        padding: 2px 4px 12px;
+        border-bottom: 1px solid #c9e4f7;
+      }
+
+      .menu-title {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #11344f;
+      }
+
+      .menu-note {
+        margin: 6px 0 0;
+        font-size: 0.8rem;
+        line-height: 1.45;
+        color: #486883;
+      }
+
+      .menu-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .menu-card .menu-link {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        text-decoration: none !important;
+        border: 1px solid #c6e1f5;
+        border-radius: 14px;
+        padding: 11px 12px;
+        color: #0f3653 !important;
+        background: linear-gradient(180deg, #ffffff, #f2f9ff);
+        box-shadow: 0 8px 16px rgba(18, 90, 136, 0.08);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      }
+
+      .menu-card .menu-link::before {
+        content: "";
+        position: absolute;
+        right: 10px;
+        top: 9px;
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        background: linear-gradient(145deg, rgba(126, 202, 252, 0.2), rgba(126, 202, 252, 0.02));
+      }
+
+      .menu-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        font-family: "IBM Plex Mono", Consolas, monospace;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: #0f5d90;
+        border: 1px solid #abd8f7;
+        background: linear-gradient(160deg, #def2ff, #c5e9ff);
+        z-index: 1;
+      }
+
+      .menu-copy {
+        display: grid;
+        line-height: 1.2;
+        z-index: 1;
+      }
+
+      .menu-copy strong {
+        font-size: 0.95rem;
+        color: #0e3552;
+      }
+
+      .menu-copy small {
+        margin-top: 3px;
+        color: #4f7290;
+        font-size: 0.74rem;
+      }
+
+      .menu-arrow {
+        margin-left: auto;
+        color: #5d8bb0;
+        font-size: 0.95rem;
+        transform: translateX(0);
+        transition: transform 0.18s ease, color 0.18s ease;
+        z-index: 1;
+      }
+
+      .menu-card .menu-link:hover {
+        transform: translateY(-2px);
+        border-color: #95c7ea;
+        box-shadow: 0 14px 22px rgba(18, 90, 136, 0.16);
+      }
+
+      .menu-card .menu-link:hover .menu-arrow {
+        transform: translateX(3px);
+        color: #1d6f9f;
+      }
+
+      .menu-card .menu-link.active {
+        border-color: #2b7aaf;
+        background:
+          radial-gradient(90% 120% at 0% 0%, rgba(255, 255, 255, 0.23), rgba(255, 255, 255, 0) 45%),
+          linear-gradient(120deg, #0d5b8e, #2e85bc 55%, #4ea8d9);
+        box-shadow: 0 16px 24px rgba(11, 74, 115, 0.3);
+      }
+
+      .menu-card .menu-link.active .menu-copy strong,
+      .menu-card .menu-link.active .menu-copy small,
+      .menu-card .menu-link.active .menu-arrow {
+        color: #f3fbff;
+      }
+
+      .menu-card .menu-link.active .menu-icon {
+        background: linear-gradient(160deg, #f5fcff, #ddf1ff);
+      }
+
+      @media (max-width: 980px) {
+        .prof-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .menu-card {
+          position: static;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="bg-orb orb-a"></div>
@@ -23,23 +171,108 @@
         <button id="logout-btn" class="btn btn-ghost">Logout</button>
       </header>
 
-      <section class="grid-2">
+      <section class="prof-layout">
+        <aside class="glass menu-card">
+          <div class="menu-head">
+            <p class="kicker">Professor Workspace</p>
+            <h3 class="menu-title">Navigation</h3>
+            <p class="menu-note">Switch between project assignment, docs ingestion, and student outcomes.</p>
+          </div>
+
+          <nav class="menu-nav" aria-label="Professor sections">
+            <a class="menu-link {% if active_tab == 'assign' %}active{% endif %}" href="/professor/assign">
+              <span class="menu-icon">AS</span>
+              <span class="menu-copy">
+                <strong>Assign Projects</strong>
+                <small>Create one project for many students</small>
+              </span>
+              <span class="menu-arrow">&gt;</span>
+            </a>
+
+            <a class="menu-link {% if active_tab == 'docs' %}active{% endif %}" href="/professor/docs">
+              <span class="menu-icon">DC</span>
+              <span class="menu-copy">
+                <strong>Document Center</strong>
+                <small>Ingest and track library references</small>
+              </span>
+              <span class="menu-arrow">&gt;</span>
+            </a>
+
+            <a class="menu-link {% if active_tab == 'results' %}active{% endif %}" href="/professor/results">
+              <span class="menu-icon">RS</span>
+              <span class="menu-copy">
+                <strong>Results Studio</strong>
+                <small>Review submissions and diffs</small>
+              </span>
+              <span class="menu-arrow">&gt;</span>
+            </a>
+          </nav>
+        </aside>
+
         <article class="glass panel">
-          <h3>Assign Project</h3>
-          <label>Student ID Number</label>
-          <input id="assign-student-id" type="text" placeholder="e.g. S123456" />
+          {% if active_tab == 'assign' %}
+          <h3>Assign New Project</h3>
+          <label>Student ID Numbers (comma, space, or new line separated)</label>
+          <textarea id="assign-student-ids" rows="5" placeholder="S123456, S123457\nS123458"></textarea>
 
           <label>Project Title</label>
           <input id="assign-title" type="text" placeholder="Project title" />
 
           <label>Project Description</label>
-          <textarea id="assign-description" rows="8" placeholder="Describe project goals and requirements..."></textarea>
+          <textarea id="assign-description" rows="10" placeholder="Describe project goals and requirements..."></textarea>
 
-          <button id="assign-project" class="btn btn-primary">Assign Project</button>
+          <button id="assign-project" class="btn btn-primary">Assign to Students</button>
           <p id="assign-message" class="status"></p>
-        </article>
 
-        <article class="glass panel">
+          <div class="table-wrap">
+            <table id="assign-results-table">
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Status</th>
+                  <th>Info</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          {% endif %}
+
+          {% if active_tab == 'docs' %}
+          <h3>Ingest Library Documentation</h3>
+          <label>Library Name</label>
+          <input id="doc-library-name" type="text" placeholder="e.g. pandas" />
+
+          <label>Library Version</label>
+          <input id="doc-library-version" type="text" placeholder="e.g. 2.2.2" />
+
+          <label>Source Title</label>
+          <input id="doc-source-title" type="text" placeholder="e.g. DataFrame.groupby API Notes" />
+
+          <label>Documentation Content</label>
+          <textarea id="doc-content" rows="10" placeholder="Paste library documentation content here..."></textarea>
+
+          <button id="ingest-doc" class="btn btn-secondary">Embed and Ingest to Vector DB</button>
+          <p id="doc-message" class="status"></p>
+
+          <h3>Recently Ingested Documents</h3>
+          <div class="table-wrap">
+            <table id="docs-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Library</th>
+                  <th>Version</th>
+                  <th>Source</th>
+                  <th>Chunks</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          {% endif %}
+
+          {% if active_tab == 'results' %}
           <h3>Student Results</h3>
           <div class="inline-actions">
             <button id="refresh-submissions" class="btn btn-small">Refresh Results</button>
@@ -79,7 +312,10 @@
           <textarea id="detail-corrected-code" rows="8" class="mono" readonly></textarea>
 
           <label>Mistakes (diff)</label>
-          <pre id="detail-mistakes" class="diff-box"></pre>
+          <div id="detail-mistakes" class="diff-box"></div>
+
+          <p id="results-message" class="status"></p>
+          {% endif %}
         </article>
       </section>
     </main>

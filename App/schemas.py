@@ -59,6 +59,23 @@ class ProjectCreateRequest(BaseModel):
     description: str = Field(..., min_length=5)
 
 
+class ProjectAssignFailure(BaseModel):
+    student_id_number: str
+    error: str
+
+
+class ProjectBulkCreateRequest(BaseModel):
+    professor_id: int
+    student_id_numbers: list[str] = Field(..., min_length=1)
+    title: str = Field(..., min_length=3, max_length=200)
+    description: str = Field(..., min_length=5)
+
+
+class ProjectBulkCreateResponse(BaseModel):
+    created_projects: list[ProjectOut] = Field(default_factory=list)
+    failed_assignments: list[ProjectAssignFailure] = Field(default_factory=list)
+
+
 class ProjectOut(BaseModel):
     id: int
     professor_id: int
@@ -96,4 +113,33 @@ class SubmissionSummary(BaseModel):
     student_id_number: str = ""
     grade_percent: float
     status: str
+    created_at: str
+
+
+class StudentSubmissionSummary(BaseModel):
+    id: int
+    project_id: int
+    project_title: str
+    grade_percent: float
+    status: str
+    created_at: str
+
+
+class LibraryDocumentCreateRequest(BaseModel):
+    professor_id: int
+    library_name: str = Field(..., min_length=1, max_length=120)
+    library_version: str = Field(..., min_length=1, max_length=60)
+    source_title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field(..., min_length=20)
+
+
+class LibraryDocumentOut(BaseModel):
+    id: int
+    professor_id: int
+    library_name: str
+    library_version: str
+    source_title: str
+    content: str
+    chunk_count: int
+    vector_ids_json: str
     created_at: str

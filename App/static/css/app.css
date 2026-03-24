@@ -238,6 +238,135 @@ input:focus, select:focus, textarea:focus {
   display: block;
 }
 
+.prof-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+}
+
+.menu-card {
+  padding: 14px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+  border: 1px solid #b8d9f3;
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(84, 188, 255, 0.2), rgba(84, 188, 255, 0) 45%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.93), rgba(242, 250, 255, 0.9));
+  box-shadow: 0 18px 36px rgba(17, 83, 126, 0.1);
+}
+
+.menu-head {
+  margin-bottom: 14px;
+}
+
+.menu-title {
+  margin: 0;
+  font-size: 1.08rem;
+  color: #0d3552;
+}
+
+.menu-note {
+  margin: 6px 0 0;
+  color: #3f6280;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.menu-nav {
+  display: grid;
+  gap: 10px;
+}
+
+.menu-link {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #0f334e;
+  border: 1px solid #cae5fa;
+  border-radius: 14px;
+  padding: 11px;
+  font-weight: 600;
+  background: linear-gradient(180deg, #fdfefe, #f2f9ff);
+  box-shadow: 0 6px 14px rgba(25, 94, 136, 0.06);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.menu-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  font-size: 0.78rem;
+  background: linear-gradient(160deg, #daf1ff, #bfe5ff);
+  color: #0c4b74;
+  border: 1px solid #abd8f7;
+}
+
+.menu-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.menu-copy strong {
+  font-size: 0.92rem;
+  color: #0a3554;
+  line-height: 1.2;
+}
+
+.menu-copy small {
+  margin-top: 3px;
+  font-size: 0.74rem;
+  color: #4e728f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menu-arrow {
+  font-size: 0.9rem;
+  color: #6694b5;
+  transform: translateX(0);
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.menu-link:hover {
+  transform: translateY(-1px);
+  border-color: #98c9ed;
+  box-shadow: 0 12px 20px rgba(25, 94, 136, 0.12);
+  background: linear-gradient(180deg, #ffffff, #ebf6ff);
+}
+
+.menu-link:hover .menu-arrow {
+  transform: translateX(3px);
+  color: #1d6f9f;
+}
+
+.menu-link.active {
+  border-color: #2f80b7;
+  background:
+    radial-gradient(90% 130% at 0% 0%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 45%),
+    linear-gradient(115deg, #0f5f94, #2e88bf 55%, #53a8d8);
+  box-shadow: 0 14px 26px rgba(12, 71, 110, 0.27);
+}
+
+.menu-link.active .menu-icon {
+  background: linear-gradient(160deg, #f4fbff, #d8f0ff);
+  border-color: #a9d6f5;
+}
+
+.menu-link.active .menu-copy strong,
+.menu-link.active .menu-copy small,
+.menu-link.active .menu-arrow {
+  color: #f5fbff;
+}
+
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -250,7 +379,7 @@ input:focus, select:focus, textarea:focus {
 
 .inline-actions {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(160px, 1fr) auto;
   gap: 8px;
   align-items: center;
   margin-bottom: 10px;
@@ -293,12 +422,49 @@ input:focus, select:focus, textarea:focus {
   min-height: 170px;
   max-height: 320px;
   overflow: auto;
-  border: 1px dashed #9fcbef;
+  border: 1px solid #b8d9f3;
   border-radius: 12px;
-  background: #f5fbff;
-  padding: 10px;
+  background: #f8fcff;
+  padding: 0;
   font-family: "IBM Plex Mono", Consolas, monospace;
   font-size: 0.82rem;
+}
+
+.diff-line {
+  display: block;
+  white-space: pre;
+  padding: 3px 10px;
+  border-bottom: 1px solid #e8f3fc;
+}
+
+.diff-line:last-child {
+  border-bottom: none;
+}
+
+.diff-line.added {
+  background: #e8fff0;
+  color: #0f6d3a;
+}
+
+.diff-line.removed {
+  background: #ffeef0;
+  color: #9d1f34;
+}
+
+.diff-line.hunk {
+  background: #edf6ff;
+  color: #245f96;
+}
+
+.diff-line.header {
+  background: #f2f7fb;
+  color: #4d6b86;
+}
+
+.soft-divider {
+  border: none;
+  border-top: 1px solid #d8eaff;
+  margin: 16px 0;
 }
 
 .table-wrap {
@@ -330,6 +496,38 @@ th {
 @media (max-width: 980px) {
   .auth-shell, .grid-2 {
     grid-template-columns: 1fr;
+  }
+
+  .prof-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-card {
+    position: static;
+  }
+
+  .menu-nav {
+    gap: 8px;
+  }
+
+  .menu-link {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    padding: 10px;
+  }
+
+  .menu-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+  }
+
+  .menu-copy strong {
+    font-size: 0.88rem;
+  }
+
+  .menu-copy small {
+    font-size: 0.7rem;
   }
 
   .topbar {

@@ -3,3 +3,4 @@ uvicorn
 pydantic
 nbformat
 jinja2
+chromadb

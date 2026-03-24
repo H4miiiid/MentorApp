@@ -14,6 +14,8 @@ This app now supports role-based learning workflows with persistent storage.
 - Professor dashboard:
     - Assign projects to specific students.
     - Assignment target is student ID number.
+        - Ingest local library documentation into vector DB with metadata:
+            library name, version, and source title.
     - Review student submissions.
     - Open each submission to inspect student code, corrected code, mistake diff, and grade.
 - Persistent SQLite database:

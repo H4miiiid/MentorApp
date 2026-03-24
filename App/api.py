@@ -9,7 +9,11 @@ from pathlib import Path
 from .config import settings
 from .schemas import (
     HealthResponse,
+    LibraryDocumentCreateRequest,
+    LibraryDocumentOut,
     LoginRequest,
+    ProjectBulkCreateRequest,
+    ProjectBulkCreateResponse,
     ProjectCreateRequest,
     ProjectOut,
     RegisterRequest,
@@ -18,14 +22,20 @@ from .schemas import (
     SubmissionCreateRequest,
     SubmissionOut,
     SubmissionSummary,
+    StudentSubmissionSummary,
     UserOut,
 )
 from .service import (
+    add_professor_library_document,
     create_project_assignment,
+    create_project_assignments_bulk,
     ensure_initialized,
     get_submission_detail_for_professor,
+    get_submission_detail_for_student,
     list_professor_submissions,
+    list_professor_library_documents,
     list_student_projects,
+    list_student_submissions,
     list_students,
     login_user,
     register_user,
@@ -56,20 +66,46 @@ def create_app() -> FastAPI:
         )
 
     @app.get("/student")
-    def student_page(request: Request):
+    def student_page() -> RedirectResponse:
+        return RedirectResponse(url="/student/projects", status_code=307)
+
+    def _render_student_page(request: Request, active_tab: str, title: str):
         return TEMPLATES.TemplateResponse(
             request=request,
             name="student.html",
-            context={"title": "Student Dashboard"},
+            context={"title": title, "active_tab": active_tab},
         )
 
+    @app.get("/student/projects")
+    def student_projects_page(request: Request):
+        return _render_student_page(request, active_tab="projects", title="Student - Projects")
+
+    @app.get("/student/results")
+    def student_results_page(request: Request):
+        return _render_student_page(request, active_tab="results", title="Student - Previous Results")
+
     @app.get("/professor")
-    def professor_page(request: Request):
+    def professor_page() -> RedirectResponse:
+        return RedirectResponse(url="/professor/assign", status_code=307)
+
+    def _render_professor_page(request: Request, active_tab: str, title: str):
         return TEMPLATES.TemplateResponse(
             request=request,
             name="professor.html",
-            context={"title": "Professor Dashboard"},
+            context={"title": title, "active_tab": active_tab},
         )
+
+    @app.get("/professor/assign")
+    def professor_assign_page(request: Request):
+        return _render_professor_page(request, active_tab="assign", title="Professor - Assign Projects")
+
+    @app.get("/professor/docs")
+    def professor_docs_page(request: Request):
+        return _render_professor_page(request, active_tab="docs", title="Professor - Library Documents")
+
+    @app.get("/professor/results")
+    def professor_results_page(request: Request):
+        return _render_professor_page(request, active_tab="results", title="Professor - Student Results")
 
     @app.get("/app")
     def app_entry() -> RedirectResponse:
@@ -126,6 +162,18 @@ def create_app() -> FastAPI:
         except Exception as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.post("/projects/bulk", response_model=ProjectBulkCreateResponse)
+    def create_projects_bulk(request: ProjectBulkCreateRequest) -> ProjectBulkCreateResponse:
+        try:
+            return create_project_assignments_bulk(
+                professor_id=request.professor_id,
+                student_id_numbers=request.student_id_numbers,
+                title=request.title,
+                description=request.description,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
     @app.get("/students/{student_id}/projects", response_model=list[ProjectOut])
     def student_projects(student_id: int) -> list[ProjectOut]:
         return list_student_projects(student_id)
@@ -142,6 +190,17 @@ def create_app() -> FastAPI:
         except Exception as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    @app.get("/students/{student_id}/submissions", response_model=list[StudentSubmissionSummary])
+    def student_submissions(student_id: int) -> list[StudentSubmissionSummary]:
+        return list_student_submissions(student_id)
+
+    @app.get("/students/{student_id}/submissions/{submission_id}", response_model=SubmissionOut)
+    def student_submission_detail(student_id: int, submission_id: int) -> SubmissionOut:
+        try:
+            return get_submission_detail_for_student(submission_id=submission_id, student_id=student_id)
+        except Exception as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
     @app.get("/professors/{professor_id}/submissions", response_model=list[SubmissionSummary])
     def professor_submissions(professor_id: int) -> list[SubmissionSummary]:
         return list_professor_submissions(professor_id)
@@ -155,6 +214,26 @@ def create_app() -> FastAPI:
             )
         except Exception as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @app.post("/professors/library-documents", response_model=LibraryDocumentOut)
+    def add_library_document(request: LibraryDocumentCreateRequest) -> LibraryDocumentOut:
+        try:
+            return add_professor_library_document(
+                professor_id=request.professor_id,
+                library_name=request.library_name,
+                library_version=request.library_version,
+                source_title=request.source_title,
+                content=request.content,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/professors/{professor_id}/library-documents", response_model=list[LibraryDocumentOut])
+    def get_library_documents(professor_id: int) -> list[LibraryDocumentOut]:
+        try:
+            return list_professor_library_documents(professor_id)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return app
 

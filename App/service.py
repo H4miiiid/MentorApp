@@ -2,13 +2,25 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 import os
 from difflib import unified_diff
 from typing import Any
 
 from .database import execute_insert, fetch_all, fetch_one, init_db, utc_now_iso
 from .repair_engine import RepairEngineError, get_repair_engine
-from .schemas import ProjectOut, RepairResult, SubmissionOut, SubmissionSummary, UserOut
+from .schemas import (
+    LibraryDocumentOut,
+    ProjectAssignFailure,
+    ProjectBulkCreateResponse,
+    ProjectOut,
+    RepairResult,
+    SubmissionOut,
+    SubmissionSummary,
+    StudentSubmissionSummary,
+    UserOut,
+)
+from .vector_store import ingest_library_document
 
 
 def _normalize_role(role: str) -> str:
@@ -32,6 +44,15 @@ def _normalize_student_id(student_id_number: str) -> str:
     if len(value) > 64:
         raise ValueError("Student ID number is too long.")
     return value
+
+
+def _normalize_required_text(value: str, field_name: str, max_len: int) -> str:
+    cleaned = value.strip()
+    if not cleaned:
+        raise ValueError(f"{field_name} is required.")
+    if len(cleaned) > max_len:
+        raise ValueError(f"{field_name} is too long.")
+    return cleaned
 
 
 def _hash_password(password: str) -> str:
@@ -229,6 +250,51 @@ def create_project_assignment(
     return ProjectOut(**row)
 
 
+def create_project_assignments_bulk(
+    *,
+    professor_id: int,
+    student_id_numbers: list[str],
+    title: str,
+    description: str,
+) -> ProjectBulkCreateResponse:
+    ensure_initialized()
+
+    professor = fetch_one("SELECT id, role FROM users WHERE id = ?", (professor_id,))
+    if professor is None or professor["role"] != "professor":
+        raise ValueError("Professor account not found.")
+
+    seen: set[str] = set()
+    normalized_ids: list[str] = []
+    for raw_id in student_id_numbers:
+        sid = _normalize_student_id(raw_id)
+        if not sid:
+            continue
+        if sid in seen:
+            continue
+        seen.add(sid)
+        normalized_ids.append(sid)
+
+    if not normalized_ids:
+        raise ValueError("At least one valid student ID number is required.")
+
+    created: list[ProjectOut] = []
+    failed: list[ProjectAssignFailure] = []
+
+    for sid in normalized_ids:
+        try:
+            project = create_project_assignment(
+                professor_id=professor_id,
+                student_id_number=sid,
+                title=title,
+                description=description,
+            )
+            created.append(project)
+        except Exception as exc:
+            failed.append(ProjectAssignFailure(student_id_number=sid, error=str(exc)))
+
+    return ProjectBulkCreateResponse(created_projects=created, failed_assignments=failed)
+
+
 def list_student_projects(student_id: int) -> list[ProjectOut]:
     ensure_initialized()
     rows = fetch_all(
@@ -332,3 +398,115 @@ def get_submission_detail_for_professor(submission_id: int, professor_id: int) -
     if row is None:
         raise ValueError("Submission not found or not accessible.")
     return SubmissionOut(**row)
+
+
+def list_student_submissions(student_id: int) -> list[StudentSubmissionSummary]:
+    ensure_initialized()
+    rows = fetch_all(
+        """
+        SELECT
+            s.id,
+            s.project_id,
+            p.title AS project_title,
+            s.grade_percent,
+            s.status,
+            s.created_at
+        FROM submissions s
+        JOIN projects p ON p.id = s.project_id
+        WHERE s.student_id = ?
+        ORDER BY s.id DESC
+        """,
+        (student_id,),
+    )
+    return [StudentSubmissionSummary(**row) for row in rows]
+
+
+def get_submission_detail_for_student(submission_id: int, student_id: int) -> SubmissionOut:
+    ensure_initialized()
+    row = fetch_one(
+        """
+        SELECT *
+        FROM submissions
+        WHERE id = ? AND student_id = ?
+        """,
+        (submission_id, student_id),
+    )
+    if row is None:
+        raise ValueError("Submission not found or not accessible.")
+    return SubmissionOut(**row)
+
+
+def add_professor_library_document(
+    *,
+    professor_id: int,
+    library_name: str,
+    library_version: str,
+    source_title: str,
+    content: str,
+) -> LibraryDocumentOut:
+    ensure_initialized()
+
+    professor = fetch_one("SELECT id, role FROM users WHERE id = ?", (professor_id,))
+    if professor is None or professor["role"] != "professor":
+        raise ValueError("Professor account not found.")
+
+    normalized_library = _normalize_required_text(library_name, "Library name", 120)
+    normalized_version = _normalize_required_text(library_version, "Library version", 60)
+    normalized_title = _normalize_required_text(source_title, "Source title", 200)
+    normalized_content = content.strip()
+    if len(normalized_content) < 20:
+        raise ValueError("Documentation content must be at least 20 characters.")
+
+    vector_ids = ingest_library_document(
+        library_name=normalized_library,
+        library_version=normalized_version,
+        source_title=normalized_title,
+        content=normalized_content,
+        professor_id=professor_id,
+    )
+
+    row_id = execute_insert(
+        """
+        INSERT INTO library_documents (
+            professor_id,
+            library_name,
+            library_version,
+            source_title,
+            content,
+            chunk_count,
+            vector_ids_json,
+            created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            professor_id,
+            normalized_library,
+            normalized_version,
+            normalized_title,
+            normalized_content,
+            len(vector_ids),
+            json.dumps(vector_ids),
+            utc_now_iso(),
+        ),
+    )
+
+    row = fetch_one("SELECT * FROM library_documents WHERE id = ?", (row_id,))
+    if row is None:
+        raise RuntimeError("Failed to save ingested documentation record.")
+    return LibraryDocumentOut(**row)
+
+
+def list_professor_library_documents(professor_id: int) -> list[LibraryDocumentOut]:
+    ensure_initialized()
+
+    rows = fetch_all(
+        """
+        SELECT *
+        FROM library_documents
+        WHERE professor_id = ?
+        ORDER BY id DESC
+        """,
+        (professor_id,),
+    )
+    return [LibraryDocumentOut(**row) for row in rows]

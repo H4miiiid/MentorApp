@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/css/app.css" />
+    <link rel="stylesheet" href="/static/css/app.css?v=3" />
   </head>
   <body>
     <div class="bg-orb orb-a"></div>
@@ -23,8 +23,37 @@
         <button id="logout-btn" class="btn btn-ghost">Logout</button>
       </header>
 
-      <section class="grid-2">
+      <section class="prof-layout">
+        <aside class="glass menu-card">
+          <div class="menu-head">
+            <p class="kicker">Student Workspace</p>
+            <h3 class="menu-title">Navigation</h3>
+            <p class="menu-note">Move between current project work and your submission history.</p>
+          </div>
+
+          <nav class="menu-nav" aria-label="Student sections">
+            <a class="menu-link {% if active_tab == 'projects' %}active{% endif %}" href="/student/projects">
+              <span class="menu-icon">PJ</span>
+              <span class="menu-copy">
+                <strong>See Projects</strong>
+                <small>Open assigned projects and write code</small>
+              </span>
+              <span class="menu-arrow">&gt;</span>
+            </a>
+
+            <a class="menu-link {% if active_tab == 'results' %}active{% endif %}" href="/student/results">
+              <span class="menu-icon">PR</span>
+              <span class="menu-copy">
+                <strong>Previous Results</strong>
+                <small>Review grades, corrections, and diffs</small>
+              </span>
+              <span class="menu-arrow">&gt;</span>
+            </a>
+          </nav>
+        </aside>
+
         <article class="glass panel">
+          {% if active_tab == 'projects' %}
           <h3>Assigned Project</h3>
           <div class="inline-actions">
             <select id="project-select"></select>
@@ -39,10 +68,31 @@
           <div class="inline-actions">
             <button id="submit-code" class="btn btn-primary">Check Code</button>
           </div>
-        </article>
+          {% endif %}
 
-        <article class="glass panel">
-          <h3>Results</h3>
+          {% if active_tab == 'results' %}
+          <h3>Previous Results</h3>
+          <div class="inline-actions">
+            <button id="refresh-results" class="btn btn-small">Refresh Results</button>
+            <select id="submission-select"></select>
+            <button id="load-result" class="btn btn-small">Load Detail</button>
+          </div>
+
+          <div class="table-wrap">
+            <table id="student-results-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Project</th>
+                  <th>Grade</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
           <label>Corrected Code</label>
           <textarea id="corrected-code" rows="12" class="mono" readonly></textarea>
 
@@ -57,15 +107,16 @@
           </div>
 
           <label>Mistakes (diff)</label>
-          <pre id="mistakes" class="diff-box"></pre>
+          <div id="mistakes" class="diff-box"></div>
+          {% endif %}
         </article>
       </section>
 
       <p id="student-message" class="status"></p>
     </main>
 
-    <script src="/static/js/common.js"></script>
+    <script src="/static/js/common.js?v=5"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
-    <script src="/static/js/student.js"></script>
+    <script src="/static/js/student.js?v=5"></script>
   </body>
 </html>

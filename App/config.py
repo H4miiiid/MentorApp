@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 DEFAULT_DB_PATH = str((Path(__file__).resolve().parent / "mentorapp.db"))
+DEFAULT_VECTOR_DB_PATH = str((Path(__file__).resolve().parent.parent / "VectorDB" / "chroma_library_docs"))
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,8 @@ class Settings:
         "Graph Workflow/LangGraph_SFT_Repair_Workflow.ipynb",
     ).strip()
     database_path: str = os.getenv("MENTOR_APP_DB_PATH", DEFAULT_DB_PATH)
+    vector_db_path: str = os.getenv("MENTOR_APP_VECTOR_DB_PATH", DEFAULT_VECTOR_DB_PATH)
+    vector_collection_name: str = os.getenv("MENTOR_APP_VECTOR_COLLECTION", "library_docs")
 
 
 settings = Settings()

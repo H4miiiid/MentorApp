@@ -75,6 +75,22 @@ def init_db() -> None:
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS library_documents (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                professor_id INTEGER NOT NULL,
+                library_name TEXT NOT NULL,
+                library_version TEXT NOT NULL,
+                source_title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                chunk_count INTEGER NOT NULL,
+                vector_ids_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (professor_id) REFERENCES users (id)
+            )
+            """
+        )
 
 
 def _column_names(conn: sqlite3.Connection, table: str) -> set[str]:

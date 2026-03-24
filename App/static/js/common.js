@@ -46,3 +46,36 @@ async function apiFetch(path, options = {}) {
 function toDiffBlock(text) {
   return text || "No differences available.";
 }
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderDiffHtml(diffText) {
+  const raw = toDiffBlock(diffText);
+  if (raw === "No changes were needed.") {
+    return '<span class="diff-line header">No changes were needed.</span>';
+  }
+
+  const lines = String(raw).split("\n");
+  return lines
+    .map((line) => {
+      let cls = "context";
+      if (line.startsWith("+++ ") || line.startsWith("--- ")) {
+        cls = "header";
+      } else if (line.startsWith("@@")) {
+        cls = "hunk";
+      } else if (line.startsWith("+") && !line.startsWith("+++")) {
+        cls = "added";
+      } else if (line.startsWith("-") && !line.startsWith("---")) {
+        cls = "removed";
+      }
+      return `<span class="diff-line ${cls}">${escapeHtml(line || " ")}</span>`;
+    })
+    .join("");
+}
