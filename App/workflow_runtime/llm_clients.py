@@ -11,6 +11,7 @@ from langchain_openai import ChatOpenAI
 
 from App.workflow_runtime.config import CFG, openrouter_headers
 from App.workflow_runtime.observability import setup_langsmith, traceable
+from App.workflow_runtime.server_manager import ensure_llama_server_running
 from App.workflow_runtime.state import extract_failure_signature
 
 
@@ -18,6 +19,10 @@ def ensure_llama_server_available() -> None:
     setup_langsmith()
     base = CFG.llama_server_url.rstrip("/")
     health_url = base.replace("/v1", "") + "/health"
+
+    # Try bringing up a managed local server if target is currently down.
+    ensure_llama_server_running()
+
     try:
         response = requests.get(health_url, timeout=3)
     except Exception as exc:

@@ -4,6 +4,11 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+except Exception:  # pragma: no cover
+    load_dotenv = None
+
 
 def _bool_env(name: str, default: bool) -> bool:
     value = os.getenv(name)
@@ -12,10 +17,43 @@ def _bool_env(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _load_env_fallback() -> None:
+    env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            continue
+        if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+            value = value[1:-1]
+        os.environ.setdefault(key, value)
+
+
+if load_dotenv is not None:
+    load_dotenv()
+else:
+    _load_env_fallback()
+
+
 @dataclass(frozen=True)
 class WorkflowConfig:
     llama_server_url: str = os.getenv("LLAMA_SERVER_URL", "http://127.0.0.1:8081/v1").strip()
     llama_model: str = os.getenv("LLAMA_OPENAI_MODEL", "local-gguf").strip()
+    llama_server_host: str = os.getenv("LLAMA_SERVER_HOST", "127.0.0.1").strip()
+    llama_server_port: int = int(os.getenv("LLAMA_SERVER_PORT", "8081"))
+    llama_server_ctx: int = int(os.getenv("LLAMA_SERVER_CTX", "8192"))
+    llama_server_n_gpu_layers: int = int(os.getenv("LLAMA_SERVER_N_GPU_LAYERS", "999"))
+    llama_server_threads: int = int(os.getenv("LLAMA_SERVER_THREADS", str(max(1, (os.cpu_count() or 4) - 1))))
+    llama_server_auto_start: bool = _bool_env("LLAMA_SERVER_AUTO_START", True)
+    llama_server_path: str = os.getenv("LLAMA_SERVER_PATH", "").strip()
+    local_gguf_path: str = os.getenv("LOCAL_GGUF_PATH", "").strip()
 
     openrouter_api_key: str = (os.getenv("OPENROUTER_API_KEY") or "").strip()
     openrouter_base_url: str = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
