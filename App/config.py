@@ -18,8 +18,8 @@ class Settings:
     backend_mode: str = os.getenv("REPAIR_BACKEND_MODE", "mock").strip().lower()
     workflow_module: str = os.getenv("REPAIR_WORKFLOW_MODULE", "App.workflow_entrypoint")
     workflow_function: str = os.getenv("REPAIR_WORKFLOW_FUNCTION", "run_workflow")
-    workflow_source: str = os.getenv("REPAIR_WORKFLOW_SOURCE", "auto").strip().lower()
-    workflow_py_path: str = os.getenv("REPAIR_WORKFLOW_PY_PATH", "").strip()
+    workflow_source: str = os.getenv("REPAIR_WORKFLOW_SOURCE", "pyfile").strip().lower()
+    workflow_py_path: str = os.getenv("REPAIR_WORKFLOW_PY_PATH", "App/langgraph_repair_workflow.py").strip()
     workflow_notebook_path: str = os.getenv(
         "REPAIR_WORKFLOW_NOTEBOOK_PATH",
         "Graph Workflow/LangGraph_SFT_Repair_Workflow.ipynb",
