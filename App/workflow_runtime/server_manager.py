@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import atexit
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -30,14 +31,39 @@ def _resolve_server_executable() -> Path | None:
         p = Path(CFG.llama_server_path).expanduser().resolve()
         return p if p.exists() else None
 
+    # 1) Look on PATH first.
+    path_hit = shutil.which("llama-server") or shutil.which("llama-server.exe")
+    if path_hit:
+        return Path(path_hit).resolve()
+
+    # 2) Check common local build output locations.
     candidates = [
         Path("llama.cpp/build/bin/Release/llama-server.exe").resolve(),
         Path("llama.cpp/build/bin/llama-server.exe").resolve(),
         Path("llama.cpp/build/bin/llama-server").resolve(),
+        Path("llama.cpp/build/bin/Release/llama-server").resolve(),
+        Path("App/llama.cpp/build/bin/Release/llama-server.exe").resolve(),
+        Path("App/llama.cpp/build/bin/llama-server.exe").resolve(),
+        Path("App/llama.cpp/build/bin/llama-server").resolve(),
+        Path("App/llama.cpp/build/bin/Release/llama-server").resolve(),
     ]
     for candidate in candidates:
         if candidate.exists():
             return candidate
+
+    # 3) Fall back to recursive search under known build roots.
+    for build_root in (Path("llama.cpp/build").resolve(), Path("App/llama.cpp/build").resolve()):
+        if not build_root.exists():
+            continue
+        hits = [
+            f
+            for f in build_root.rglob("llama-server*")
+            if f.is_file() and f.name.lower().startswith("llama-server")
+        ]
+        if hits:
+            hits.sort(key=lambda p: len(str(p)))
+            return hits[0]
+
     return None
 
 
@@ -56,7 +82,7 @@ def ensure_llama_server_running() -> None:
     if exe is None:
         raise RuntimeError(
             "Cannot auto-start llama-server: executable not found. "
-            "Set LLAMA_SERVER_PATH or build llama.cpp first."
+            "Set LLAMA_SERVER_PATH, add llama-server to PATH, or build llama.cpp first."
         )
 
     if not CFG.local_gguf_path:
