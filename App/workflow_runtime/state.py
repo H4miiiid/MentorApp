@@ -58,7 +58,7 @@ def normalize_code(code: str) -> str:
     return "\n".join(line.rstrip() for line in code.strip().splitlines())
 
 
-def code_changed_meaningfully(before: str, after: str, ratio_threshold: float = 0.995) -> bool:
+def code_changed_meaningfully(before: str, after: str, ratio_threshold: float = 0.99999) -> bool:
     if normalize_code(before) == normalize_code(after):
         return False
     ratio = difflib.SequenceMatcher(a=before, b=after).ratio()
