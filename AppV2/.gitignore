@@ -1,0 +1,12 @@
+# Backend runtime artifacts (defaults live under AppV2/backend/)
+backend/*.db
+backend/storage/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Frontend
+frontend/node_modules/
+frontend/dist/

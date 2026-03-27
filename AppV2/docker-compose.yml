@@ -1,0 +1,41 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: AppV2/backend/Dockerfile
+    ports:
+      - "${BACKEND_PORT:-8001}:8001"
+    environment:
+      APPV2_HOST: "0.0.0.0"
+      APPV2_PORT: "8001"
+      APPV2_DB_PATH: /data/mentorapp_v2.db
+      APPV2_STORAGE_DIR: /data/storage
+      # Default dev secret; override via .env: APPV2_JWT_SECRET=... for production
+      APPV2_JWT_SECRET: ${APPV2_JWT_SECRET:-97f5abc077ec811e4a007cfe1680bb089c42325a61ff667496f70d4a36b6cfc32773082aeb6ebff5b6d03f0a4191deb6}
+      APPV2_JWT_EXPIRE_MINUTES: ${APPV2_JWT_EXPIRE_MINUTES:-1440}
+    volumes:
+      - appv2-data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: AppV2/frontend/Dockerfile
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+
+volumes:
+  appv2-data:

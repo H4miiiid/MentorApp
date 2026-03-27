@@ -1,0 +1,21 @@
+.git
+.gitignore
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+**/*.db
+.env
+
+App/
+AppV2/backend/storage/
+AppV2/backend/*.db
+AppV2/frontend/node_modules
+AppV2/frontend/dist
+Benchmark_Testing
+Dataset_Generation_Prompt_Engineerin
+Datasets
+Fine-Tuning
+Graph Workflow
+RAG_Pipelines
+VectorDB

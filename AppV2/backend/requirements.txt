@@ -1,0 +1,6 @@
+# AppV2 backend (install alongside repo root deps as needed)
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+sqlmodel>=0.0.22
+python-dotenv>=1.0.0
+PyJWT>=2.8.0
