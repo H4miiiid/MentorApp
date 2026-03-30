@@ -1,5 +1,10 @@
 FROM python:3.13-slim
 
+# Docker CLI for sandboxed student code execution (uses host socket from compose).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends docker.io ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -21,4 +26,5 @@ COPY AppV2/backend /app/AppV2/backend
 
 EXPOSE 8001
 
-CMD ["sh", "-c", "exec uvicorn AppV2.backend.main:app --host \"${APPV2_HOST}\" --port \"${APPV2_PORT}\""]
+# --log-level info: align uvicorn with app logging; grading logs use AppV2.backend.* loggers to stdout
+CMD ["sh", "-c", "exec uvicorn AppV2.backend.main:app --host \"${APPV2_HOST}\" --port \"${APPV2_PORT}\" --log-level info"]

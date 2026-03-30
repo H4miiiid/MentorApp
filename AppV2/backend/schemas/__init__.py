@@ -12,6 +12,13 @@ from .document import DocumentCreate, DocumentRead, DocumentUpdate
 from .health import HealthResponse
 from .submission import SubmissionCreate, SubmissionRead, SubmissionUpdate
 from .user import UserCreate, UserRead, UserUpdate
+from .admin import AdminConfigResponse, AdminUserInsightsResponse, StudentEnrollmentItem
+from .grading_model import (
+    GradingModelCreate,
+    GradingModelRead,
+    GradingModelUpdate,
+    GradingStatusResponse,
+)
 
 __all__ = [
     "LoginRequest",
@@ -32,4 +39,11 @@ __all__ = [
     "UserCreate",
     "UserRead",
     "UserUpdate",
+    "AdminConfigResponse",
+    "AdminUserInsightsResponse",
+    "StudentEnrollmentItem",
+    "GradingModelCreate",
+    "GradingModelRead",
+    "GradingModelUpdate",
+    "GradingStatusResponse",
 ]

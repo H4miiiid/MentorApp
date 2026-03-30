@@ -1,5 +1,5 @@
 """REST routers."""
 
-from . import assignments, auth, documents, submissions, users
+from . import admin, assignments, auth, documents, submissions, users
 
-__all__ = ["assignments", "auth", "documents", "submissions", "users"]
+__all__ = ["admin", "assignments", "auth", "documents", "submissions", "users"]

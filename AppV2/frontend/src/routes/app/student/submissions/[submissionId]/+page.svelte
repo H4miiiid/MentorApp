@@ -13,6 +13,9 @@
 
   $: submissionId = $page.params.submissionId ?? "";
 
+  $: gradingDone =
+    submission != null && (submission.status === "completed" || submission.status === "failed");
+
   async function load(id: string) {
     if (!id) {
       loading = false;
@@ -74,42 +77,54 @@
 
     <h2 class="gh-title" style="font-size: 15px; margin-bottom: 8px;">Submitted code</h2>
     <div class="gh-code-view-shell">
-      <div class="gh-code-editor-toolbar">Python</div>
+      <div class="gh-code-editor-toolbar">Python · your upload</div>
       <pre class="gh-code-block gh-code-block-python">{submission.code || "—"}</pre>
     </div>
 
-    {#if submission.corrected_code}
-      <h2 class="gh-title" style="font-size: 15px; margin: 20px 0 8px;">Corrected code</h2>
-      <div class="gh-code-view-shell">
-        <div class="gh-code-editor-toolbar">Python</div>
-        <pre class="gh-code-block gh-code-block-python">{submission.corrected_code}</pre>
+    {#if !gradingDone}
+      <p class="gh-muted" style="margin: 20px 0 0; font-size: 14px;">
+        Grading is still running. When it finishes, <strong>errors (stderr)</strong>,
+        <strong>corrected code</strong>, <strong>diff</strong>, and test output will appear below. Refresh if needed.
+      </p>
+    {:else}
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Errors (stderr)</h2>
+      <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
+        Runtime or checker errors from the autograder sandbox (same field teachers see).
+      </p>
+      <div class="gh-code-view-shell gh-code-shell-error">
+        <div class="gh-code-editor-toolbar">Stderr</div>
+        <pre class="gh-code-block gh-code-block-stderr">{submission.stderr?.trim() || "—"}</pre>
       </div>
-    {/if}
 
-    {#if submission.diff}
-      <h2 class="gh-title" style="font-size: 15px; margin: 20px 0 8px;">Diff</h2>
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Corrected code</h2>
+      <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
+        Suggested or auto-fixed code from the grader (when provided).
+      </p>
+      <div class="gh-code-view-shell">
+        <div class="gh-code-editor-toolbar">Python · suggested</div>
+        <pre class="gh-code-block gh-code-block-python">{submission.corrected_code?.trim() || "—"}</pre>
+      </div>
+
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Diff</h2>
+      <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
+        Unified diff between your submission and the corrected version.
+      </p>
       <div class="gh-code-view-shell">
         <div class="gh-code-editor-toolbar">Diff</div>
-        <pre class="gh-code-block gh-code-block-python">{submission.diff}</pre>
+        <pre class="gh-code-block gh-code-block-python">{submission.diff?.trim() || "—"}</pre>
+      </div>
+
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Stdout</h2>
+      <div class="gh-code-view-shell">
+        <div class="gh-code-editor-toolbar">Stdout</div>
+        <pre class="gh-code-block gh-code-block-python">{submission.stdout?.trim() || "—"}</pre>
+      </div>
+
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Feedback</h2>
+      <div class="gh-code-view-shell">
+        <div class="gh-code-editor-toolbar">Text</div>
+        <pre class="gh-code-block gh-code-block-python">{submission.feedback?.trim() || "—"}</pre>
       </div>
     {/if}
-
-    <h2 class="gh-title" style="font-size: 15px; margin: 20px 0 8px;">Stdout</h2>
-    <div class="gh-code-view-shell">
-      <div class="gh-code-editor-toolbar">Stdout</div>
-      <pre class="gh-code-block gh-code-block-python">{submission.stdout || "—"}</pre>
-    </div>
-
-    <h2 class="gh-title" style="font-size: 15px; margin: 20px 0 8px;">Stderr</h2>
-    <div class="gh-code-view-shell">
-      <div class="gh-code-editor-toolbar">Stderr</div>
-      <pre class="gh-code-block gh-code-block-python">{submission.stderr || "—"}</pre>
-    </div>
-
-    <h2 class="gh-title" style="font-size: 15px; margin: 20px 0 8px;">Feedback</h2>
-    <div class="gh-code-view-shell">
-      <div class="gh-code-editor-toolbar">Text</div>
-      <pre class="gh-code-block gh-code-block-python">{submission.feedback || "—"}</pre>
-    </div>
   {/if}
 </section>

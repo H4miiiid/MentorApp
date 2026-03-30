@@ -87,6 +87,23 @@ class Submission(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=_utc_now)
 
 
+class GradingModel(SQLModel, table=True):
+    """Catalog of local llama.cpp SFT endpoints (one row active for grading)."""
+
+    __tablename__ = "grading_models"
+
+    id: str = Field(default_factory=_new_uuid, primary_key=True, max_length=36)
+    display_name: str = Field(max_length=200)
+    # Filename under host models/gguf (must match llama sidecar -m /models/<file>).
+    gguf_filename: str = Field(max_length=512)
+    # OpenAI-compatible model id sent to llama-server (often matches GGUF or alias).
+    openai_model_name: str = Field(max_length=200)
+    n_ctx: int = Field(default=8192, ge=256)
+    is_active: bool = Field(default=False, index=True)
+    created_at: datetime = Field(default_factory=_utc_now)
+    updated_at: datetime = Field(default_factory=_utc_now)
+
+
 class Document(SQLModel, table=True):
     __tablename__ = "documents"
 

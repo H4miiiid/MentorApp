@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
@@ -81,10 +82,20 @@ def get_user(session: SessionDep, user_id: str) -> UserRead:
     response_model=UserRead,
     dependencies=[Depends(require_admin)],
 )
-def update_user(session: SessionDep, user_id: str, body: UserUpdate) -> UserRead:
+def update_user(
+    session: SessionDep,
+    user_id: str,
+    body: UserUpdate,
+    current: Annotated[User, Depends(require_admin)],
+) -> UserRead:
     u = session.get(User, user_id)
     if u is None:
         raise HTTPException(status_code=404, detail="User not found")
+    if u.role == UserRole.admin and u.id != current.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot modify other administrator accounts",
+        )
     data = body.model_dump(exclude_unset=True)
     if "email" in data and data["email"] is not None:
         ne = data["email"].strip().lower()
@@ -118,5 +129,10 @@ def delete_user(session: SessionDep, user_id: str) -> None:
     u = session.get(User, user_id)
     if u is None:
         raise HTTPException(status_code=404, detail="User not found")
+    if u.role == UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot delete administrator accounts",
+        )
     delete_user_cascade(session, user_id)
     session.commit()

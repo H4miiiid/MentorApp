@@ -30,7 +30,7 @@
         return;
       }
       await invalidate(SESSION_DEPENDENCY);
-      await goto("/app");
+      await goto("/app/admin");
     } catch (e) {
       errorMsg = e instanceof Error ? e.message : "Something went wrong";
     } finally {

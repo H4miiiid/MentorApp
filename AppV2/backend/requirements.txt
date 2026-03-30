@@ -4,3 +4,14 @@ uvicorn[standard]>=0.32.0
 sqlmodel>=0.0.22
 python-dotenv>=1.0.0
 PyJWT>=2.8.0
+# LangGraph grading workflow (APPV2_GRADING_BACKEND=langgraph)
+# Optional: install chromadb + sentence-transformers for local RAG (otherwise RAG returns empty docs)
+langgraph>=0.2.55
+langchain-core>=0.3.45
+langchain-openai>=0.2.14
+langsmith>=0.1.100
+requests>=2.32.0
+duckduckgo-search>=6.0.0
+# Local RAG (Chroma + embeddings) — optional but recommended for LangGraph retrieve/rerank nodes
+chromadb>=0.4.0
+sentence-transformers>=2.2.0

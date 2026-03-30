@@ -56,6 +56,26 @@ class Settings:
     jwt_secret: str = os.getenv("APPV2_JWT_SECRET", "")
     jwt_algorithm: str = os.getenv("APPV2_JWT_ALGORITHM", "HS256")
     jwt_expire_minutes: int = int(os.getenv("APPV2_JWT_EXPIRE_MINUTES", "1440"))
+    # Background grading worker (pluggable pipeline; see `grading/` package)
+    grading_worker_enabled: bool = os.getenv("APPV2_GRADING_WORKER_ENABLED", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+    grading_poll_interval_seconds: float = float(os.getenv("APPV2_GRADING_POLL_INTERVAL_SECONDS", "2"))
+    grading_backend: str = os.getenv("APPV2_GRADING_BACKEND", "mock").strip()
+    grading_mock_sleep_seconds: float = float(os.getenv("APPV2_GRADING_MOCK_SLEEP_SECONDS", "10"))
+    grading_max_attempts: int = int(os.getenv("APPV2_GRADING_MAX_ATTEMPTS", "6"))
+    # If true (default), ensure default admin exists once per process startup (idempotent).
+    bootstrap_admin_enabled: bool = os.getenv("APPV2_BOOTSTRAP_ADMIN", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+    bootstrap_admin_email: str = os.getenv("APPV2_ADMIN_EMAIL", "admin@gmail.com").strip().lower()
+    bootstrap_admin_password: str = os.getenv("APPV2_ADMIN_PASSWORD", "123456")
 
     @property
     def database_url(self) -> str:

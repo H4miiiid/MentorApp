@@ -7,7 +7,14 @@ from pathlib import Path
 from sqlmodel import Session, SQLModel, create_engine
 
 from ..core.config import settings
-from .models import Assignment, AssignmentStudent, Document, Submission, User  # noqa: F401
+from .models import (  # noqa: F401
+    Assignment,
+    AssignmentStudent,
+    Document,
+    GradingModel,
+    Submission,
+    User,
+)
 
 _engine = None
 

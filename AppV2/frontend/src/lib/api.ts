@@ -222,3 +222,119 @@ export async function fetchDocuments(): Promise<DocumentRead[]> {
 export async function deleteDocument(id: string): Promise<void> {
   await apiJson(`/api/documents/${id}`, { method: "DELETE" });
 }
+
+/** Admin API */
+export type AdminConfigResponse = {
+  backend_version: string;
+  database_path: string;
+  storage_dir: string;
+  grading_worker_enabled: boolean;
+  grading_backend: string;
+  grading_poll_interval_seconds: number;
+  grading_mock_sleep_seconds: number;
+  grading_max_attempts: number;
+  jwt_expire_minutes: number;
+};
+
+export type StudentEnrollmentItem = {
+  assignment: AssignmentRead;
+  assigned_at: string;
+};
+
+export type AdminUserInsightsResponse = {
+  user: UserRead;
+  teacher_assignments: AssignmentRead[] | null;
+  student_enrollments: StudentEnrollmentItem[] | null;
+  student_submissions: SubmissionRead[] | null;
+};
+
+export async function fetchAdminConfig(): Promise<AdminConfigResponse> {
+  return apiJson<AdminConfigResponse>("/api/admin/config");
+}
+
+/** Grading models catalog + llama health (admin). */
+export type GradingModelRead = {
+  id: string;
+  display_name: string;
+  gguf_filename: string;
+  openai_model_name: string;
+  n_ctx: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type GradingStatusResponse = {
+  llama_health_ok: boolean;
+  llama_health_url: string;
+  llama_server_url: string;
+  active_model: GradingModelRead | null;
+  compose_gguf_hint: string;
+  note: string;
+};
+
+export type GradingModelCreateBody = {
+  display_name: string;
+  gguf_filename: string;
+  openai_model_name: string;
+  n_ctx?: number;
+};
+
+export async function fetchGradingStatus(): Promise<GradingStatusResponse> {
+  return apiJson<GradingStatusResponse>("/api/admin/grading/status");
+}
+
+export async function fetchGradingModels(): Promise<GradingModelRead[]> {
+  return apiJson<GradingModelRead[]>("/api/admin/grading-models");
+}
+
+export async function createGradingModel(body: GradingModelCreateBody): Promise<GradingModelRead> {
+  return apiJson<GradingModelRead>("/api/admin/grading-models", {
+    method: "POST",
+    body: JSON.stringify({
+      display_name: body.display_name.trim(),
+      gguf_filename: body.gguf_filename.trim(),
+      openai_model_name: body.openai_model_name.trim(),
+      n_ctx: body.n_ctx ?? 8192,
+    }),
+  });
+}
+
+export async function activateGradingModel(modelId: string): Promise<GradingModelRead> {
+  return apiJson<GradingModelRead>(`/api/admin/grading-models/${encodeURIComponent(modelId)}/activate`, {
+    method: "POST",
+  });
+}
+
+export async function deleteGradingModel(modelId: string): Promise<void> {
+  await apiJson(`/api/admin/grading-models/${encodeURIComponent(modelId)}`, { method: "DELETE" });
+}
+
+export async function fetchAdminUsers(role?: UserRole | ""): Promise<UserRead[]> {
+  const q = role ? `?role=${encodeURIComponent(role)}` : "";
+  return apiJson<UserRead[]>(`/api/admin/users${q}`);
+}
+
+export async function fetchAdminUserInsights(userId: string): Promise<AdminUserInsightsResponse> {
+  return apiJson<AdminUserInsightsResponse>(`/api/admin/users/${userId}/insights`);
+}
+
+export type UserUpdatePayload = {
+  email?: string;
+  full_name?: string;
+  role?: UserRole;
+  student_id_number?: string;
+  is_active?: boolean;
+  password?: string;
+};
+
+export async function patchUser(userId: string, body: UserUpdatePayload): Promise<UserRead> {
+  return apiJson<UserRead>(`/api/users/${userId}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function deleteUserAccount(userId: string): Promise<void> {
+  await apiJson(`/api/users/${userId}`, { method: "DELETE" });
+}
