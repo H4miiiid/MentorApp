@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 
 class GradingModelRead(BaseModel):
     id: str
     display_name: str
-    gguf_filename: str
+    notes: str
     openai_model_name: str
     n_ctx: int = 8192
     is_active: bool
@@ -18,24 +18,33 @@ class GradingModelRead(BaseModel):
 
 class GradingModelCreate(BaseModel):
     display_name: str = Field(max_length=200)
-    gguf_filename: str = Field(max_length=512)
+    notes: str = Field(
+        default="",
+        max_length=512,
+        validation_alias=AliasChoices("notes", "gguf_filename"),
+    )
     openai_model_name: str = Field(max_length=200)
     n_ctx: int = Field(default=8192, ge=256, le=131072)
 
 
 class GradingModelUpdate(BaseModel):
     display_name: str | None = Field(default=None, max_length=200)
-    gguf_filename: str | None = Field(default=None, max_length=512)
+    notes: str | None = Field(
+        default=None,
+        max_length=512,
+        validation_alias=AliasChoices("notes", "gguf_filename"),
+    )
     openai_model_name: str | None = Field(default=None, max_length=200)
     n_ctx: int | None = Field(default=None, ge=256, le=131072)
 
 
 class GradingStatusResponse(BaseModel):
-    """Llama HTTP health + active catalog row (for admin diagnostics)."""
+    """Remote llama.cpp HTTP health + active catalog row (for admin diagnostics)."""
 
     llama_health_ok: bool
     llama_health_url: str
     llama_server_url: str
     active_model: GradingModelRead | None
-    compose_gguf_hint: str
+    llama_auto_start: bool
+    llama_health_error: str | None = None
     note: str

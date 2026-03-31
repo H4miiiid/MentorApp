@@ -1,6 +1,6 @@
 """Workflow node requirements (audit reference for LangGraph grading).
 
-Each node in `graph.py` may depend on sandbox execution, local llama.cpp (SFT),
+Each node in `graph.py` may depend on sandbox execution, remote llama.cpp SFT (OpenAI-compatible),
 OpenRouter API keys, Chroma RAG, or outbound web search. Use this map for
 operations docs and optional preflight checks.
 """
@@ -23,7 +23,7 @@ class NodeRequirement(TypedDict):
 
 
 # run_checks: compile + execute student code — must be isolated (Docker sandbox).
-# SFT nodes: local llama-server OpenAI-compatible API.
+# SFT nodes: llama.cpp OpenAI-compatible API (remote or local).
 # reflection_critic, external_expert_repair, summarize (when OpenRouter key set): OpenRouter.
 # retrieve_local_docs, assess_local_context: Chroma + optional sentence-transformers on host.
 # web_search_docs: duckduckgo-search (network).
@@ -62,7 +62,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
-        "notes": "Local fine-tuned repair via llama.cpp server.",
+        "notes": "Fine-tuned repair via llama.cpp HTTP server (LLAMA_SERVER_URL /v1).",
     },
     {
         "node": "retrieve_local_docs",

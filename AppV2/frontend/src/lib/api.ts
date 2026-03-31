@@ -256,7 +256,7 @@ export async function fetchAdminConfig(): Promise<AdminConfigResponse> {
 export type GradingModelRead = {
   id: string;
   display_name: string;
-  gguf_filename: string;
+  notes: string;
   openai_model_name: string;
   n_ctx: number;
   is_active: boolean;
@@ -269,13 +269,14 @@ export type GradingStatusResponse = {
   llama_health_url: string;
   llama_server_url: string;
   active_model: GradingModelRead | null;
-  compose_gguf_hint: string;
+  llama_auto_start: boolean;
+  llama_health_error: string | null;
   note: string;
 };
 
 export type GradingModelCreateBody = {
   display_name: string;
-  gguf_filename: string;
+  notes?: string;
   openai_model_name: string;
   n_ctx?: number;
 };
@@ -293,7 +294,7 @@ export async function createGradingModel(body: GradingModelCreateBody): Promise<
     method: "POST",
     body: JSON.stringify({
       display_name: body.display_name.trim(),
-      gguf_filename: body.gguf_filename.trim(),
+      notes: (body.notes ?? "").trim(),
       openai_model_name: body.openai_model_name.trim(),
       n_ctx: body.n_ctx ?? 8192,
     }),

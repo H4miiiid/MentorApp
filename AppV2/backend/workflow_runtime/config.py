@@ -42,8 +42,11 @@ if load_dotenv is not None:
 else:
     _load_env_fallback()
 
-# Repo root (…/MentorApp): same layout as App v1 + Graph Workflow notebook (models/gguf, VectorDB/…).
+# Repo root (…/MentorApp): VectorDB layout matches App v1 + Graph Workflow notebook.
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+
+# Local dev default when LLAMA_SERVER_URL is unset; Docker Compose requires LLAMA_SERVER_URL in .env.
+_LLAMA_SERVER_URL: str = os.getenv("LLAMA_SERVER_URL", "").strip() or "http://127.0.0.1:8081/v1"
 
 
 def _resolve_chroma_dir() -> str:
@@ -55,15 +58,16 @@ def _resolve_chroma_dir() -> str:
 
 @dataclass(frozen=True)
 class WorkflowConfig:
-    llama_server_url: str = os.getenv("LLAMA_SERVER_URL", "http://127.0.0.1:8081/v1").strip()
+    # OpenAI-compatible base URL for llama.cpp HTTP server (e.g. https://vast-host:port/v1).
+    llama_server_url: str = _LLAMA_SERVER_URL
     llama_model: str = os.getenv("LLAMA_OPENAI_MODEL", "local-gguf").strip()
     llama_server_host: str = os.getenv("LLAMA_SERVER_HOST", "127.0.0.1").strip()
     llama_server_port: int = int(os.getenv("LLAMA_SERVER_PORT", "8081"))
     llama_server_ctx: int = int(os.getenv("LLAMA_SERVER_CTX", "8192"))
     llama_server_n_gpu_layers: int = int(os.getenv("LLAMA_SERVER_N_GPU_LAYERS", "999"))
     llama_server_threads: int = int(os.getenv("LLAMA_SERVER_THREADS", str(max(1, (os.cpu_count() or 4) - 1))))
-    # Default false: Docker / CI have no llama-server binary; run llama-server on the host and connect.
-    # Local one-click auto-spawn: set LLAMA_SERVER_AUTO_START=true (and LOCAL_GGUF_PATH, etc.).
+    # Default false: production points at a remote llama.cpp (Vast AI, etc.). Host-only dev may set
+    # LLAMA_SERVER_AUTO_START=true with LOCAL_GGUF_PATH to spawn a local llama-server binary.
     llama_server_auto_start: bool = _bool_env("LLAMA_SERVER_AUTO_START", False)
     llama_server_path: str = os.getenv("LLAMA_SERVER_PATH", "").strip()
     local_gguf_path: str = os.getenv("LOCAL_GGUF_PATH", "").strip()

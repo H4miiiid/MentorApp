@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import os
 from datetime import datetime, timezone
 from typing import Annotated
 
@@ -29,6 +28,7 @@ from ...schemas.grading_model import (
     GradingStatusResponse,
 )
 from ...workflow_runtime.config import CFG
+from ...workflow_runtime.llm_clients import llama_health_url_from_openai_base
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -67,7 +67,7 @@ def _grading_model_read(m: GradingModel) -> GradingModelRead:
     return GradingModelRead(
         id=m.id,
         display_name=m.display_name,
-        gguf_filename=m.gguf_filename,
+        notes=m.gguf_filename,
         openai_model_name=m.openai_model_name,
         n_ctx=m.n_ctx,
         is_active=m.is_active,
@@ -96,27 +96,30 @@ def _submission_read(s: Submission) -> SubmissionRead:
 
 @router.get("/grading/status", response_model=GradingStatusResponse)
 def get_grading_status(_: Annotated[User, Depends(require_admin)]) -> GradingStatusResponse:
-    base = CFG.llama_server_url.rstrip("/")
-    health_url = base.replace("/v1", "") + "/health"
+    health_url = llama_health_url_from_openai_base(CFG.llama_server_url)
     ok = False
+    health_err: str | None = None
     try:
         r = requests.get(health_url, timeout=3)
         ok = r.status_code == 200
-    except Exception:
+        if not ok:
+            health_err = f"HTTP {r.status_code}"
+    except Exception as exc:
         ok = False
+        health_err = str(exc)
     active = get_active_grading_model()
-    gguf_hint = os.getenv("LLAMA_GGUF_FILE", "model.gguf")
     note = (
-        "The llama sidecar loads one GGUF from the host models directory. "
-        "After changing the active model's `gguf_filename`, restart the llama service so it serves that file, "
-        "or keep filenames aligned with your compose `LLAMA_GGUF_FILE`."
+        "SFT grading uses ChatOpenAI against LLAMA_SERVER_URL (OpenAI-compatible /v1), typically a remote "
+        "llama.cpp instance (e.g. on Vast AI). The active catalog row sets the model id string; that model "
+        "must be loaded on the remote server. LLAMA_SERVER_AUTO_START is for local host dev only."
     )
     return GradingStatusResponse(
         llama_health_ok=ok,
         llama_health_url=health_url,
         llama_server_url=CFG.llama_server_url,
         active_model=_grading_model_read(active) if active else None,
-        compose_gguf_hint=gguf_hint,
+        llama_auto_start=CFG.llama_server_auto_start,
+        llama_health_error=health_err,
         note=note,
     )
 
@@ -139,7 +142,7 @@ def create_grading_model(
     is_first = len(existing) == 0
     m = GradingModel(
         display_name=body.display_name.strip(),
-        gguf_filename=body.gguf_filename.strip(),
+        gguf_filename=body.notes.strip(),
         openai_model_name=body.openai_model_name.strip(),
         n_ctx=body.n_ctx,
         is_active=is_first,
@@ -163,8 +166,8 @@ def update_grading_model(
         raise HTTPException(status_code=404, detail="Grading model not found")
     if body.display_name is not None:
         m.display_name = body.display_name.strip()
-    if body.gguf_filename is not None:
-        m.gguf_filename = body.gguf_filename.strip()
+    if body.notes is not None:
+        m.gguf_filename = body.notes.strip()
     if body.openai_model_name is not None:
         m.openai_model_name = body.openai_model_name.strip()
     if body.n_ctx is not None:

@@ -1,39 +1,11 @@
 services:
-  # Official llama.cpp HTTP server (OpenAI-compatible /v1). Default GGUF dir matches App v1 / LangGraph notebook: repo-root models/gguf.
-  # Put your .gguf there (or set LLAMA_MODELS_DIR + LLAMA_GGUF_FILE). Example filename from notebooks: qwen2_5_coder_7b_merged_f16.gguf.
-  llama:
-    image: ghcr.io/ggml-org/llama.cpp:server
-    volumes:
-      - ${LLAMA_MODELS_DIR:-../models/gguf}:/models:ro
-    ports:
-      - "${LLAMA_HOST_PORT:-8081}:8081"
-    command:
-      - "-m"
-      - "/models/${LLAMA_GGUF_FILE:-model.gguf}"
-      - "--port"
-      - "8081"
-      - "--host"
-      - "0.0.0.0"
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-fsS",
-          "http://127.0.0.1:8081/health",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 120s
-
   backend:
     build:
       context: ..
       dockerfile: AppV2/backend/Dockerfile
     ports:
       - "${BACKEND_PORT:-8001}:8001"
-    # LangGraph grading needs llama /health up before jobs run; wait for logs or curl :8081/health. Mock backend does not need llama.
+    # LangGraph grading uses a remote OpenAI-compatible llama.cpp endpoint (e.g. Vast AI). Set LLAMA_SERVER_URL in .env.
     environment:
       APPV2_HOST: "0.0.0.0"
       APPV2_PORT: "8001"
@@ -42,7 +14,7 @@ services:
       # Default dev secret; override via .env: APPV2_JWT_SECRET=... for production
       APPV2_JWT_SECRET: ${APPV2_JWT_SECRET:-97f5abc077ec811e4a007cfe1680bb089c42325a61ff667496f70d4a36b6cfc32773082aeb6ebff5b6d03f0a4191deb6}
       APPV2_JWT_EXPIRE_MINUTES: ${APPV2_JWT_EXPIRE_MINUTES:-1440}
-      # LangGraph grading uses the llama sidecar. For mock-only, set APPV2_GRADING_BACKEND=mock and remove or stop the llama service if you do not want it running.
+      # For mock-only grading, set APPV2_GRADING_BACKEND=mock (no remote llama needed).
       APPV2_GRADING_WORKER_ENABLED: ${APPV2_GRADING_WORKER_ENABLED:-true}
       APPV2_GRADING_BACKEND: ${APPV2_GRADING_BACKEND:-langgraph}
       APPV2_GRADING_MAX_ATTEMPTS: ${APPV2_GRADING_MAX_ATTEMPTS:-6}
@@ -50,16 +22,15 @@ services:
       APPV2_GRADING_MOCK_SLEEP_SECONDS: ${APPV2_GRADING_MOCK_SLEEP_SECONDS:-10}
       # INFO shows grading-worker / mock / future LangGraph; use DEBUG for verbose agent traces
       APPV2_LOG_LEVEL: ${APPV2_LOG_LEVEL:-INFO}
-      # Same Docker network as the llama service (override to use host.docker.internal:8081 if llama runs on the host).
-      LLAMA_SERVER_URL: ${LLAMA_SERVER_URL:-http://llama:8081/v1}
+      # Required: remote llama.cpp HTTP server with OpenAI-compatible /v1 (e.g. Vast AI). Must include trailing /v1.
+      LLAMA_SERVER_URL: ${LLAMA_SERVER_URL:?Set LLAMA_SERVER_URL in .env to your llama.cpp OpenAI-compatible base URL (e.g. https://host:port/v1)}
       LLAMA_SERVER_AUTO_START: ${LLAMA_SERVER_AUTO_START:-false}
       LLAMA_SERVER_PATH: ${LLAMA_SERVER_PATH:-}
       LOCAL_GGUF_PATH: ${LOCAL_GGUF_PATH:-}
       # Same Chroma path convention as App v1 (VectorDB/chroma_library_docs under repo root); host dir mounted below.
       MENTOR_APP_VECTOR_DB_PATH: ${MENTOR_APP_VECTOR_DB_PATH:-/vector/chroma_library_docs}
       MENTOR_APP_VECTOR_COLLECTION: ${MENTOR_APP_VECTOR_COLLECTION:-library_docs}
-      # Align DB bootstrap default grading row with the llama sidecar GGUF filename.
-      LLAMA_GGUF_FILE: ${LLAMA_GGUF_FILE:-model.gguf}
+      # Default OpenAI-compatible model id for DB bootstrap when grading_models is empty (must match the remote server).
       LLAMA_OPENAI_MODEL: ${LLAMA_OPENAI_MODEL:-local-gguf}
       # Sandboxed code execution via host Docker (docker CLI in backend image + socket mount).
       SANDBOX_USE_DOCKER: ${SANDBOX_USE_DOCKER:-true}

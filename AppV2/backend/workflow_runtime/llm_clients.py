@@ -15,18 +15,22 @@ from AppV2.backend.workflow_runtime.server_manager import ensure_llama_server_ru
 from AppV2.backend.workflow_runtime.state import extract_failure_signature
 
 
-def ensure_llama_server_available() -> None:
-    """Verify llama.cpp ``llama-server`` HTTP API (same contract as App v1).
+def llama_health_url_from_openai_base(openai_base_url: str) -> str:
+    """Derive llama.cpp ``/health`` URL from the OpenAI-compatible ``/v1`` base (same as App v1)."""
+    base = openai_base_url.rstrip("/")
+    return base.replace("/v1", "") + "/health"
 
-    - If ``LLAMA_SERVER_AUTO_START`` is true (typical **host** dev): try to spawn ``llama-server``
-      when ``/health`` is down (needs ``LLAMA_SERVER_PATH`` or ``llama-server`` on ``PATH``, plus
-      ``LOCAL_GGUF_PATH``).
-    - If false (typical **Docker**): expect you already started ``llama-server`` elsewhere (e.g. on
-      the host) and set ``LLAMA_SERVER_URL`` to reach it (e.g. ``http://host.docker.internal:8081/v1``).
+
+def ensure_llama_server_available() -> None:
+    """Verify the llama.cpp HTTP server responds on ``/health`` (OpenAI API lives under ``/v1``).
+
+    - **Remote (default in Docker):** set ``LLAMA_SERVER_URL`` to the OpenAI-compatible base URL of your
+      hosted llama.cpp instance (e.g. Vast AI), typically ending with ``/v1``. Keep ``LLAMA_SERVER_AUTO_START=false``.
+    - **Host dev with auto-start:** set ``LLAMA_SERVER_AUTO_START=true`` and configure ``LOCAL_GGUF_PATH`` /
+      ``LLAMA_SERVER_PATH`` so a local ``llama-server`` binary can be spawned when ``/health`` is down.
     """
     setup_langsmith()
-    base = CFG.llama_server_url.rstrip("/")
-    health_url = base.replace("/v1", "") + "/health"
+    health_url = llama_health_url_from_openai_base(CFG.llama_server_url)
 
     if CFG.llama_server_auto_start:
         ensure_llama_server_running()
@@ -35,16 +39,16 @@ def ensure_llama_server_available() -> None:
         response = requests.get(health_url, timeout=3)
     except Exception as exc:
         raise RuntimeError(
-            f"Cannot connect to llama-server at {health_url}: {exc}. "
-            "Start llama-server on the host: `llama-server --model <file.gguf> --host 0.0.0.0 --port 8081` "
-            "(port must match LLAMA_SERVER_URL). From Docker use e.g. http://host.docker.internal:8081/v1 "
-            "and LLAMA_SERVER_AUTO_START=false. If you do not need local SFT grading yet, use "
-            "APPV2_GRADING_BACKEND=mock."
+            f"Cannot reach llama.cpp HTTP server at {health_url} (from LLAMA_SERVER_URL={CFG.llama_server_url!r}): {exc}. "
+            "Confirm the remote Vast AI (or other) llama.cpp endpoint is up and that LLAMA_SERVER_URL points to its "
+            "OpenAI-compatible base (usually ending with /v1). For local-only experiments you can run llama-server "
+            "on the host and set LLAMA_SERVER_URL accordingly, or set APPV2_GRADING_BACKEND=mock to skip SFT grading."
         ) from exc
 
     if response.status_code != 200:
         raise RuntimeError(
-            f"llama-server health check failed at {health_url} with status {response.status_code}"
+            f"llama.cpp health check failed at {health_url} with HTTP status {response.status_code}. "
+            "Verify the remote server is healthy and LLAMA_SERVER_URL matches its OpenAI-compatible base."
         )
 
 

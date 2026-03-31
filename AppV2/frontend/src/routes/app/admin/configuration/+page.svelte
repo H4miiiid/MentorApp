@@ -21,7 +21,7 @@
   let loading = true;
 
   let newName = "";
-  let newGguf = "";
+  let newNotes = "";
   let newOpenai = "";
   let newCtx = 8192;
   let busy = false;
@@ -73,8 +73,8 @@
 
   async function onCreate(e: Event) {
     e.preventDefault();
-    if (!newName.trim() || !newGguf.trim() || !newOpenai.trim()) {
-      errorMsg = "Fill display name, GGUF filename, and OpenAI model name.";
+    if (!newName.trim() || !newOpenai.trim()) {
+      errorMsg = "Fill display name and OpenAI model id (remote llama.cpp).";
       return;
     }
     busy = true;
@@ -82,12 +82,12 @@
     try {
       await createGradingModel({
         display_name: newName,
-        gguf_filename: newGguf,
+        notes: newNotes,
         openai_model_name: newOpenai,
         n_ctx: newCtx,
       });
       newName = "";
-      newGguf = "";
+      newNotes = "";
       newOpenai = "";
       newCtx = 8192;
       await load();
@@ -108,8 +108,8 @@
   />
   <h1 class="gh-title" style="margin-top: 0; margin-bottom: 8px;">Configuration</h1>
   <p class="gh-subtitle" style="margin-bottom: 20px;">
-    Backend settings and grading model catalog. Llama must serve the GGUF file that matches your deployment;
-    restart the llama container after changing files on disk.
+    Backend settings and grading model catalog. SFT grading uses a remote OpenAI-compatible llama.cpp endpoint
+    (<code>LLAMA_SERVER_URL</code>); the active catalog row must match the model id served there.
   </p>
 
   {#if errorMsg}
@@ -144,9 +144,9 @@
 
     {#if status}
       <div class="gh-card" style="max-width: none; margin-bottom: 20px;">
-        <h2 class="gh-title" style="font-size: 18px; margin-top: 0;">Grading / llama.cpp</h2>
+        <h2 class="gh-title" style="font-size: 18px; margin-top: 0;">Grading / remote llama.cpp</h2>
         <dl class="gh-dl">
-          <dt>Llama HTTP health</dt>
+          <dt>Endpoint HTTP health</dt>
           <dd>
             <span
               class="gh-monitoring-pill"
@@ -157,16 +157,22 @@
             </span>
             <code style="margin-left: 8px;">{status.llama_health_url}</code>
           </dd>
+          {#if !status.llama_health_ok && status.llama_health_error}
+            <dt>Health error</dt>
+            <dd><code>{status.llama_health_error}</code></dd>
+          {/if}
           <dt>LLAMA_SERVER_URL</dt>
           <dd><code>{status.llama_server_url}</code></dd>
-          <dt>Compose GGUF hint</dt>
-          <dd><code>{status.compose_gguf_hint}</code></dd>
+          <dt>LLAMA_SERVER_AUTO_START</dt>
+          <dd>{status.llama_auto_start ? "true (local dev spawn)" : "false (remote / manual)"}</dd>
           <dt>Active catalog model</dt>
           <dd>
             {#if status.active_model}
               <strong>{status.active_model.display_name}</strong>
-              — OpenAI name <code>{status.active_model.openai_model_name}</code>,
-              GGUF file <code>{status.active_model.gguf_filename}</code>
+              — OpenAI model id <code>{status.active_model.openai_model_name}</code>
+              {#if status.active_model.notes}
+                — notes <code>{status.active_model.notes}</code>
+              {/if}
             {:else}
               <span class="gh-muted">None</span>
             {/if}
@@ -179,8 +185,8 @@
     <div class="gh-card" style="max-width: none;">
       <h2 class="gh-title" style="font-size: 18px; margin-top: 0;">Grading model catalog</h2>
       <p class="gh-muted" style="margin-top: 0;">
-        The <strong>active</strong> row sets the OpenAI <code>model</code> string sent to llama-server for SFT steps.
-        Keep <code>gguf_filename</code> aligned with the file on disk and the llama sidecar <code>-m</code> flag.
+        The <strong>active</strong> row sets the OpenAI <code>model</code> string sent to the remote llama.cpp server
+        for SFT steps. It must match the model loaded on your Vast AI (or other) endpoint.
       </p>
 
       <div style="overflow-x: auto;">
@@ -188,7 +194,7 @@
           <thead>
             <tr>
               <th style="text-align: left; padding: 8px;">Name</th>
-              <th style="text-align: left; padding: 8px;">GGUF file</th>
+              <th style="text-align: left; padding: 8px;">Notes</th>
               <th style="text-align: left; padding: 8px;">OpenAI model id</th>
               <th style="text-align: left; padding: 8px;">Ctx</th>
               <th style="text-align: left; padding: 8px;">Active</th>
@@ -199,7 +205,9 @@
             {#each models as m}
               <tr>
                 <td style="padding: 8px; border-top: 1px solid var(--gh-border);">{m.display_name}</td>
-                <td style="padding: 8px; border-top: 1px solid var(--gh-border);"><code>{m.gguf_filename}</code></td>
+                <td style="padding: 8px; border-top: 1px solid var(--gh-border);"
+                  ><code>{m.notes || "—"}</code></td
+                >
                 <td style="padding: 8px; border-top: 1px solid var(--gh-border);"><code>{m.openai_model_name}</code></td>
                 <td style="padding: 8px; border-top: 1px solid var(--gh-border);">{m.n_ctx}</td>
                 <td style="padding: 8px; border-top: 1px solid var(--gh-border);">{m.is_active ? "yes" : ""}</td>
@@ -228,14 +236,19 @@
         <h3 class="gh-title" style="font-size: 15px; margin: 0;">Add catalog entry</h3>
         <label>
           Display name
-          <input class="gh-input" type="text" bind:value={newName} placeholder="e.g. Qwen SFT" />
+          <input class="gh-input" type="text" bind:value={newName} placeholder="e.g. Qwen SFT (Vast)" />
         </label>
         <label>
-          GGUF filename (under host/models/gguf)
-          <input class="gh-input" type="text" bind:value={newGguf} placeholder="model.gguf" />
+          Notes (optional)
+          <input
+            class="gh-input"
+            type="text"
+            bind:value={newNotes}
+            placeholder="e.g. Vast instance id or HF model id"
+          />
         </label>
         <label>
-          OpenAI model name (sent to llama-server)
+          OpenAI model id (must match remote llama.cpp)
           <input class="gh-input" type="text" bind:value={newOpenai} placeholder="local-gguf" />
         </label>
         <label>

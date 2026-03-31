@@ -1,7 +1,7 @@
 """Persistent global grading model selection (SQLite).
 
 Exactly one `GradingModel.is_active` row is preferred; bootstrap creates a default
-from `LLAMA_GGUF_FILE` / `LLAMA_OPENAI_MODEL` when the table is empty.
+from `LLAMA_OPENAI_MODEL` when the table is empty.
 """
 
 from __future__ import annotations
@@ -28,17 +28,16 @@ def ensure_grading_models_bootstrapped() -> None:
     with Session(engine) as session:
         rows = list(session.exec(select(GradingModel)).all())
         if not rows:
-            gguf = os.getenv("LLAMA_GGUF_FILE", "model.gguf").strip() or "model.gguf"
             openai = os.getenv("LLAMA_OPENAI_MODEL", "local-gguf").strip() or "local-gguf"
             m = GradingModel(
                 display_name="Default",
-                gguf_filename=gguf,
+                gguf_filename="",
                 openai_model_name=openai,
                 is_active=True,
             )
             session.add(m)
             session.commit()
-            logger.info("grading_models: created default catalog row | gguf=%s openai=%s", gguf, openai)
+            logger.info("grading_models: created default catalog row | openai=%s", openai)
             return
         if not any(r.is_active for r in rows):
             first = rows[0]
@@ -50,7 +49,7 @@ def ensure_grading_models_bootstrapped() -> None:
 
 
 def get_active_openai_model_name() -> str:
-    """OpenAI-compatible model name for ChatOpenAI -> llama-server."""
+    """OpenAI-compatible model name for ChatOpenAI -> remote llama.cpp."""
     try:
         engine = get_engine()
         with Session(engine) as session:
