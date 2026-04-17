@@ -4,8 +4,9 @@ from typing import Any
 
 from langgraph.graph import END, StateGraph
 
-from AppV2.backend.workflow_runtime.llm_clients import ensure_llama_server_available
+from AppV2.backend.workflow_runtime.llm_clients import ensure_hf_endpoint_available
 from AppV2.backend.workflow_runtime.observability import setup_langsmith
+from AppV2.backend.workflow_runtime.sandbox import SandboxUnavailableError
 from AppV2.backend.workflow_runtime.nodes import (
     assess_local_context,
     attempt_sft_with_rag,
@@ -133,7 +134,7 @@ def run_workflow(
     run_id: str = "",
 ) -> dict[str, Any]:
     setup_langsmith()
-    ensure_llama_server_available()
+    ensure_hf_endpoint_available()
 
     app = build_graph()
     ctx = {}
@@ -148,14 +149,42 @@ def run_workflow(
         max_attempts=max_attempts,
         workflow_context=ctx or None,
     )
-    final_state = app.invoke(state)
+    try:
+        final_state = app.invoke(state)
+    except SandboxUnavailableError as exc:
+        # Infra failure — do NOT pretend the student's code was wrong.
+        return {
+            "final_code": original_code,
+            "final_status": "sandbox_unavailable",
+            "attempt_count": 0,
+            "max_attempts": max_attempts,
+            "route_history": ["run_checks"],
+            "attempt_history": [],
+            "error_category": "sandbox_unavailable",
+            "stop_reason": "sandbox_unavailable",
+            "no_meaningful_change_count": 0,
+            "repeated_failure_count": 0,
+            "sandbox_error": str(exc),
+        }
 
     return {
         "final_code": final_state["final_code"],
         "final_status": final_state["final_status"],
         "attempt_count": final_state["attempt_count"],
+        "max_attempts": final_state["max_attempts"],
         "route_history": final_state["route_history"],
         "attempt_history": final_state["attempt_history"],
         "error_category": final_state.get("error_category", ""),
         "stop_reason": final_state.get("stop_reason", ""),
+        "no_meaningful_change_count": final_state.get("no_meaningful_change_count", 0),
+        "repeated_failure_count": final_state.get("repeated_failure_count", 0),
+        # Snapshot of the student's ORIGINAL failing run. These survive LLM repairs and let
+        # the grader + UI distinguish a clean first-try pass from a "we had to fix it for you"
+        # pass, and let the student see the actual mistake in their own code.
+        "initial_traceback": final_state.get("initial_traceback", ""),
+        "initial_error_category": final_state.get("initial_error_category", ""),
+        "initial_error_type": final_state.get("initial_error_type", ""),
+        "initial_error_explanation": final_state.get("initial_error_explanation", ""),
+        "initial_stdout": final_state.get("initial_stdout", ""),
+        "initial_stderr": final_state.get("initial_stderr", ""),
     }

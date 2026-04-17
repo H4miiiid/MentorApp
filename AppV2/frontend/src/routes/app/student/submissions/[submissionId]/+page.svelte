@@ -2,7 +2,9 @@
   import { page } from "$app/stores";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
   import { fetchAssignment, fetchSubmission, type AssignmentRead, type SubmissionRead } from "$lib/api";
+  import FeedbackPanel from "$lib/components/FeedbackPanel.svelte";
   import SubmissionStatusBadge from "$lib/components/SubmissionStatusBadge.svelte";
+  import UnifiedDiffView from "$lib/components/UnifiedDiffView.svelte";
   import { formatDateTime, formatSubmissionGrade } from "$lib/format";
   import { PATH_STUDENT_HOME, PATH_STUDENT_SUBMISSIONS } from "$lib/paths";
 
@@ -109,10 +111,7 @@
       <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
         Unified diff between your submission and the corrected version.
       </p>
-      <div class="gh-code-view-shell">
-        <div class="gh-code-editor-toolbar">Diff</div>
-        <pre class="gh-code-block gh-code-block-python">{submission.diff?.trim() || "—"}</pre>
-      </div>
+      <UnifiedDiffView diff={submission.diff ?? ""} />
 
       <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Stdout</h2>
       <div class="gh-code-view-shell">
@@ -120,11 +119,11 @@
         <pre class="gh-code-block gh-code-block-python">{submission.stdout?.trim() || "—"}</pre>
       </div>
 
-      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Feedback</h2>
-      <div class="gh-code-view-shell">
-        <div class="gh-code-editor-toolbar">Text</div>
-        <pre class="gh-code-block gh-code-block-python">{submission.feedback?.trim() || "—"}</pre>
-      </div>
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Grader feedback</h2>
+      <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
+        Summary of what the autograder found, which repair strategies it tried, and why it stopped.
+      </p>
+      <FeedbackPanel feedback={submission.feedback ?? ""} studentView={true} />
     {/if}
   {/if}
 </section>

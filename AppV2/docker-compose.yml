@@ -5,7 +5,9 @@ services:
       dockerfile: AppV2/backend/Dockerfile
     ports:
       - "${BACKEND_PORT:-8001}:8001"
-    # LangGraph grading uses a remote OpenAI-compatible llama.cpp endpoint (e.g. Vast AI). Set LLAMA_SERVER_URL in .env.
+    # LangGraph: HF Inference Endpoint for SFT (not a llama.cpp container). Ephemeral `docker run`
+    # containers for student code are the grading sandbox (SANDBOX_*), not model servers.
+    # Set HF_INFERENCE_BASE_URL in .env.
     environment:
       APPV2_HOST: "0.0.0.0"
       APPV2_PORT: "8001"
@@ -14,7 +16,7 @@ services:
       # Default dev secret; override via .env: APPV2_JWT_SECRET=... for production
       APPV2_JWT_SECRET: ${APPV2_JWT_SECRET:-97f5abc077ec811e4a007cfe1680bb089c42325a61ff667496f70d4a36b6cfc32773082aeb6ebff5b6d03f0a4191deb6}
       APPV2_JWT_EXPIRE_MINUTES: ${APPV2_JWT_EXPIRE_MINUTES:-1440}
-      # For mock-only grading, set APPV2_GRADING_BACKEND=mock (no remote llama needed).
+      # For mock-only grading, set APPV2_GRADING_BACKEND=mock (no endpoint needed).
       APPV2_GRADING_WORKER_ENABLED: ${APPV2_GRADING_WORKER_ENABLED:-true}
       APPV2_GRADING_BACKEND: ${APPV2_GRADING_BACKEND:-langgraph}
       APPV2_GRADING_MAX_ATTEMPTS: ${APPV2_GRADING_MAX_ATTEMPTS:-6}
@@ -22,26 +24,44 @@ services:
       APPV2_GRADING_MOCK_SLEEP_SECONDS: ${APPV2_GRADING_MOCK_SLEEP_SECONDS:-10}
       # INFO shows grading-worker / mock / future LangGraph; use DEBUG for verbose agent traces
       APPV2_LOG_LEVEL: ${APPV2_LOG_LEVEL:-INFO}
-      # Required: remote llama.cpp HTTP server with OpenAI-compatible /v1 (e.g. Vast AI). Must include trailing /v1.
-      LLAMA_SERVER_URL: ${LLAMA_SERVER_URL:?Set LLAMA_SERVER_URL in .env to your llama.cpp OpenAI-compatible base URL (e.g. https://host:port/v1)}
-      LLAMA_SERVER_AUTO_START: ${LLAMA_SERVER_AUTO_START:-false}
-      LLAMA_SERVER_PATH: ${LLAMA_SERVER_PATH:-}
-      LOCAL_GGUF_PATH: ${LOCAL_GGUF_PATH:-}
+      # Required: Hugging Face Inference Endpoint OpenAI-compatible /v1 base URL.
+      HF_INFERENCE_BASE_URL: ${HF_INFERENCE_BASE_URL:?Set HF_INFERENCE_BASE_URL in .env to your Hugging Face OpenAI-compatible endpoint URL (e.g. https://host/v1)}
+      # Optional: Hub token for downloading RAG embedding models (rate limits + fewer warnings).
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_HUB_DISABLE_TELEMETRY: ${HF_HUB_DISABLE_TELEMETRY:-1}
+      # SFT calls to the inference endpoint (avoid long default OpenAI client retry loops).
+      SFT_HTTP_TIMEOUT_SECONDS: ${SFT_HTTP_TIMEOUT_SECONDS:-90}
+      SFT_MAX_RETRIES: ${SFT_MAX_RETRIES:-1}
+      # Preload Chroma embedder + reranker at startup (reduces first-submission latency).
+      RAG_WARMUP_ON_STARTUP: ${RAG_WARMUP_ON_STARTUP:-true}
       # Same Chroma path convention as App v1 (VectorDB/chroma_library_docs under repo root); host dir mounted below.
       MENTOR_APP_VECTOR_DB_PATH: ${MENTOR_APP_VECTOR_DB_PATH:-/vector/chroma_library_docs}
       MENTOR_APP_VECTOR_COLLECTION: ${MENTOR_APP_VECTOR_COLLECTION:-library_docs}
-      # Default OpenAI-compatible model id for DB bootstrap when grading_models is empty (must match the remote server).
-      LLAMA_OPENAI_MODEL: ${LLAMA_OPENAI_MODEL:-local-gguf}
-      # Sandboxed code execution via host Docker (docker CLI in backend image + socket mount).
+      # Default OpenAI-compatible model id for DB bootstrap when grading_models is empty.
+      HF_OPENAI_MODEL: ${HF_OPENAI_MODEL:-hf-endpoint-model}
+      # Sandboxed student code: `docker run --rm` per check (not a Compose service).
       SANDBOX_USE_DOCKER: ${SANDBOX_USE_DOCKER:-true}
       SANDBOX_ALLOW_UNSAFE_FALLBACK: ${SANDBOX_ALLOW_UNSAFE_FALLBACK:-false}
       SANDBOX_PYTHON_IMAGE: ${SANDBOX_PYTHON_IMAGE:-python:3.13-slim-bookworm}
+      # Feed stdin so input() works (blank lines; override with SANDBOX_STDIN in .env if needed).
+      SANDBOX_STDIN_BLANK_LINES: ${SANDBOX_STDIN_BLANK_LINES:-512}
+      # Shared scratch volume so the backend (running in a container) can share candidate.py
+      # with sibling sandbox containers spawned by the host Docker daemon. A plain
+      # tempfile.mkdtemp() path inside the backend container is NOT visible to the host
+      # daemon, so `-v /tmp/...:/work` silently mounts an empty directory and the sandbox
+      # fails with "cannot open /work/candidate.py". Using a named volume with a per-run
+      # sub-path fixes this cleanly (see workflow_runtime/sandbox.py).
+      SANDBOX_SCRATCH_VOLUME: mentorapp-sandbox-scratch
+      SANDBOX_SCRATCH_DIR: /sandbox-scratch
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - appv2-data:/data
       - ${VECTOR_DB_DIR:-../VectorDB}:/vector
+      # Persist Hugging Face Hub model cache between restarts (RAG embeddings / reranker).
+      - hf-hub-cache:/root/.cache/huggingface
       - /var/run/docker.sock:/var/run/docker.sock
+      - sandbox-scratch:/sandbox-scratch
     # Default admin is created on startup if missing (see APPV2_BOOTSTRAP_ADMIN in backend core/config).
     # Optional: APPV2_BOOTSTRAP_ADMIN=false, APPV2_ADMIN_EMAIL, APPV2_ADMIN_PASSWORD. CLI: python -m AppV2.backend.bootstrap_admin
     healthcheck:
@@ -68,3 +88,6 @@ services:
 
 volumes:
   appv2-data:
+  hf-hub-cache:
+  sandbox-scratch:
+    name: mentorapp-sandbox-scratch

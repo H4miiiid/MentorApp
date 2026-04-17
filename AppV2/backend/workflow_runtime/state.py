@@ -44,6 +44,14 @@ class RepairState(TypedDict):
     summarized_hints: str
     reflection_feedback: dict[str, Any]
     initial_traceback: str
+    # Snapshot of the student's *original* first-attempt run (before any LLM repair).
+    # Used to (a) surface the real error in the UI even when the workflow later succeeds,
+    # and (b) drive the "repaired vs. clean pass" grading policy.
+    initial_error_category: str
+    initial_error_type: str
+    initial_error_explanation: str
+    initial_stdout: str
+    initial_stderr: str
 
     next_strategy: str
     failure_signature: str
@@ -174,6 +182,15 @@ def classify_error(traceback_text: str, check_result: dict[str, Any]) -> dict[st
             "error_line": error_line,
         }
 
+    # input() hitting EOF (no stdin) — sandbox now feeds blank lines by default
+    if err_lower == "eoferror":
+        return {
+            "category": "stdin_eof",
+            "error_type": error_type,
+            "error_explanation": error_msg,
+            "error_line": error_line,
+        }
+
     api_indicators = [
         "importerror",
         "modulenotfounderror",
@@ -255,6 +272,11 @@ def init_state(
         summarized_hints="",
         reflection_feedback={},
         initial_traceback="",
+        initial_error_category="",
+        initial_error_type="",
+        initial_error_explanation="",
+        initial_stdout="",
+        initial_stderr="",
         next_strategy="",
         failure_signature="",
         previous_failure_signature="",

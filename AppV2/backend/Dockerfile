@@ -1,9 +1,28 @@
 FROM python:3.13-slim
 
-# Docker CLI for sandboxed student code execution (uses host socket from compose).
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends docker.io ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# Docker CLI for sandboxed student code execution (talks to host daemon via the
+# socket mounted in docker-compose.yml). We install the static CLI from Docker's
+# official CDN instead of relying on Debian's `docker.io` package, because on
+# Debian 13 "trixie" that package was split and no longer ships the `docker`
+# client binary — only the daemon. Pinning a static tarball works on every
+# Debian/Ubuntu base and avoids a whole apt-repo setup.
+ARG DOCKER_CLI_VERSION=27.4.1
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends ca-certificates curl; \
+    rm -rf /var/lib/apt/lists/*; \
+    arch="$(uname -m)"; \
+    case "$arch" in \
+      x86_64)   static_arch="x86_64" ;; \
+      aarch64)  static_arch="aarch64" ;; \
+      *)        echo "unsupported arch: $arch" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://download.docker.com/linux/static/stable/${static_arch}/docker-${DOCKER_CLI_VERSION}.tgz" -o /tmp/docker.tgz; \
+    tar -xzf /tmp/docker.tgz -C /tmp; \
+    install -m 0755 /tmp/docker/docker /usr/local/bin/docker; \
+    rm -rf /tmp/docker /tmp/docker.tgz; \
+    # Fail the build early if the CLI is missing or non-functional.
+    docker --version
 
 WORKDIR /app
 

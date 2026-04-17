@@ -10,7 +10,9 @@
     type SubmissionRead,
     type UserRead,
   } from "$lib/api";
+  import FeedbackPanel from "$lib/components/FeedbackPanel.svelte";
   import SubmissionStatusBadge from "$lib/components/SubmissionStatusBadge.svelte";
+  import UnifiedDiffView from "$lib/components/UnifiedDiffView.svelte";
   import { formatDateTime, formatSubmissionGrade } from "$lib/format";
 
   let submission: SubmissionRead | null = null;
@@ -113,10 +115,10 @@
       </div>
 
       <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Diff</h2>
-      <div class="gh-code-view-shell">
-        <div class="gh-code-editor-toolbar">Diff</div>
-        <pre class="gh-code-block gh-code-block-python">{submission.diff?.trim() || "—"}</pre>
-      </div>
+      <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
+        Color-coded unified diff (additions, removals, and file/hunk headers).
+      </p>
+      <UnifiedDiffView diff={submission.diff ?? ""} />
 
       <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Stdout</h2>
       <div class="gh-code-view-shell">
@@ -124,11 +126,11 @@
         <pre class="gh-code-block gh-code-block-python">{submission.stdout?.trim() || "—"}</pre>
       </div>
 
-      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Feedback</h2>
-      <div class="gh-code-view-shell">
-        <div class="gh-code-editor-toolbar">Text</div>
-        <pre class="gh-code-block gh-code-block-python">{submission.feedback?.trim() || "—"}</pre>
-      </div>
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Grader feedback</h2>
+      <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
+        Workflow path, repair attempts, and stop reason from the LangGraph autograder.
+      </p>
+      <FeedbackPanel feedback={submission.feedback ?? ""} studentView={false} />
     {/if}
   {/if}
 </section>

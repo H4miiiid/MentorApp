@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import logging
 import traceback as tb
 from typing import Any
 
 from AppV2.backend.workflow_runtime.config import CFG
-from AppV2.backend.workflow_runtime.sandbox import execute_python_after_compile
+from AppV2.backend.workflow_runtime.sandbox import (
+    SandboxUnavailableError,
+    execute_python_after_compile,
+)
 from AppV2.backend.workflow_runtime.llm_clients import (
     call_external_model,
     call_reflection_model,
@@ -23,6 +27,29 @@ from AppV2.backend.workflow_runtime.state import (
     now_iso,
     push_route,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def _capture_initial_failure(state: RepairState, result: dict[str, Any], trace: str) -> None:
+    """Snapshot the *first* failed run so grading and the UI can show the student's
+    original error even after the LLM has repaired it.
+
+    Called from ``run_checks`` the very first time a check fails (either at compile
+    time or during sandbox execution). Subsequent failures during the repair loop
+    must NOT overwrite this snapshot — the point is to remember what the student
+    actually submitted.
+    """
+    if state.get("initial_traceback"):
+        return
+    cleaned = trace or ""
+    state["initial_traceback"] = cleaned
+    classification = classify_error(cleaned, result)
+    state["initial_error_category"] = classification.get("category", "")
+    state["initial_error_type"] = classification.get("error_type", "")
+    state["initial_error_explanation"] = classification.get("error_explanation", "")
+    state["initial_stdout"] = result.get("stdout", "") or ""
+    state["initial_stderr"] = result.get("stderr", "") or cleaned
 
 
 def record_attempt(state: RepairState, route: str, before_code: str, after_code: str, prompt: str) -> None:
@@ -63,32 +90,61 @@ def run_checks(state: RepairState) -> RepairState:
         state["traceback"] = trace
         state["check_result"] = result
         state["failure_signature"] = extract_failure_signature(trace)
+        _capture_initial_failure(state, result, trace)
+        logger.debug("run_checks compile failed (no sandbox)")
         return state
 
     try:
         run_out = execute_python_after_compile(code, float(CFG.execution_timeout_seconds))
-        result["stdout"] = run_out.get("stdout") or ""
-        result["stderr"] = run_out.get("stderr") or ""
-        result["sandbox_mode"] = run_out.get("mode", "")
-
-        if run_out.get("ok"):
-            result["runtime_ok"] = True
-            result["passed"] = True
-            state["traceback"] = ""
-            state["failure_signature"] = ""
-        else:
-            trace = result["stderr"] or "Runtime failed without stderr output."
-            result["traceback"] = trace
-            state["traceback"] = trace
-            state["failure_signature"] = extract_failure_signature(trace)
     except Exception as exc:
         err = f"Sandbox execution error: {exc}"
         result["traceback"] = err
         state["traceback"] = err
         state["failure_signature"] = extract_failure_signature(err)
         result["stderr"] = (result.get("stderr") or "") + "\n" + err
+        state["check_result"] = result
+        return state
+
+    result["stdout"] = run_out.get("stdout") or ""
+    result["stderr"] = run_out.get("stderr") or ""
+    result["sandbox_mode"] = run_out.get("mode", "")
+    result["returncode"] = run_out.get("returncode")
+
+    # Infra failure: bail out of the graph entirely. The student's code never ran,
+    # so feeding the infra message to the LLM repair loop is worse than useless —
+    # it produces a confident grade of 0 for perfectly correct code.
+    if result["sandbox_mode"] == "unavailable":
+        state["check_result"] = result
+        raise SandboxUnavailableError(result["stderr"] or "Sandbox unavailable.")
+
+    if run_out.get("ok"):
+        result["runtime_ok"] = True
+        result["passed"] = True
+        state["traceback"] = ""
+        state["failure_signature"] = ""
+    else:
+        trace = result["stderr"] or "Runtime failed without stderr output."
+        result["traceback"] = trace
+        state["traceback"] = trace
+        state["failure_signature"] = extract_failure_signature(trace)
+        _capture_initial_failure(state, result, trace)
 
     state["check_result"] = result
+    logger.debug(
+        "run_checks sandbox_mode=%s passed=%s",
+        result.get("sandbox_mode"),
+        result.get("passed"),
+    )
+    if not result.get("passed"):
+        err_preview = (result.get("stderr") or "")[:800].replace("\n", " ")
+        logger.info(
+            "run_checks failed | compile_ok=%s runtime_ok=%s sandbox_mode=%s returncode=%s stderr_preview=%s",
+            result.get("compile_ok"),
+            result.get("runtime_ok"),
+            result.get("sandbox_mode"),
+            result.get("returncode"),
+            err_preview or "(empty)",
+        )
     return state
 
 
@@ -171,7 +227,7 @@ def choose_next_strategy(state: RepairState) -> RepairState:
             state["stop_reason"] = "all_strategies_exhausted"
         return state
 
-    if category in ("syntax_error", "name_error", "timeout"):
+    if category in ("syntax_error", "name_error", "timeout", "stdin_eof"):
         if not state["used_traceback"]:
             state["next_strategy"] = "traceback_sft"
         elif not state["used_reflection"]:
