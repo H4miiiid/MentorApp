@@ -28,7 +28,7 @@ from ...schemas.grading_model import (
     GradingStatusResponse,
 )
 from ...workflow_runtime.config import CFG
-from ...workflow_runtime.llm_clients import llama_health_url_from_openai_base
+from ...workflow_runtime.llm_clients import endpoint_health_url_from_openai_base
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -96,7 +96,7 @@ def _submission_read(s: Submission) -> SubmissionRead:
 
 @router.get("/grading/status", response_model=GradingStatusResponse)
 def get_grading_status(_: Annotated[User, Depends(require_admin)]) -> GradingStatusResponse:
-    health_url = llama_health_url_from_openai_base(CFG.llama_server_url)
+    health_url = endpoint_health_url_from_openai_base(CFG.hf_inference_base_url)
     ok = False
     health_err: str | None = None
     try:
@@ -109,17 +109,15 @@ def get_grading_status(_: Annotated[User, Depends(require_admin)]) -> GradingSta
         health_err = str(exc)
     active = get_active_grading_model()
     note = (
-        "SFT grading uses ChatOpenAI against LLAMA_SERVER_URL (OpenAI-compatible /v1), typically a remote "
-        "llama.cpp instance (e.g. on Vast AI). The active catalog row sets the model id string; that model "
-        "must be loaded on the remote server. LLAMA_SERVER_AUTO_START is for local host dev only."
+        "SFT grading uses ChatOpenAI against HF_INFERENCE_BASE_URL (OpenAI-compatible /v1). "
+        "The active catalog row sets the model id string sent to the Hugging Face endpoint."
     )
     return GradingStatusResponse(
-        llama_health_ok=ok,
-        llama_health_url=health_url,
-        llama_server_url=CFG.llama_server_url,
+        endpoint_health_ok=ok,
+        endpoint_health_url=health_url,
+        hf_inference_base_url=CFG.hf_inference_base_url,
         active_model=_grading_model_read(active) if active else None,
-        llama_auto_start=CFG.llama_server_auto_start,
-        llama_health_error=health_err,
+        endpoint_health_error=health_err,
         note=note,
     )
 

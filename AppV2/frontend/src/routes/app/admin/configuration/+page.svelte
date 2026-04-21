@@ -74,7 +74,7 @@
   async function onCreate(e: Event) {
     e.preventDefault();
     if (!newName.trim() || !newOpenai.trim()) {
-      errorMsg = "Fill display name and OpenAI model id (remote llama.cpp).";
+      errorMsg = "Fill display name and OpenAI model id (HF endpoint).";
       return;
     }
     busy = true;
@@ -108,8 +108,8 @@
   />
   <h1 class="gh-title" style="margin-top: 0; margin-bottom: 8px;">Configuration</h1>
   <p class="gh-subtitle" style="margin-bottom: 20px;">
-    Backend settings and grading model catalog. SFT grading uses a remote OpenAI-compatible llama.cpp endpoint
-    (<code>LLAMA_SERVER_URL</code>); the active catalog row must match the model id served there.
+    Backend settings and grading model catalog. SFT grading uses an OpenAI-compatible Hugging Face endpoint
+    (<code>HF_INFERENCE_BASE_URL</code>); the active catalog row must match the model id served there.
   </p>
 
   {#if errorMsg}
@@ -144,27 +144,25 @@
 
     {#if status}
       <div class="gh-card" style="max-width: none; margin-bottom: 20px;">
-        <h2 class="gh-title" style="font-size: 18px; margin-top: 0;">Grading / remote llama.cpp</h2>
+        <h2 class="gh-title" style="font-size: 18px; margin-top: 0;">Grading / HF endpoint</h2>
         <dl class="gh-dl">
           <dt>Endpoint HTTP health</dt>
           <dd>
             <span
               class="gh-monitoring-pill"
-              class:gh-monitoring-pill-live={status.llama_health_ok}
-              class:gh-monitoring-pill-error={!status.llama_health_ok}
+              class:gh-monitoring-pill-live={status.endpoint_health_ok}
+              class:gh-monitoring-pill-error={!status.endpoint_health_ok}
             >
-              {status.llama_health_ok ? "reachable" : "unreachable"}
+              {status.endpoint_health_ok ? "reachable" : "unreachable"}
             </span>
-            <code style="margin-left: 8px;">{status.llama_health_url}</code>
+            <code style="margin-left: 8px;">{status.endpoint_health_url}</code>
           </dd>
-          {#if !status.llama_health_ok && status.llama_health_error}
+          {#if !status.endpoint_health_ok && status.endpoint_health_error}
             <dt>Health error</dt>
-            <dd><code>{status.llama_health_error}</code></dd>
+            <dd><code>{status.endpoint_health_error}</code></dd>
           {/if}
-          <dt>LLAMA_SERVER_URL</dt>
-          <dd><code>{status.llama_server_url}</code></dd>
-          <dt>LLAMA_SERVER_AUTO_START</dt>
-          <dd>{status.llama_auto_start ? "true (local dev spawn)" : "false (remote / manual)"}</dd>
+          <dt>HF_INFERENCE_BASE_URL</dt>
+          <dd><code>{status.hf_inference_base_url}</code></dd>
           <dt>Active catalog model</dt>
           <dd>
             {#if status.active_model}
@@ -185,8 +183,8 @@
     <div class="gh-card" style="max-width: none;">
       <h2 class="gh-title" style="font-size: 18px; margin-top: 0;">Grading model catalog</h2>
       <p class="gh-muted" style="margin-top: 0;">
-        The <strong>active</strong> row sets the OpenAI <code>model</code> string sent to the remote llama.cpp server
-        for SFT steps. It must match the model loaded on your Vast AI (or other) endpoint.
+        The <strong>active</strong> row sets the OpenAI <code>model</code> string sent to the Hugging Face endpoint
+        for SFT steps.
       </p>
 
       <div style="overflow-x: auto;">
@@ -236,7 +234,7 @@
         <h3 class="gh-title" style="font-size: 15px; margin: 0;">Add catalog entry</h3>
         <label>
           Display name
-          <input class="gh-input" type="text" bind:value={newName} placeholder="e.g. Qwen SFT (Vast)" />
+          <input class="gh-input" type="text" bind:value={newName} placeholder="e.g. Qwen SFT Endpoint" />
         </label>
         <label>
           Notes (optional)
@@ -244,12 +242,12 @@
             class="gh-input"
             type="text"
             bind:value={newNotes}
-            placeholder="e.g. Vast instance id or HF model id"
+            placeholder="e.g. Endpoint id or deployment note"
           />
         </label>
         <label>
-          OpenAI model id (must match remote llama.cpp)
-          <input class="gh-input" type="text" bind:value={newOpenai} placeholder="local-gguf" />
+          OpenAI model id (must match HF endpoint)
+          <input class="gh-input" type="text" bind:value={newOpenai} placeholder="hf-endpoint-model" />
         </label>
         <label>
           Context size

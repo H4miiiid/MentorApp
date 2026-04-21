@@ -1,6 +1,6 @@
 """Workflow node requirements (audit reference for LangGraph grading).
 
-Each node in `graph.py` may depend on sandbox execution, remote llama.cpp SFT (OpenAI-compatible),
+Each node in `graph.py` may depend on sandbox execution, HF endpoint SFT (OpenAI-compatible),
 OpenRouter API keys, Chroma RAG, or outbound web search. Use this map for
 operations docs and optional preflight checks.
 """
@@ -15,7 +15,7 @@ class NodeRequirement(TypedDict):
 
     node: str
     needs_sandbox: bool
-    needs_local_sft: bool
+    needs_endpoint_sft: bool
     needs_openrouter: bool
     needs_chroma_rag: bool
     needs_web_search: bool
@@ -23,7 +23,7 @@ class NodeRequirement(TypedDict):
 
 
 # run_checks: compile + execute student code — must be isolated (Docker sandbox).
-# SFT nodes: llama.cpp OpenAI-compatible API (remote or local).
+# SFT nodes: HF OpenAI-compatible inference endpoint.
 # reflection_critic, external_expert_repair, summarize (when OpenRouter key set): OpenRouter.
 # retrieve_local_docs, assess_local_context: Chroma + optional sentence-transformers on host.
 # web_search_docs: duckduckgo-search (network).
@@ -31,7 +31,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "run_checks",
         "needs_sandbox": True,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
@@ -40,7 +40,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "diagnose_failure",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
@@ -49,7 +49,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "choose_next_strategy",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
@@ -58,16 +58,16 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "attempt_sft_with_traceback",
         "needs_sandbox": False,
-        "needs_local_sft": True,
+        "needs_endpoint_sft": True,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
-        "notes": "Fine-tuned repair via llama.cpp HTTP server (LLAMA_SERVER_URL /v1).",
+        "notes": "Fine-tuned repair via Hugging Face OpenAI-compatible endpoint (/v1).",
     },
     {
         "node": "retrieve_local_docs",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": True,
         "needs_web_search": False,
@@ -76,7 +76,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "assess_local_context",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": True,
         "needs_web_search": False,
@@ -85,7 +85,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "web_search_docs",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": True,
@@ -94,7 +94,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "summarize_context",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": True,
         "needs_chroma_rag": False,
         "needs_web_search": False,
@@ -103,16 +103,16 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "attempt_sft_with_rag",
         "needs_sandbox": False,
-        "needs_local_sft": True,
+        "needs_endpoint_sft": True,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
-        "notes": "Local SFT with RAG hints in prompt.",
+        "notes": "Endpoint SFT with RAG hints in prompt.",
     },
     {
         "node": "reflection_critic",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": True,
         "needs_chroma_rag": False,
         "needs_web_search": False,
@@ -121,16 +121,16 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "attempt_sft_with_reflection",
         "needs_sandbox": False,
-        "needs_local_sft": True,
+        "needs_endpoint_sft": True,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
-        "notes": "Local SFT with reflection JSON hints.",
+        "notes": "Endpoint SFT with reflection JSON hints.",
     },
     {
         "node": "external_expert_repair",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": True,
         "needs_chroma_rag": False,
         "needs_web_search": False,
@@ -139,7 +139,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "finalize_success",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,
@@ -148,7 +148,7 @@ NODE_REQUIREMENTS: list[NodeRequirement] = [
     {
         "node": "finalize_failure",
         "needs_sandbox": False,
-        "needs_local_sft": False,
+        "needs_endpoint_sft": False,
         "needs_openrouter": False,
         "needs_chroma_rag": False,
         "needs_web_search": False,

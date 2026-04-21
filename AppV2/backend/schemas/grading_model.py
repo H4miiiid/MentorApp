@@ -39,12 +39,11 @@ class GradingModelUpdate(BaseModel):
 
 
 class GradingStatusResponse(BaseModel):
-    """Remote llama.cpp HTTP health + active catalog row (for admin diagnostics)."""
+    """HF endpoint HTTP health + active catalog row (for admin diagnostics)."""
 
-    llama_health_ok: bool
-    llama_health_url: str
-    llama_server_url: str
+    endpoint_health_ok: bool
+    endpoint_health_url: str
+    hf_inference_base_url: str
     active_model: GradingModelRead | None
-    llama_auto_start: bool
-    llama_health_error: str | None = None
+    endpoint_health_error: str | None = None
     note: str

@@ -8,10 +8,12 @@ export function formatBytes(bytes: number): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 }
 
-/** Show "-" while not graded; otherwise the numeric grade. */
+/** Show "-" while not graded; otherwise the score out of 100 (backend stores 0–100). */
 export function formatSubmissionGrade(grade: number, status: SubmissionStatus): string {
   if (status === "pending" || status === "running") return "-";
-  return String(grade);
+  const g = Number.isFinite(grade) ? grade : 0;
+  const rounded = Math.abs(g % 1) < 1e-9 ? g.toFixed(0) : g.toFixed(1);
+  return `${rounded} / 100`;
 }
 
 export function formatDateTime(iso: string | null | undefined): string {

@@ -88,15 +88,15 @@ class Submission(SQLModel, table=True):
 
 
 class GradingModel(SQLModel, table=True):
-    """Catalog entry for SFT grading: remote OpenAI-compatible model id + optional admin notes."""
+    """Catalog entry for SFT grading: OpenAI-compatible endpoint model id + optional admin notes."""
 
     __tablename__ = "grading_models"
 
     id: str = Field(default_factory=_new_uuid, primary_key=True, max_length=36)
     display_name: str = Field(max_length=200)
-    # Legacy column name: optional notes (Vast instance id, HF id, etc.); not used for routing.
+    # Legacy column name: optional notes (endpoint name/id, deployment notes); not used for routing.
     gguf_filename: str = Field(default="", max_length=512)
-    # OpenAI-compatible model id sent to the remote llama.cpp server (must match server’s loaded model).
+    # OpenAI-compatible model id sent to the Hugging Face endpoint.
     openai_model_name: str = Field(max_length=200)
     n_ctx: int = Field(default=8192, ge=256)
     is_active: bool = Field(default=False, index=True)

@@ -252,7 +252,7 @@ export async function fetchAdminConfig(): Promise<AdminConfigResponse> {
   return apiJson<AdminConfigResponse>("/api/admin/config");
 }
 
-/** Grading models catalog + llama health (admin). */
+/** Grading models catalog + endpoint health (admin). */
 export type GradingModelRead = {
   id: string;
   display_name: string;
@@ -265,12 +265,11 @@ export type GradingModelRead = {
 };
 
 export type GradingStatusResponse = {
-  llama_health_ok: boolean;
-  llama_health_url: string;
-  llama_server_url: string;
+  endpoint_health_ok: boolean;
+  endpoint_health_url: string;
+  hf_inference_base_url: string;
   active_model: GradingModelRead | null;
-  llama_auto_start: boolean;
-  llama_health_error: string | null;
+  endpoint_health_error: string | null;
   note: string;
 };
 

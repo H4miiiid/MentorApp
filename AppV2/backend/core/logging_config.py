@@ -42,6 +42,16 @@ def configure_logging() -> None:
     if level > logging.DEBUG:
         for chatty in ("langchain", "langchain_core", "langsmith"):
             logging.getLogger(chatty).setLevel(logging.WARNING)
+        # Hub / HTTP clients are noisy at INFO during embedding model downloads.
+        for noisy in (
+            "httpx",
+            "httpcore",
+            "huggingface_hub",
+            "sentence_transformers",
+            "openai",
+            "chromadb",
+        ):
+            logging.getLogger(noisy).setLevel(logging.WARNING)
 
     # Uvicorn: keep access/error visible at same level
     for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):

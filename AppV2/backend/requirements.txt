@@ -19,3 +19,5 @@ sentence-transformers>=2.2.0
 # Common student-runtime data science libs used in sandboxed submissions.
 scikit-learn>=1.5.0
 matplotlib>=3.9.0
+
+pytest>=8.0.0
