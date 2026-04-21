@@ -15,6 +15,9 @@
     attempt_count?: number;
     max_attempts?: number;
     error_category?: string;
+    mistake_count?: number;
+    mistake_categories?: string[];
+    mistake_lines?: string[];
     stop_reason?: string;
     route_history?: string[];
     attempt_history_tail?: Attempt[];
@@ -57,6 +60,8 @@
   $: isFailure = !isRepaired && !isSuccess && !isSandboxInfra && !!final;
 
   $: attempts = parsed?.attempt_count ?? 0;
+  $: mistakeCount = parsed?.mistake_count ?? 0;
+  $: mistakeCategories = parsed?.mistake_categories ?? [];
   $: maxAttempts = parsed?.max_attempts ?? 0;
   $: attemptPct =
     maxAttempts > 0 ? Math.min(100, Math.round((attempts / maxAttempts) * 100)) : 0;
@@ -226,6 +231,19 @@
                 ? (parsed.initial_error_category || parsed.error_category || "")
                 : (parsed.error_category || "")
             )}
+          </div>
+        </div>
+      {/if}
+      {#if !isSandboxInfra && mistakeCount > 0}
+        <div class="fb-metric">
+          <div class="fb-metric-label">Mistakes detected</div>
+          <div class="fb-metric-value">
+            {mistakeCount}
+            {#if mistakeCategories.length > 0}
+              <span class="gh-muted" style="font-size: 12px; margin-left: 8px;">
+                ({mistakeCategories.map(categoryLabel).join(", ")})
+              </span>
+            {/if}
           </div>
         </div>
       {/if}

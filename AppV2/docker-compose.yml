@@ -39,10 +39,15 @@ services:
       MENTOR_APP_VECTOR_COLLECTION: ${MENTOR_APP_VECTOR_COLLECTION:-library_docs}
       # Default OpenAI-compatible model id for DB bootstrap when grading_models is empty.
       HF_OPENAI_MODEL: ${HF_OPENAI_MODEL:-hf-endpoint-model}
+      # LangSmith tracing for LangGraph workflow monitoring.
+      LANGSMITH_ENABLED: ${LANGSMITH_ENABLED:-true}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY:-}
+      LANGCHAIN_PROJECT: ${LANGCHAIN_PROJECT:-MentorApp-Application-code-Repair}
+      LANGCHAIN_ENDPOINT: ${LANGCHAIN_ENDPOINT:-https://api.smith.langchain.com}
       # Sandboxed student code: `docker run --rm` per check (not a Compose service).
       SANDBOX_USE_DOCKER: ${SANDBOX_USE_DOCKER:-true}
       SANDBOX_ALLOW_UNSAFE_FALLBACK: ${SANDBOX_ALLOW_UNSAFE_FALLBACK:-false}
-      SANDBOX_PYTHON_IMAGE: ${SANDBOX_PYTHON_IMAGE:-python:3.13-slim-bookworm}
+      SANDBOX_PYTHON_IMAGE: ${SANDBOX_PYTHON_IMAGE:-appv2-backend:latest}
       # Feed stdin so input() works (blank lines; override with SANDBOX_STDIN in .env if needed).
       SANDBOX_STDIN_BLANK_LINES: ${SANDBOX_STDIN_BLANK_LINES:-512}
       # Shared scratch volume so the backend (running in a container) can share candidate.py

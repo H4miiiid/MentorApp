@@ -234,6 +234,8 @@ def run_python_in_docker(code: str, timeout: float) -> dict[str, Any]:
             "--rm",
             "--name",
             container_name,
+            "-e",
+            "MPLBACKEND=Agg",
             "--network",
             "none",
             "--memory",

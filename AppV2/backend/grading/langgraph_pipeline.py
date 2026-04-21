@@ -29,50 +29,117 @@ def _unified_diff(original: str, final: str) -> str:
     )
 
 
-# Highest possible grade when the student's ORIGINAL submission did not pass and the
-# LLM repair loop had to intervene. Anchoring strictly below 100 means the grade itself
-# communicates "you got help" without needing to read the feedback panel.
-REPAIRED_SUCCESS_CAP = 85.0
-REPAIRED_SUCCESS_FLOOR = 40.0
+MISTAKE_WEIGHT_BY_CATEGORY: dict[str, float] = {
+    "syntax_error": 1.0,
+    "name_error": 1.0,
+    "stdin_eof": 1.0,
+    "local_reasoning_error": 1.8,
+    "api_library_error": 2.0,
+    "timeout": 2.2,
+    "sandbox_unavailable": 0.0,
+}
+
+INFERRED_FIX_UNIT_WEIGHT = 0.9
+MAX_INFERRED_FIX_UNITS = 4
 
 
-def _grade_repaired_success(*, attempts: int, max_attempts: int, initial_category: str) -> float:
-    """Grade a submission that only passed after N >= 1 LLM repair attempts.
+def _is_meaningful_code_line(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return False
+    if stripped.startswith("#"):
+        return False
+    return True
 
-    Design goals:
-      * First-try passes stay at 100.0 (handled by the caller).
-      * One small fix for a clearly "typo-ish" error (syntax/name/stdin_eof) → high
-        80s, still noticeably less than 100.
-      * A single repair for a deeper logic / API error → low 70s.
-      * Many repair attempts drop the score proportionally, never below
-        ``REPAIRED_SUCCESS_FLOOR``, so a student who eventually passed is still
-        rewarded above a student who never did.
-    """
+
+def _infer_repair_fix_units(original_code: str, final_code: str) -> int:
+    before = (original_code or "").splitlines()
+    after = (final_code or "").splitlines()
+    if before == after:
+        return 0
+
+    matcher = difflib.SequenceMatcher(a=before, b=after)
+    units = 0
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            continue
+        changed_lines = before[i1:i2] + after[j1:j2]
+        if any(_is_meaningful_code_line(line) for line in changed_lines):
+            units += 1
+
+    return min(MAX_INFERRED_FIX_UNITS, units)
+
+
+def _extract_mistake_profile(
+    result: dict[str, Any],
+    *,
+    original_code: str = "",
+    final_code: str = "",
+) -> dict[str, Any]:
+    events = result.get("error_events") or []
+    by_signature: dict[str, dict[str, Any]] = {}
+    for event in events:
+        signature = (event.get("signature") or "").strip()
+        if not signature:
+            continue
+        if signature not in by_signature:
+            by_signature[signature] = {
+                "category": (event.get("category") or "api_library_error").strip(),
+                "line": (event.get("error_line") or "").strip(),
+            }
+
+    if not by_signature:
+        fallback_category = (
+            (result.get("initial_error_category") or "").strip()
+            or (result.get("error_category") or "").strip()
+        )
+        if fallback_category:
+            by_signature[fallback_category] = {
+                "category": fallback_category,
+                "line": (result.get("initial_error_type") or "").strip(),
+            }
+
+    categories = sorted({item["category"] for item in by_signature.values() if item.get("category")})
+    mistake_lines = [item.get("line", "") for item in by_signature.values() if item.get("line")][:8]
+    observed_weighted_units = sum(MISTAKE_WEIGHT_BY_CATEGORY.get(cat, 1.6) for cat in categories)
+    # Use computed signatures first; fallback to workflow-provided aggregate when available.
+    observed_mistake_count = len(by_signature) or int(result.get("mistake_count") or 0)
+
+    inferred_fix_units = 0
+    status = (result.get("final_status") or "").lower()
+    attempts = int(result.get("attempt_count") or 0)
+    if status == "success" and attempts > 0:
+        inferred_fix_units = _infer_repair_fix_units(original_code, final_code)
+
+    effective_mistake_count = max(observed_mistake_count, inferred_fix_units)
+    inferred_extra_units = max(0, effective_mistake_count - observed_mistake_count)
+    weighted_units = observed_weighted_units + INFERRED_FIX_UNIT_WEIGHT * inferred_extra_units
+    if effective_mistake_count > 0 and weighted_units <= 0:
+        weighted_units = 1.0
+
+    return {
+        "mistake_count": effective_mistake_count,
+        "observed_mistake_count": observed_mistake_count,
+        "inferred_fix_units": inferred_fix_units,
+        "mistake_categories": categories,
+        "mistake_lines": mistake_lines,
+        "weighted_units": weighted_units,
+    }
+
+
+def _grade_repaired_success(*, attempts: int, max_attempts: int, weighted_units: float, mistake_count: int) -> float:
+    """Grade repaired-success outcomes using weighted mistake severity + attempts."""
     if attempts <= 0:
         return 100.0
 
-    # Anchor score by the *initial* error category (what the student actually wrote),
-    # not the per-attempt category drift during repair.
-    anchor_by_category: dict[str, float] = {
-        "syntax_error": 82.0,
-        "name_error": 78.0,
-        "stdin_eof": 80.0,
-        "local_reasoning_error": 72.0,
-        "api_library_error": 70.0,
-        "timeout": 68.0,
-    }
-    anchor = anchor_by_category.get(initial_category, 72.0)
-
-    # Each extra repair attempt beyond the first compounds the deduction. We use a
-    # smooth curve so we never cliff-drop, and we scale by the workflow's configured
-    # ``max_attempts`` so admins tuning the budget don't silently change the grading
-    # curve.
     budget = max(max_attempts, 2)
-    extra = max(0, attempts - 1)
-    dock = 6.0 * extra + 18.0 * (extra / budget)
+    extra_attempts = max(0, attempts - 1)
+    attempt_penalty = 2.5 * extra_attempts + 6.0 * (extra_attempts / budget)
+    mistake_penalty = 5.5 * max(1.0, weighted_units)
+    multiplicity_penalty = max(0, mistake_count - 1) * 2.0
 
-    score = min(REPAIRED_SUCCESS_CAP, anchor) - dock
-    score = max(REPAIRED_SUCCESS_FLOOR, score)
+    score = 100.0 - mistake_penalty - attempt_penalty - multiplicity_penalty
+    score = max(60.0, min(98.0, score))
     return round(score, 1)
 
 
@@ -83,24 +150,13 @@ def _grade_from_result(
     *,
     grading_max_attempts: int,
 ) -> float:
-    """Partial credit on failure: uses error category, attempt budget used, stagnation, and edit distance.
-
-    The old formula ``55 - min(attempts * 8, 55)`` always yielded the same score for a fixed attempt
-    count (e.g. 23 when attempt_count == 4), regardless of error severity or progress.
-
-    **Repaired-success grading.** The prior policy returned a flat ``100.0`` whenever
-    ``final_status == "success"``, which meant a student whose original submission had a
-    syntax error and was rewritten by the LLM got the same grade as a student whose code
-    passed on the first try. We now distinguish:
-
-    * ``attempt_count == 0`` (no repairs needed) → full 100.
-    * repairs were needed but the workflow eventually succeeded → partial credit
-      anchored by the *initial* error category, then docked per repair attempt. Capped
-      at 85 so it's always clear from the number alone that help was required.
-    """
+    """Mistake-weighted scoring with guaranteed 100 for clean first-pass success."""
     status = (result.get("final_status") or "").lower()
     attempts = int(result.get("attempt_count") or 0)
     max_a = int(result.get("max_attempts") or grading_max_attempts or 6)
+    profile = _extract_mistake_profile(result, original_code=original_code, final_code=final_code)
+    weighted_units = float(profile["weighted_units"])
+    mistake_count = int(profile["mistake_count"])
 
     if status == "success":
         if attempts <= 0:
@@ -108,7 +164,8 @@ def _grade_from_result(
         return _grade_repaired_success(
             attempts=attempts,
             max_attempts=max_a,
-            initial_category=(result.get("initial_error_category") or "").strip(),
+            weighted_units=weighted_units,
+            mistake_count=mistake_count,
         )
     if status == "sandbox_unavailable":
         # Infra failure — do not punish the student. Grade stays at 0 only because
@@ -116,45 +173,36 @@ def _grade_from_result(
         # and the submission should be re-graded.
         return 0.0
 
-    category = (result.get("error_category") or "").strip()
     stop = (result.get("stop_reason") or "").strip()
     nmc = int(result.get("no_meaningful_change_count") or 0)
     rep = int(result.get("repeated_failure_count") or 0)
 
-    # Midpoint partial credit by error class (syntax/name tend to be "smaller" than deep logic issues).
-    cat_mid: dict[str, float] = {
-        "syntax_error": 74.0,
-        "name_error": 70.0,
-        "stdin_eof": 72.0,
-        "timeout": 52.0,
-        "local_reasoning_error": 56.0,
-        "api_library_error": 52.0,
-    }
-    base = cat_mid.get(category, 48.0)
-
-    # Penalize using more of the repair attempt budget (smooth, not a single step per attempt).
-    frac_used = attempts / max(max_a, 1)
-    score = base * (1.0 - 0.62 * frac_used)
-
-    # Stagnation: repair steps that did not change code meaningfully.
-    score -= min(18.0, nmc * 5.5)
-    # Same traceback signature repeating.
-    score -= min(14.0, rep * 4.0)
+    # Failure outcomes still get partial credit based on weighted mistakes and progress.
+    budget_ratio = attempts / max(max_a, 1)
+    score = 82.0
+    score -= 7.0 * max(1.0, weighted_units)
+    score -= 5.0 * budget_ratio
+    score -= min(8.0, nmc * 2.0)
+    score -= min(8.0, rep * 2.0)
 
     if stop == "no_meaningful_change":
-        score -= 10.0
-    elif stop == "max_attempts_reached":
         score -= 4.0
+    elif stop == "max_attempts_reached":
+        score -= 2.0
+    elif stop == "all_strategies_exhausted":
+        score -= 3.0
 
+    # Small boost when there is evidence of real edits toward a fix.
     orig = original_code or ""
     final = final_code or ""
     sim = difflib.SequenceMatcher(a=orig, b=final).ratio()
-    if sim >= 0.998:
-        score -= 22.0
-    else:
-        score += min(12.0, (1.0 - sim) * 28.0)
+    if sim < 0.995:
+        score += min(6.0, (1.0 - sim) * 30.0)
 
-    return max(0.0, min(99.9, round(score, 1)))
+    if mistake_count >= 3:
+        score -= 2.0 * (mistake_count - 2)
+
+    return max(20.0, min(95.0, round(score, 1)))
 
 
 def _was_repaired(result: dict[str, Any]) -> bool:
@@ -175,12 +223,18 @@ def _initial_error_snippet(result: dict[str, Any], max_chars: int = 1200) -> str
     return tb
 
 
-def _feedback_blob(result: dict[str, Any]) -> str:
+def _feedback_blob(result: dict[str, Any], *, original_code: str = "", final_code: str = "") -> str:
+    profile = _extract_mistake_profile(result, original_code=original_code, final_code=final_code)
     payload: dict[str, Any] = {
         "final_status": result.get("final_status"),
         "attempt_count": result.get("attempt_count"),
         "max_attempts": result.get("max_attempts"),
         "error_category": result.get("error_category"),
+        "mistake_count": profile["mistake_count"],
+        "observed_mistake_count": profile["observed_mistake_count"],
+        "inferred_fix_units": profile["inferred_fix_units"],
+        "mistake_categories": profile["mistake_categories"],
+        "mistake_lines": profile["mistake_lines"],
         "stop_reason": result.get("stop_reason"),
         "route_history": result.get("route_history"),
         "attempt_history_tail": (result.get("attempt_history") or [])[-8:],
@@ -288,7 +342,7 @@ class LangGraphGradingPipeline(GradingPipeline):
                 diff="",
                 stdout="",
                 stderr=stderr_text,
-                feedback=_feedback_blob(result),
+                feedback=_feedback_blob(result, original_code=original, final_code=original),
             )
 
         stderr_parts: list[str] = []
@@ -324,5 +378,5 @@ class LangGraphGradingPipeline(GradingPipeline):
             diff=diff,
             stdout="",
             stderr="\n\n".join(stderr_parts) if stderr_parts else "",
-            feedback=_feedback_blob(result),
+            feedback=_feedback_blob(result, original_code=submission.code, final_code=final_code),
         )

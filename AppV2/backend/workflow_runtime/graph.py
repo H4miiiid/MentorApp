@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from langgraph.graph import END, StateGraph
@@ -26,6 +27,9 @@ from AppV2.backend.workflow_runtime.nodes import (
 from AppV2.backend.workflow_runtime.state import RepairState, init_state
 
 
+logger = logging.getLogger(__name__)
+
+
 def route_after_checks(state: RepairState) -> str:
     if state["check_result"].get("passed", False):
         return "success"
@@ -46,9 +50,23 @@ def route_local_context(state: RepairState) -> str:
     return "web" if state.get("local_context_quality") == "weak" else "summarize"
 
 
+def bootstrap(state: RepairState) -> RepairState:
+    return state
+
+
+def route_bootstrap(state: RepairState) -> str:
+    check = state.get("check_result") or {}
+    if not check:
+        return "check"
+    if check.get("passed", False):
+        return "success"
+    return "diagnose"
+
+
 def build_graph():
     builder = StateGraph(RepairState)
 
+    builder.add_node("bootstrap", bootstrap)
     builder.add_node("attempt_sft_with_traceback", attempt_sft_with_traceback)
     builder.add_node("run_checks", run_checks)
     builder.add_node("diagnose_failure", diagnose_failure)
@@ -64,7 +82,17 @@ def build_graph():
     builder.add_node("finalize_success", finalize_success)
     builder.add_node("finalize_failure", finalize_failure)
 
-    builder.set_entry_point("run_checks")
+    builder.set_entry_point("bootstrap")
+
+    builder.add_conditional_edges(
+        "bootstrap",
+        route_bootstrap,
+        {
+            "check": "run_checks",
+            "diagnose": "diagnose_failure",
+            "success": "finalize_success",
+        },
+    )
 
     for node in [
         "attempt_sft_with_traceback",
@@ -134,9 +162,19 @@ def run_workflow(
     run_id: str = "",
 ) -> dict[str, Any]:
     setup_langsmith()
-    ensure_hf_endpoint_available()
+    try:
+        ensure_hf_endpoint_available()
+    except RuntimeError as exc:
+        msg = str(exc)
+        transient_http_markers = ("HTTP 429", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504")
+        if any(marker in msg for marker in transient_http_markers):
+            logger.warning(
+                "[sft-endpoint] preflight failed with transient status; continuing workflow with best-effort fallback: %s",
+                msg,
+            )
+        else:
+            raise
 
-    app = build_graph()
     ctx = {}
     if submission_id:
         ctx["submission_id"] = submission_id
@@ -149,6 +187,54 @@ def run_workflow(
         max_attempts=max_attempts,
         workflow_context=ctx or None,
     )
+
+    try:
+        state = run_checks(state)
+    except SandboxUnavailableError as exc:
+        # Infra failure — do NOT pretend the student's code was wrong.
+        return {
+            "final_code": original_code,
+            "final_status": "sandbox_unavailable",
+            "attempt_count": 0,
+            "max_attempts": max_attempts,
+            "route_history": ["run_checks"],
+            "attempt_history": [],
+            "error_category": "sandbox_unavailable",
+            "stop_reason": "sandbox_unavailable",
+            "no_meaningful_change_count": 0,
+            "repeated_failure_count": 0,
+            "error_events": [],
+            "mistake_count": 0,
+            "sandbox_error": str(exc),
+        }
+
+    if state.get("check_result", {}).get("passed", False):
+        # First-pass success: no repair workflow needed.
+        state["final_status"] = "success"
+        state["final_code"] = state["current_code"]
+        state["route_history"].append("finalize_success_fastpath")
+        return {
+            "final_code": state["final_code"],
+            "final_status": state["final_status"],
+            "attempt_count": 0,
+            "max_attempts": max_attempts,
+            "route_history": state["route_history"],
+            "attempt_history": state["attempt_history"],
+            "error_category": "",
+            "stop_reason": "",
+            "no_meaningful_change_count": 0,
+            "repeated_failure_count": 0,
+            "error_events": state.get("error_events", []),
+            "mistake_count": 0,
+            "initial_traceback": state.get("initial_traceback", ""),
+            "initial_error_category": state.get("initial_error_category", ""),
+            "initial_error_type": state.get("initial_error_type", ""),
+            "initial_error_explanation": state.get("initial_error_explanation", ""),
+            "initial_stdout": state.get("initial_stdout", ""),
+            "initial_stderr": state.get("initial_stderr", ""),
+        }
+
+    app = build_graph()
     try:
         final_state = app.invoke(state)
     except SandboxUnavailableError as exc:
@@ -164,6 +250,8 @@ def run_workflow(
             "stop_reason": "sandbox_unavailable",
             "no_meaningful_change_count": 0,
             "repeated_failure_count": 0,
+            "error_events": [],
+            "mistake_count": 0,
             "sandbox_error": str(exc),
         }
 
@@ -178,6 +266,8 @@ def run_workflow(
         "stop_reason": final_state.get("stop_reason", ""),
         "no_meaningful_change_count": final_state.get("no_meaningful_change_count", 0),
         "repeated_failure_count": final_state.get("repeated_failure_count", 0),
+        "error_events": final_state.get("error_events", []),
+        "mistake_count": final_state.get("mistake_count", 0),
         # Snapshot of the student's ORIGINAL failing run. These survive LLM repairs and let
         # the grader + UI distinguish a clean first-try pass from a "we had to fix it for you"
         # pass, and let the student see the actual mistake in their own code.

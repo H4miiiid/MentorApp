@@ -1,13 +1,8 @@
-"""Regression tests for the repaired-success grading policy.
+"""Regression tests for repaired-success grading fairness.
 
-Previously ``_grade_from_result`` returned a flat 100.0 whenever
-``final_status == "success"``, which meant a student whose original code crashed
-at parse time and was rewritten by the LLM got the same grade as a student whose
-code passed on the first try. The fix introduces partial credit for repaired
-successes and exposes the student's original error (``initial_traceback`` et al.)
-to the frontend so the UI can show the actual mistake.
-
-These tests pin down the contract so the old behaviour cannot silently return.
+These tests ensure first-pass passes keep full marks, repaired outcomes are
+penalized rationally, and latent multi-fix repairs do not score higher than
+single-error repaired cases.
 """
 
 from __future__ import annotations
@@ -15,8 +10,6 @@ from __future__ import annotations
 import json
 
 from AppV2.backend.grading.langgraph_pipeline import (
-    REPAIRED_SUCCESS_CAP,
-    REPAIRED_SUCCESS_FLOOR,
     _feedback_blob,
     _grade_from_result,
     _grade_repaired_success,
@@ -51,32 +44,31 @@ def test_repaired_success_is_strictly_below_100() -> None:
         grading_max_attempts=6,
     )
     assert 0.0 < g < 100.0
-    assert g <= REPAIRED_SUCCESS_CAP
 
 
 def test_repaired_success_grade_drops_as_attempts_increase() -> None:
     """A student whose code took more repair attempts should score lower than a
     student whose code was fixed on the first try."""
-    one = _grade_repaired_success(attempts=1, max_attempts=6, initial_category="syntax_error")
-    two = _grade_repaired_success(attempts=2, max_attempts=6, initial_category="syntax_error")
-    three = _grade_repaired_success(attempts=3, max_attempts=6, initial_category="syntax_error")
+    one = _grade_repaired_success(attempts=1, max_attempts=6, weighted_units=1.0, mistake_count=1)
+    two = _grade_repaired_success(attempts=2, max_attempts=6, weighted_units=1.0, mistake_count=1)
+    three = _grade_repaired_success(attempts=3, max_attempts=6, weighted_units=1.0, mistake_count=1)
     assert one > two > three
-    assert three >= REPAIRED_SUCCESS_FLOOR
+    assert three >= 60.0
 
 
 def test_repaired_success_grade_reflects_error_severity() -> None:
     """A syntax typo should be penalised less than a deep API misuse that
     required repair."""
-    syntax = _grade_repaired_success(attempts=1, max_attempts=6, initial_category="syntax_error")
-    api = _grade_repaired_success(attempts=1, max_attempts=6, initial_category="api_library_error")
+    syntax = _grade_repaired_success(attempts=1, max_attempts=6, weighted_units=1.0, mistake_count=1)
+    api = _grade_repaired_success(attempts=1, max_attempts=6, weighted_units=2.0, mistake_count=1)
     assert syntax > api
 
 
 def test_repaired_success_has_floor() -> None:
     """Many repairs must still not zero out a student who eventually passed —
     they tried harder than the student who never passed."""
-    g = _grade_repaired_success(attempts=12, max_attempts=6, initial_category="api_library_error")
-    assert g >= REPAIRED_SUCCESS_FLOOR
+    g = _grade_repaired_success(attempts=12, max_attempts=6, weighted_units=3.0, mistake_count=4)
+    assert g >= 60.0
 
 
 def test_was_repaired_helper_discriminates_success_types() -> None:
@@ -102,12 +94,14 @@ def test_feedback_blob_exposes_initial_error_for_frontend() -> None:
         ),
         attempt_history=[],
     )
-    blob = json.loads(_feedback_blob(result))
+    blob = json.loads(_feedback_blob(result, original_code="broken", final_code="fixed"))
     assert blob["repaired"] is True
     assert blob["initial_error_category"] == "syntax_error"
     assert blob["initial_error_type"] == "SyntaxError"
     assert "expected ':'" in blob["initial_error_explanation"]
     assert "SyntaxError" in blob["initial_traceback"]
+    assert "inferred_fix_units" in blob
+    assert "observed_mistake_count" in blob
 
 
 def test_capture_initial_failure_populates_state_once_only() -> None:
@@ -146,3 +140,78 @@ def test_sandbox_unavailable_grade_unchanged_by_repair_policy() -> None:
         grading_max_attempts=6,
     )
     assert g == 0.0
+
+
+def test_latent_second_fix_counts_against_grade() -> None:
+    """When one surfaced syntax error hides another bug fixed in the same repair,
+    effective mistake count should be >= 2 and grade should not exceed a single
+    API-misuse repaired baseline."""
+    original = "\n".join(
+        [
+            "digits = load_digits",
+            "model = SVC(gamma=0.001",
+        ]
+    )
+    fixed = "\n".join(
+        [
+            "digits = load_digits()",
+            "model = SVC(gamma=0.001)",
+        ]
+    )
+    latent = {
+        "final_status": "success",
+        "attempt_count": 1,
+        "max_attempts": 6,
+        "error_events": [
+            {
+                "signature": "SyntaxError: '(' was never closed",
+                "category": "syntax_error",
+                "error_line": "SyntaxError: '(' was never closed",
+            }
+        ],
+        "initial_error_category": "syntax_error",
+    }
+    api_single = {
+        "final_status": "success",
+        "attempt_count": 1,
+        "max_attempts": 6,
+        "error_events": [
+            {
+                "signature": "ModuleNotFoundError: No module named 'x'",
+                "category": "api_library_error",
+                "error_line": "ModuleNotFoundError: No module named 'x'",
+            }
+        ],
+        "initial_error_category": "api_library_error",
+    }
+
+    g_latent = _grade_from_result(original, fixed, latent, grading_max_attempts=6)
+    g_api = _grade_from_result("x", "y", api_single, grading_max_attempts=6)
+    blob = json.loads(_feedback_blob(latent, original_code=original, final_code=fixed))
+
+    assert blob["mistake_count"] >= 2
+    assert blob["inferred_fix_units"] >= 2
+    assert g_latent < g_api
+
+
+def test_comment_and_whitespace_only_edits_do_not_add_inferred_fix_units() -> None:
+    result = {
+        "final_status": "success",
+        "attempt_count": 1,
+        "max_attempts": 6,
+        "error_events": [
+            {
+                "signature": "SyntaxError: invalid syntax",
+                "category": "syntax_error",
+                "error_line": "SyntaxError: invalid syntax",
+            }
+        ],
+        "initial_error_category": "syntax_error",
+    }
+    original = "value = 1\n# comment\n"
+    final = "value = 1\n\n# updated comment\n"
+
+    blob = json.loads(_feedback_blob(result, original_code=original, final_code=final))
+
+    assert blob["inferred_fix_units"] == 0
+    assert blob["mistake_count"] == blob["observed_mistake_count"]

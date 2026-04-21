@@ -45,8 +45,12 @@ else:
 # Repo root (…/MentorApp): VectorDB layout matches App v1 + Graph Workflow notebook.
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
-# Local dev default when LLAMA_SERVER_URL is unset; Docker Compose requires LLAMA_SERVER_URL in .env.
-_LLAMA_SERVER_URL: str = os.getenv("LLAMA_SERVER_URL", "").strip() or "http://127.0.0.1:8081/v1"
+# Prefer HF endpoint base URL when provided; fallback to legacy LLAMA_SERVER_URL.
+_LLAMA_SERVER_URL: str = (
+    os.getenv("HF_INFERENCE_BASE_URL", "").strip()
+    or os.getenv("LLAMA_SERVER_URL", "").strip()
+    or "http://127.0.0.1:8081/v1"
+)
 
 
 def _resolve_chroma_dir() -> str:
@@ -60,7 +64,11 @@ def _resolve_chroma_dir() -> str:
 class WorkflowConfig:
     # OpenAI-compatible base URL for llama.cpp HTTP server (e.g. https://vast-host:port/v1).
     llama_server_url: str = _LLAMA_SERVER_URL
-    llama_model: str = os.getenv("LLAMA_OPENAI_MODEL", "local-gguf").strip()
+    llama_model: str = (
+        os.getenv("HF_OPENAI_MODEL", "").strip()
+        or os.getenv("LLAMA_OPENAI_MODEL", "").strip()
+        or "local-gguf"
+    )
     llama_server_host: str = os.getenv("LLAMA_SERVER_HOST", "127.0.0.1").strip()
     llama_server_port: int = int(os.getenv("LLAMA_SERVER_PORT", "8081"))
     llama_server_ctx: int = int(os.getenv("LLAMA_SERVER_CTX", "8192"))
@@ -82,8 +90,17 @@ class WorkflowConfig:
     openrouter_x_title: str = os.getenv("OPENROUTER_X_TITLE", "MentorApp").strip()
 
     execution_timeout_seconds: int = int(os.getenv("EXECUTION_TIMEOUT_SECONDS", "45"))
-    http_timeout_seconds: int = int(os.getenv("HTTP_TIMEOUT_SECONDS", "120"))
+    http_timeout_seconds: int = int(
+        os.getenv("SFT_HTTP_TIMEOUT_SECONDS", "").strip() or os.getenv("HTTP_TIMEOUT_SECONDS", "120")
+    )
     max_generation_tokens: int = int(os.getenv("MAX_GENERATION_TOKENS", "3000"))
+    # API key for OpenAI-compatible SFT endpoint (HF endpoint can use HF_TOKEN).
+    sft_api_key: str = (
+        os.getenv("HF_TOKEN", "").strip()
+        or os.getenv("LLAMA_OPENAI_API_KEY", "").strip()
+        or "llama.cpp"
+    )
+    rag_warmup_on_startup: bool = _bool_env("RAG_WARMUP_ON_STARTUP", True)
 
     chroma_dir: str = _resolve_chroma_dir()
     collection_name: str = os.getenv("MENTOR_APP_VECTOR_COLLECTION", "library_docs").strip()

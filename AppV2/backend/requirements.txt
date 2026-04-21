@@ -15,3 +15,7 @@ duckduckgo-search>=6.0.0
 # Local RAG (Chroma + embeddings) — optional but recommended for LangGraph retrieve/rerank nodes
 chromadb>=0.4.0
 sentence-transformers>=2.2.0
+
+# Common student-runtime data science libs used in sandboxed submissions.
+scikit-learn>=1.5.0
+matplotlib>=3.9.0

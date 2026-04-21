@@ -165,12 +165,13 @@
             </select>
           </div>
           <div class="gh-field">
-            <label class="gh-label" for="sid">Student ID (optional)</label>
+            <label class="gh-label" for="sid">Student ID</label>
             <input
               id="sid"
               class="gh-input"
               type="text"
               bind:value={studentIdNumber}
+              required={role === "student"}
               maxlength="64"
             />
           </div>

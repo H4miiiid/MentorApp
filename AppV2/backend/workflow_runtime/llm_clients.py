@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from typing import Any
 
 import requests
@@ -16,40 +17,97 @@ from AppV2.backend.workflow_runtime.state import extract_failure_signature
 
 
 def llama_health_url_from_openai_base(openai_base_url: str) -> str:
-    """Derive llama.cpp ``/health`` URL from the OpenAI-compatible ``/v1`` base (same as App v1)."""
+    """Derive llama.cpp ``/health`` URL from an OpenAI-compatible base URL."""
     base = openai_base_url.rstrip("/")
     return base.replace("/v1", "") + "/health"
 
 
-def ensure_llama_server_available() -> None:
-    """Verify the llama.cpp HTTP server responds on ``/health`` (OpenAI API lives under ``/v1``).
+def models_url_from_openai_base(openai_base_url: str) -> str:
+    """Derive an OpenAI-compatible ``/models`` URL from a base URL."""
+    base = openai_base_url.rstrip("/")
+    return base + "/models" if base.endswith("/v1") else base + "/v1/models"
 
-    - **Remote (default in Docker):** set ``LLAMA_SERVER_URL`` to the OpenAI-compatible base URL of your
-      hosted llama.cpp instance (e.g. Vast AI), typically ending with ``/v1``. Keep ``LLAMA_SERVER_AUTO_START=false``.
-    - **Host dev with auto-start:** set ``LLAMA_SERVER_AUTO_START=true`` and configure ``LOCAL_GGUF_PATH`` /
-      ``LLAMA_SERVER_PATH`` so a local ``llama-server`` binary can be spawned when ``/health`` is down.
+
+def sft_auth_headers() -> dict[str, str]:
+    """Return bearer auth headers for protected endpoints when configured."""
+    token = (CFG.sft_api_key or "").strip()
+    if not token or token == "llama.cpp":
+        return {}
+    return {"Authorization": f"Bearer {token}"}
+
+
+def ensure_llama_server_available() -> None:
+    """Verify the SFT endpoint is reachable.
+
+    Probe order:
+    1) ``/health`` for llama.cpp-style servers
+    2) ``/v1/models`` for OpenAI-compatible endpoints (HF, etc.)
     """
     setup_langsmith()
     health_url = llama_health_url_from_openai_base(CFG.llama_server_url)
+    models_url = models_url_from_openai_base(CFG.llama_server_url)
+    headers = sft_auth_headers()
 
     if CFG.llama_server_auto_start:
         ensure_llama_server_running()
 
-    try:
-        response = requests.get(health_url, timeout=3)
-    except Exception as exc:
-        raise RuntimeError(
-            f"Cannot reach llama.cpp HTTP server at {health_url} (from LLAMA_SERVER_URL={CFG.llama_server_url!r}): {exc}. "
-            "Confirm the remote Vast AI (or other) llama.cpp endpoint is up and that LLAMA_SERVER_URL points to its "
-            "OpenAI-compatible base (usually ending with /v1). For local-only experiments you can run llama-server "
-            "on the host and set LLAMA_SERVER_URL accordingly, or set APPV2_GRADING_BACKEND=mock to skip SFT grading."
-        ) from exc
+    max_attempts = 6
+    sleep_seconds = 5
+    transient_statuses = {429, 500, 502, 503, 504}
+    health_status = ""
+    models_status = ""
 
-    if response.status_code != 200:
-        raise RuntimeError(
-            f"llama.cpp health check failed at {health_url} with HTTP status {response.status_code}. "
-            "Verify the remote server is healthy and LLAMA_SERVER_URL matches its OpenAI-compatible base."
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get(health_url, timeout=3, headers=headers)
+            health_status = f"HTTP {response.status_code}"
+            if response.status_code == 200:
+                return
+            if response.status_code in {401, 403}:
+                break
+        except Exception as exc:
+            health_status = f"ERROR {exc}"
+
+        try:
+            response = requests.get(models_url, timeout=5, headers=headers)
+            models_status = f"HTTP {response.status_code}"
+            if response.status_code == 200:
+                return
+            if response.status_code in {401, 403}:
+                break
+        except Exception as exc:
+            models_status = f"ERROR {exc}"
+
+        health_retryable = any(f"HTTP {code}" == health_status for code in transient_statuses) or health_status.startswith(
+            "ERROR "
         )
+        models_retryable = any(f"HTTP {code}" == models_status for code in transient_statuses) or models_status.startswith(
+            "ERROR "
+        )
+        should_retry = health_retryable or models_retryable
+
+        if attempt < max_attempts and should_retry:
+            time.sleep(sleep_seconds)
+            continue
+        break
+
+    token_hint = (
+        " Set HF_TOKEN in AppV2/.env if your Hugging Face endpoint is protected."
+        if not headers
+        else " Verify HF_TOKEN/endpoint token is valid for this endpoint."
+    )
+
+    raise RuntimeError(
+        f"SFT endpoint preflight failed for base URL {CFG.llama_server_url!r}. "
+        f"Probe {health_url} -> {health_status}; probe {models_url} -> {models_status}. "
+        "Verify HF_INFERENCE_BASE_URL or LLAMA_SERVER_URL points to your OpenAI-compatible /v1 endpoint."
+        + token_hint
+    )
+
+
+def ensure_hf_endpoint_available() -> None:
+    """Compatibility wrapper for HF-named call sites."""
+    ensure_llama_server_available()
 
 
 def get_sft_llm() -> ChatOpenAI:
@@ -58,7 +116,7 @@ def get_sft_llm() -> ChatOpenAI:
     model_name = get_active_openai_model_name()
     return ChatOpenAI(
         base_url=CFG.llama_server_url,
-        api_key="llama.cpp",
+        api_key=CFG.sft_api_key,
         model=model_name,
         temperature=0.1,
         max_tokens=CFG.max_generation_tokens,

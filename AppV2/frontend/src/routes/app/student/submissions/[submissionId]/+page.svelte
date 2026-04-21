@@ -18,6 +18,20 @@
   $: gradingDone =
     submission != null && (submission.status === "completed" || submission.status === "failed");
 
+  function parseMistakeCount(feedback: string | undefined): number {
+    const src = (feedback ?? "").trim();
+    if (!src) return 0;
+    try {
+      const parsed = JSON.parse(src) as { mistake_count?: unknown };
+      const raw = parsed.mistake_count;
+      return typeof raw === "number" && Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  $: mistakeCount = gradingDone && submission ? parseMistakeCount(submission.feedback) : 0;
+
   async function load(id: string) {
     if (!id) {
       loading = false;
@@ -72,6 +86,8 @@
         <dd><SubmissionStatusBadge status={submission.status} /></dd>
         <dt>Grade</dt>
         <dd>{formatSubmissionGrade(submission.grade, submission.status)}</dd>
+        <dt>Mistakes</dt>
+        <dd>{mistakeCount > 0 ? mistakeCount : "—"}</dd>
         <dt>Created</dt>
         <dd>{formatDateTime(submission.created_at)}</dd>
       </dl>

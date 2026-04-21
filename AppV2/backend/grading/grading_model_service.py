@@ -28,7 +28,11 @@ def ensure_grading_models_bootstrapped() -> None:
     with Session(engine) as session:
         rows = list(session.exec(select(GradingModel)).all())
         if not rows:
-            openai = os.getenv("LLAMA_OPENAI_MODEL", "local-gguf").strip() or "local-gguf"
+            openai = (
+                os.getenv("HF_OPENAI_MODEL", "").strip()
+                or os.getenv("LLAMA_OPENAI_MODEL", "").strip()
+                or "local-gguf"
+            )
             m = GradingModel(
                 display_name="Default",
                 gguf_filename="",
@@ -58,7 +62,11 @@ def get_active_openai_model_name() -> str:
                 return row.openai_model_name.strip()
     except Exception:
         logger.debug("grading_models: read active model failed, using env", exc_info=True)
-    return os.getenv("LLAMA_OPENAI_MODEL", "local-gguf").strip()
+    return (
+        os.getenv("HF_OPENAI_MODEL", "").strip()
+        or os.getenv("LLAMA_OPENAI_MODEL", "").strip()
+        or "local-gguf"
+    )
 
 
 def get_active_grading_model() -> GradingModel | None:

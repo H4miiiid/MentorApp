@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import difflib
 import logging
 import re
 from datetime import datetime, timezone
@@ -58,6 +57,8 @@ class RepairState(TypedDict):
     previous_failure_signature: str
     repeated_failure_count: int
     no_meaningful_change_count: int
+    error_events: list[dict[str, Any]]
+    mistake_count: int
     should_stop: bool
     stop_reason: str
 
@@ -101,10 +102,11 @@ def normalize_code(code: str) -> str:
 
 
 def code_changed_meaningfully(before: str, after: str, ratio_threshold: float = 0.99999) -> bool:
+    _ = ratio_threshold  # kept for compatibility with existing call sites
     if normalize_code(before) == normalize_code(after):
         return False
-    ratio = difflib.SequenceMatcher(a=before, b=after).ratio()
-    return ratio < ratio_threshold
+    # Any non-trivial normalized change should count as meaningful.
+    return True
 
 
 def extract_failure_signature(traceback_text: str) -> str:
@@ -282,6 +284,8 @@ def init_state(
         previous_failure_signature="",
         repeated_failure_count=0,
         no_meaningful_change_count=0,
+        error_events=[],
+        mistake_count=0,
         should_stop=False,
         stop_reason="",
         final_status="",

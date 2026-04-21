@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import traceback as tb
 from typing import Any
 
@@ -30,6 +31,23 @@ from AppV2.backend.workflow_runtime.state import (
 
 logger = logging.getLogger(__name__)
 
+_MISSING_MODULE_RE = re.compile(r"ModuleNotFoundError:\\s+No module named ['\"]([^'\"]+)['\"]")
+_SANDBOX_EXPECTED_MODULES = {
+    "sklearn",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "scipy",
+    "seaborn",
+}
+
+
+def _extract_missing_module(trace_text: str) -> str:
+    match = _MISSING_MODULE_RE.search(trace_text or "")
+    if not match:
+        return ""
+    return match.group(1).strip()
+
 
 def _capture_initial_failure(state: RepairState, result: dict[str, Any], trace: str) -> None:
     """Snapshot the *first* failed run so grading and the UI can show the student's
@@ -50,6 +68,31 @@ def _capture_initial_failure(state: RepairState, result: dict[str, Any], trace: 
     state["initial_error_explanation"] = classification.get("error_explanation", "")
     state["initial_stdout"] = result.get("stdout", "") or ""
     state["initial_stderr"] = result.get("stderr", "") or cleaned
+
+
+def _record_error_event(state: RepairState, result: dict[str, Any], trace: str) -> None:
+    """Track observed failures so grading can use mistake-count weighting."""
+    cleaned = trace or ""
+    if not cleaned.strip():
+        return
+    classification = classify_error(cleaned, result)
+    signature = extract_failure_signature(cleaned)
+    state["error_events"].append(
+        {
+            "attempt": state.get("attempt_count", 0),
+            "signature": signature,
+            "category": classification.get("category", "api_library_error"),
+            "error_type": classification.get("error_type", "UnknownError"),
+            "error_line": classification.get("error_line", ""),
+            "timestamp": now_iso(),
+        }
+    )
+    distinct_signatures = {
+        (evt.get("signature") or "").strip()
+        for evt in state.get("error_events", [])
+        if (evt.get("signature") or "").strip()
+    }
+    state["mistake_count"] = len(distinct_signatures)
 
 
 def record_attempt(state: RepairState, route: str, before_code: str, after_code: str, prompt: str) -> None:
@@ -91,6 +134,7 @@ def run_checks(state: RepairState) -> RepairState:
         state["check_result"] = result
         state["failure_signature"] = extract_failure_signature(trace)
         _capture_initial_failure(state, result, trace)
+        _record_error_event(state, result, trace)
         logger.debug("run_checks compile failed (no sandbox)")
         return state
 
@@ -122,12 +166,30 @@ def run_checks(state: RepairState) -> RepairState:
         result["passed"] = True
         state["traceback"] = ""
         state["failure_signature"] = ""
+        state["no_meaningful_change_count"] = 0
+        state["repeated_failure_count"] = 0
     else:
         trace = result["stderr"] or "Runtime failed without stderr output."
         result["traceback"] = trace
         state["traceback"] = trace
         state["failure_signature"] = extract_failure_signature(trace)
+
+        missing_module = _extract_missing_module(trace)
+        if (
+            state.get("attempt_count", 0) == 0
+            and missing_module
+            and missing_module.split(".", 1)[0] in _SANDBOX_EXPECTED_MODULES
+        ):
+            # If a known course/runtime library is missing from the sandbox image,
+            # this is environment drift, not a student code mistake.
+            state["check_result"] = result
+            raise SandboxUnavailableError(
+                f"Sandbox dependency missing: {missing_module}. "
+                "Execution could not be validated in the sandbox image."
+            )
+
         _capture_initial_failure(state, result, trace)
+        _record_error_event(state, result, trace)
 
     state["check_result"] = result
     logger.debug(
@@ -191,7 +253,7 @@ def diagnose_failure(state: RepairState) -> RepairState:
     if state["attempt_count"] >= state["max_attempts"]:
         state["should_stop"] = True
         state["stop_reason"] = "max_attempts_reached"
-    elif state["no_meaningful_change_count"] >= 2:
+    elif state["no_meaningful_change_count"] >= 3:
         if state["used_reflection"] and not state["used_external"]:
             state["should_stop"] = False
             state["stop_reason"] = ""
