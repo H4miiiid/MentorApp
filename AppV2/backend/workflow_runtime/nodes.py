@@ -139,7 +139,11 @@ def run_checks(state: RepairState) -> RepairState:
         return state
 
     try:
-        run_out = execute_python_after_compile(code, float(CFG.execution_timeout_seconds))
+        run_out = execute_python_after_compile(
+            code,
+            float(CFG.execution_timeout_seconds),
+            data_files=state.get("data_files") or None,
+        )
     except Exception as exc:
         err = f"Sandbox execution error: {exc}"
         result["traceback"] = err

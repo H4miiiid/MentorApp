@@ -1,15 +1,20 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
+  import DocumentPicker from "$lib/components/DocumentPicker.svelte";
   import { PATH_TEACHER_HOME } from "$lib/paths";
   import {
     addAssignmentStudents,
     fetchAssignment,
+    fetchAssignmentDocuments,
     fetchAssignmentStudents,
+    fetchDocuments,
     fetchSubmissions,
     fetchUsers,
+    setAssignmentDocuments,
     type AssignmentRead,
     type AssignmentStudentRead,
+    type DocumentRead,
     type SubmissionRead,
     type SubmissionStatus,
     type UserRead,
@@ -38,6 +43,13 @@
   let sortBy: "name" | "activity" = "name";
   let sortOrder: "asc" | "desc" = "asc";
 
+  let attachedDocs: DocumentRead[] = [];
+  let libraryDocs: DocumentRead[] = [];
+  let selectedDocIds: string[] = [];
+  let docsSaving = false;
+  let docsError = "";
+  let docsMessage = "";
+
   $: assignmentId = $page.params.assignmentId ?? "";
 
   function nameForUser(id: string): string {
@@ -56,16 +68,21 @@
     loading = true;
     errorMsg = "";
     try {
-      const [a, studs, subs, users] = await Promise.all([
+      const [a, studs, subs, users, attached, lib] = await Promise.all([
         fetchAssignment(id),
         fetchAssignmentStudents(id),
         fetchSubmissions(),
         fetchUsers(),
+        fetchAssignmentDocuments(id),
+        fetchDocuments({ includeArchived: false }),
       ]);
       assignment = a;
       enrollments = studs;
       submissions = subs.filter((s) => s.assignment_id === id);
       usersById = new Map(users.map((u) => [u.id, u]));
+      attachedDocs = attached;
+      libraryDocs = lib;
+      selectedDocIds = attached.map((d) => d.id);
     } catch (e) {
       errorMsg = e instanceof Error ? e.message : "Failed to load";
       assignment = null;
@@ -73,6 +90,31 @@
       loading = false;
     }
   }
+
+  async function saveAttachedDocs() {
+    if (!assignmentId) return;
+    docsError = "";
+    docsMessage = "";
+    docsSaving = true;
+    try {
+      const next = await setAssignmentDocuments(assignmentId, selectedDocIds);
+      attachedDocs = next;
+      selectedDocIds = next.map((d) => d.id);
+      docsMessage = `Saved ${next.length} document${next.length === 1 ? "" : "s"} to this assignment.`;
+    } catch (e) {
+      docsError = e instanceof Error ? e.message : "Failed to save attached documents";
+    } finally {
+      docsSaving = false;
+    }
+  }
+
+  $: hasDocsChanges = (() => {
+    const a = new Set(attachedDocs.map((d) => d.id));
+    const b = new Set(selectedDocIds);
+    if (a.size !== b.size) return true;
+    for (const id of a) if (!b.has(id)) return true;
+    return false;
+  })();
 
   $: load(assignmentId);
 
@@ -193,6 +235,47 @@
     <div class="gh-card" style="max-width: none; margin-bottom: 24px;">
       <h2 class="gh-title" style="font-size: 16px; margin-bottom: 8px;">Description</h2>
       <p style="margin: 0; white-space: pre-wrap;">{assignment.description || "—"}</p>
+    </div>
+
+    <div class="gh-card" style="max-width: none; margin-bottom: 24px;">
+      <h2 class="gh-title" style="font-size: 16px; margin-bottom: 4px;">Attached documents</h2>
+      <p class="gh-subtitle" style="margin: 0 0 12px;">
+        Select previously uploaded documents that students may download for this assignment. Attached
+        files are also made available inside the grading sandbox via
+        <code>$ASSIGNMENT_DATA_DIR</code>. Upload new files from the
+        <a href="/app/teacher/documents">Documents tab</a>.
+      </p>
+
+      {#if docsError}
+        <div class="gh-alert gh-alert-error" style="margin-bottom: 12px;">{docsError}</div>
+      {/if}
+      {#if docsMessage}
+        <div class="gh-alert" style="margin-bottom: 12px;">{docsMessage}</div>
+      {/if}
+
+      <div style="margin-bottom: 12px;">
+        <DocumentPicker
+          documents={libraryDocs}
+          bind:selectedIds={selectedDocIds}
+          idPrefix="attach-doc"
+          summaryLabel="Select documents to attach"
+          emptyLabel="Your library is empty. Upload documents first, then return to attach them here."
+          open={attachedDocs.length > 0}
+        />
+      </div>
+      <div class="gh-form-actions" style="margin: 0;">
+        <button
+          type="button"
+          class="gh-btn gh-btn-primary"
+          disabled={docsSaving || !hasDocsChanges || libraryDocs.length === 0}
+          on:click={saveAttachedDocs}
+        >
+          {docsSaving ? "Saving…" : "Save attached documents"}
+        </button>
+        <span class="gh-muted" style="font-size: 12px;">
+          {selectedDocIds.length} selected · {attachedDocs.length} currently attached
+        </span>
+      </div>
     </div>
 
     <div

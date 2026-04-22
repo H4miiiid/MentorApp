@@ -1,0 +1,38 @@
+# Curated student-runtime stack for grading sandbox (`SANDBOX_PYTHON_IMAGE`).
+# Install order is just "what the student may `import`"; versions are loose to
+# pick up manylinux wheels for python:3.13-slim-bookworm.
+#
+# If you add a library here, rebuild the sandbox image:
+#   docker compose -f AppV2/docker-compose.yml build sandbox-image
+# (or `docker compose up --build`, which rebuilds everything).
+
+# --- Core numerics / dataframes ---
+numpy>=1.26
+pandas>=2.2
+scipy>=1.13
+
+# --- Classical ML / stats ---
+scikit-learn>=1.5
+statsmodels>=0.14
+joblib>=1.4
+
+# --- Plotting (matplotlib runs headless via MPLBACKEND=Agg) ---
+matplotlib>=3.9
+seaborn>=0.13
+
+# --- IO formats commonly used in coursework ---
+openpyxl>=3.1        # .xlsx
+xlrd>=2.0            # legacy .xls (read-only)
+pyarrow>=15.0        # .parquet, .feather
+lxml>=5.2            # fast XML / HTML parser
+beautifulsoup4>=4.12 # HTML scraping exercises
+Pillow>=10.3         # image IO (PIL) — pairs well with matplotlib
+
+# --- Networking / HTTP clients (sandbox disables --network by default, but
+# students may still import these for offline examples and unit tests) ---
+requests>=2.32
+
+# --- Misc teaching conveniences ---
+sympy>=1.13          # symbolic math / calculus assignments
+networkx>=3.3        # graph exercises
+tqdm>=4.66           # progress bars in loops

@@ -160,6 +160,7 @@ def run_workflow(
     submission_id: str = "",
     assignment_id: str = "",
     run_id: str = "",
+    data_files: list[tuple[str, str]] | None = None,
 ) -> dict[str, Any]:
     setup_langsmith()
     try:
@@ -186,6 +187,7 @@ def run_workflow(
         original_code=original_code,
         max_attempts=max_attempts,
         workflow_context=ctx or None,
+        data_files=data_files,
     )
 
     try:

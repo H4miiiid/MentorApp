@@ -8,13 +8,22 @@ from sqlmodel import Session, select
 
 from ...api.cascade import delete_assignment_cascade
 from ...api.deps import SessionDep, get_current_user
-from ...db.models import Assignment, AssignmentStudent, User, UserRole
+from ...db.models import (
+    Assignment,
+    AssignmentDocument,
+    AssignmentStudent,
+    Document,
+    User,
+    UserRole,
+)
 from ...schemas import (
     AssignmentCreate,
+    AssignmentDocumentsReplace,
     AssignmentRead,
     AssignmentStudentAdd,
     AssignmentStudentRead,
     AssignmentUpdate,
+    DocumentRead,
 )
 
 router = APIRouter(
@@ -206,6 +215,103 @@ def list_assignment_students(
         )
         for r in rows
     ]
+
+
+def _document_to_read(d: Document) -> DocumentRead:
+    return DocumentRead(
+        id=d.id,
+        uploaded_by=d.uploaded_by,
+        title=d.title,
+        description=d.description,
+        file_path=d.file_path,
+        file_type=d.file_type,
+        file_size_bytes=d.file_size_bytes,
+        assignment_id=d.assignment_id,
+        archived_at=d.archived_at,
+        created_at=d.created_at,
+        updated_at=d.updated_at,
+    )
+
+
+@router.get("/{assignment_id}/documents", response_model=list[DocumentRead])
+def list_assignment_documents(
+    session: SessionDep,
+    current: Annotated[User, Depends(get_current_user)],
+    assignment_id: str,
+) -> list[DocumentRead]:
+    """Documents currently attached to this assignment (visible to teacher + enrolled students)."""
+    a = _get_assignment_or_404(session, assignment_id)
+    if not _can_view_assignment(session, a, current):
+        raise HTTPException(status_code=403, detail="Not allowed to view this assignment")
+    rows = session.exec(
+        select(AssignmentDocument).where(AssignmentDocument.assignment_id == assignment_id)
+    ).all()
+    docs: list[DocumentRead] = []
+    for row in rows:
+        d = session.get(Document, row.document_id)
+        if d is None:
+            continue
+        docs.append(_document_to_read(d))
+    return docs
+
+
+@router.put(
+    "/{assignment_id}/documents",
+    response_model=list[DocumentRead],
+    summary="Replace the full set of documents attached to an assignment (teacher/admin).",
+)
+def replace_assignment_documents(
+    session: SessionDep,
+    current: Annotated[User, Depends(get_current_user)],
+    assignment_id: str,
+    body: AssignmentDocumentsReplace,
+) -> list[DocumentRead]:
+    a = _get_assignment_or_404(session, assignment_id)
+    if not _can_manage_assignment(a, current):
+        raise HTTPException(status_code=403, detail="Not allowed to modify this assignment")
+
+    # Validate every requested document (exists, owned by teacher unless admin, not archived).
+    desired: list[Document] = []
+    seen: set[str] = set()
+    for doc_id in body.document_ids:
+        if doc_id in seen:
+            continue
+        seen.add(doc_id)
+        d = session.get(Document, doc_id)
+        if d is None:
+            raise HTTPException(status_code=400, detail=f"Document not found: {doc_id}")
+        if d.archived_at is not None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Document is archived and cannot be attached: {doc_id}",
+            )
+        if current.role != UserRole.admin and d.uploaded_by != current.id:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the uploading teacher (or an admin) may attach a document.",
+            )
+        desired.append(d)
+
+    current_rows = session.exec(
+        select(AssignmentDocument).where(AssignmentDocument.assignment_id == assignment_id)
+    ).all()
+    current_ids = {row.document_id for row in current_rows}
+    desired_ids = {d.id for d in desired}
+
+    for row in current_rows:
+        if row.document_id not in desired_ids:
+            session.delete(row)
+
+    for d in desired:
+        if d.id not in current_ids:
+            session.add(AssignmentDocument(assignment_id=assignment_id, document_id=d.id))
+
+    a.updated_at = _now()
+    session.add(a)
+    session.commit()
+
+    # Return the refreshed list in insertion order matching the caller's request.
+    return [_document_to_read(d) for d in desired]
 
 
 @router.post("/{assignment_id}/students", response_model=list[AssignmentStudentRead])

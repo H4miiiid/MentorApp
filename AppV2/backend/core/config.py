@@ -43,6 +43,29 @@ _APPV2_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_DB_PATH = str(_APPV2_ROOT / "mentorapp_v2.db")
 _DEFAULT_STORAGE_DIR = str(_APPV2_ROOT / "storage")
 
+# Teaching / data formats the Documents tab accepts out of the box. Teachers may
+# override via APPV2_DOCUMENT_ALLOWED_EXTS (comma-separated, with or without dots).
+_DEFAULT_DOC_EXTENSIONS: tuple[str, ...] = (
+    ".txt",
+    ".csv",
+    ".tsv",
+    ".json",
+    ".md",
+    ".pdf",
+    ".xlsx",
+    ".xls",
+    ".zip",
+    ".png",
+    ".jpg",
+    ".jpeg",
+)
+
+
+def _parse_extensions(raw: str) -> tuple[str, ...]:
+    parts = [p.strip().lower() for p in (raw or "").split(",") if p.strip()]
+    normalized = tuple(("." + p) if not p.startswith(".") else p for p in parts)
+    return normalized or _DEFAULT_DOC_EXTENSIONS
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -76,6 +99,17 @@ class Settings:
     )
     bootstrap_admin_email: str = os.getenv("APPV2_ADMIN_EMAIL", "admin@gmail.com").strip().lower()
     bootstrap_admin_password: str = os.getenv("APPV2_ADMIN_PASSWORD", "123456")
+
+    # Teacher Documents tab: per-file upload cap (MB) and allowed extensions.
+    document_max_upload_mb: int = int(os.getenv("APPV2_DOCUMENT_MAX_UPLOAD_MB", "5"))
+    document_allowed_extensions: tuple[str, ...] = _parse_extensions(
+        os.getenv("APPV2_DOCUMENT_ALLOWED_EXTS", "")
+    )
+
+    @property
+    def document_max_upload_bytes(self) -> int:
+        mb = max(1, int(self.document_max_upload_mb))
+        return mb * 1024 * 1024
 
     @property
     def database_url(self) -> str:

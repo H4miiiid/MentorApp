@@ -17,9 +17,19 @@ from AppV2.backend.workflow_runtime.state import extract_failure_signature
 
 
 def llama_health_url_from_openai_base(openai_base_url: str) -> str:
-    """Derive llama.cpp ``/health`` URL from an OpenAI-compatible base URL."""
+    """Derive an endpoint ``/health`` URL from an OpenAI-compatible base URL.
+
+    Works for both llama.cpp-style servers and Hugging Face OpenAI-compatible
+    endpoints since both expose ``/health`` one level above ``/v1``.
+    """
     base = openai_base_url.rstrip("/")
     return base.replace("/v1", "") + "/health"
+
+
+# HF-era alias: admin/grading-status callers were renamed to reference the HF endpoint
+# vocabulary while the underlying derivation is identical. Keep both names live so
+# existing imports keep working no matter which side of the rename they were written for.
+endpoint_health_url_from_openai_base = llama_health_url_from_openai_base
 
 
 def models_url_from_openai_base(openai_base_url: str) -> str:

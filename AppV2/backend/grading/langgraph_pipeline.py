@@ -6,10 +6,14 @@ import asyncio
 import difflib
 import json
 import logging
+from pathlib import Path
 from typing import Any
 
+from sqlmodel import Session, select
+
 from ..core.config import Settings
-from ..db.models import SubmissionStatus
+from ..db.database import get_engine
+from ..db.models import AssignmentDocument, Document, SubmissionStatus
 from ..workflow_runtime.graph import run_workflow
 from .pipeline import GradingPipeline
 from .types import GradingOutcome, SubmissionSnapshot
@@ -253,6 +257,41 @@ def _feedback_blob(result: dict[str, Any], *, original_code: str = "", final_cod
     return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
+def _collect_assignment_data_files(settings: Settings, assignment_id: str) -> list[tuple[str, str]]:
+    """Resolve the absolute paths of every document currently attached to an assignment.
+
+    Archived documents that remain attached are still included so past submissions keep
+    running against the same files the student saw when they submitted. Entries whose
+    files are missing on disk are skipped (logged as a warning by the sandbox layer).
+    """
+    if not assignment_id:
+        return []
+    engine = get_engine()
+    root = Path(settings.storage_dir).resolve()
+    files: list[tuple[str, str]] = []
+    with Session(engine) as session:
+        rows = session.exec(
+            select(AssignmentDocument).where(AssignmentDocument.assignment_id == assignment_id)
+        ).all()
+        for row in rows:
+            d = session.get(Document, row.document_id)
+            if d is None or not d.file_path:
+                continue
+            p = Path(d.file_path)
+            if not p.is_absolute():
+                p = (root / p).resolve()
+            else:
+                p = p.resolve()
+            # Refuse anything that escapes the storage root — defense in depth.
+            try:
+                p.relative_to(root)
+            except ValueError:
+                continue
+            target_name = Path(d.file_path).name or f"doc_{d.id}"
+            files.append((str(p), target_name))
+    return files
+
+
 class LangGraphGradingPipeline(GradingPipeline):
     """Runs the LangGraph repair workflow in a thread pool (blocking `invoke`)."""
 
@@ -272,6 +311,14 @@ class LangGraphGradingPipeline(GradingPipeline):
             },
         )
 
+        data_files = _collect_assignment_data_files(self._settings, submission.assignment_id)
+        if data_files:
+            logger.info(
+                "[grading-langgraph] attached_documents=%s | submission=%s",
+                len(data_files),
+                submission.id,
+            )
+
         def _sync_run() -> dict[str, Any]:
             return run_workflow(
                 submission.code,
@@ -279,6 +326,7 @@ class LangGraphGradingPipeline(GradingPipeline):
                 submission_id=submission.id,
                 assignment_id=submission.assignment_id,
                 run_id=submission.id,
+                data_files=data_files or None,
             )
 
         try:

@@ -39,7 +39,7 @@ def test_run_checks_raises_sandbox_unavailable(monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.setattr(
         nodes,
         "execute_python_after_compile",
-        lambda code, timeout: _unavailable_result("docker socket missing"),
+        lambda code, timeout, **kwargs: _unavailable_result("docker socket missing"),
     )
     state = init_state(original_code="print('hi')")
     with pytest.raises(sandbox.SandboxUnavailableError) as exc:
@@ -52,7 +52,7 @@ def test_run_checks_does_not_raise_on_real_student_error(monkeypatch: pytest.Mon
     monkeypatch.setattr(
         nodes,
         "execute_python_after_compile",
-        lambda code, timeout: {
+        lambda code, timeout, **kwargs: {
             "ok": False,
             "stdout": "",
             "stderr": "Traceback ...\nZeroDivisionError: division by zero",
@@ -78,7 +78,7 @@ def test_run_workflow_short_circuits_on_unavailable(monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(
         nodes,
         "execute_python_after_compile",
-        lambda code, timeout: _unavailable_result("image pull unauthorized"),
+        lambda code, timeout, **kwargs: _unavailable_result("image pull unauthorized"),
     )
 
     # If any repair node ran, it would call one of these; detonate if they do.

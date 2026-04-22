@@ -47,7 +47,11 @@ services:
       # Sandboxed student code: `docker run --rm` per check (not a Compose service).
       SANDBOX_USE_DOCKER: ${SANDBOX_USE_DOCKER:-true}
       SANDBOX_ALLOW_UNSAFE_FALLBACK: ${SANDBOX_ALLOW_UNSAFE_FALLBACK:-false}
-      SANDBOX_PYTHON_IMAGE: ${SANDBOX_PYTHON_IMAGE:-appv2-backend:latest}
+      # Image used to run student code in ephemeral `docker run` sandboxes.
+      # Defaults to the dedicated `mentorapp-sandbox:latest` image built by the
+      # `sandbox-image` service below (includes numpy/pandas/scipy/sklearn/…).
+      # Override to reuse `appv2-backend:latest` or another image if you prefer.
+      SANDBOX_PYTHON_IMAGE: ${SANDBOX_PYTHON_IMAGE:-mentorapp-sandbox:latest}
       # Feed stdin so input() works (blank lines; override with SANDBOX_STDIN in .env if needed).
       SANDBOX_STDIN_BLANK_LINES: ${SANDBOX_STDIN_BLANK_LINES:-512}
       # Shared scratch volume so the backend (running in a container) can share candidate.py
@@ -90,6 +94,19 @@ services:
       - "${FRONTEND_PORT:-3000}:80"
     depends_on:
       - backend
+
+  # Builds the sandbox image used to execute student code (see SANDBOX_PYTHON_IMAGE
+  # on the backend service). The container itself exits immediately — we only need
+  # Compose to build & tag the image so it's available to the host Docker daemon.
+  # `docker compose build` / `docker compose up --build` rebuilds it; on plain
+  # `docker compose up` the container will just exit(0) since the image already exists.
+  sandbox-image:
+    build:
+      context: ..
+      dockerfile: AppV2/sandbox/Dockerfile
+    image: mentorapp-sandbox:latest
+    command: ["true"]
+    restart: "no"
 
 volumes:
   appv2-data:

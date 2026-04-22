@@ -15,11 +15,22 @@ import sys
 import tempfile
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 logger = logging.getLogger(__name__)
 
 _SANDBOX_LOG = logging.getLogger("AppV2.backend.workflow.sandbox")
+
+
+# ``SandboxDataFile`` is how callers pass assignment resources (datasets, reference
+# documents) into the sandbox. The tuple is (host_path, name_inside_data_dir).
+# We keep it as a plain tuple to avoid a circular dep on db models and so tests
+# can construct them with bare file paths.
+SandboxDataFile = tuple[str, str]
+"""(absolute source path on host, target filename inside /work/data/)."""
+
+ASSIGNMENT_DATA_ENV_VAR = "ASSIGNMENT_DATA_DIR"
+_CONTAINER_DATA_DIR = "/work/data"
 
 
 class SandboxUnavailableError(RuntimeError):
@@ -58,7 +69,19 @@ def _docker_socket_exists() -> bool:
 
 
 def sandbox_image() -> str:
-    return os.getenv("SANDBOX_PYTHON_IMAGE", "python:3.13-slim-bookworm").strip()
+    """Image used by `docker run` for each student submission.
+
+    Default is the dedicated ``mentorapp-sandbox:latest`` image built from
+    ``AppV2/sandbox/Dockerfile`` (via the ``sandbox-image`` service in
+    ``docker-compose.yml``). It ships a curated data-science stack — numpy,
+    pandas, scipy, scikit-learn, matplotlib, seaborn, pyarrow, lxml, Pillow,
+    statsmodels, sympy, networkx, requests, openpyxl, tqdm — so common course
+    assignments don't crash with ``ModuleNotFoundError``.
+
+    Override with ``SANDBOX_PYTHON_IMAGE`` (e.g. ``python:3.13-slim-bookworm``
+    for a minimal stdlib-only runtime or a fully custom image you maintain).
+    """
+    return os.getenv("SANDBOX_PYTHON_IMAGE", "mentorapp-sandbox:latest").strip()
 
 
 def sandbox_memory() -> str:
@@ -177,7 +200,48 @@ def _scratch_volume_config() -> tuple[str, str] | None:
     return None
 
 
-def run_python_in_docker(code: str, timeout: float) -> dict[str, Any]:
+def _safe_data_filename(name: str) -> str:
+    """Strip path components from caller-supplied names before mounting into the sandbox."""
+    base = Path(name or "").name or "data"
+    return base[:200]
+
+
+def _materialize_data_files(
+    work: Path, data_files: Sequence[SandboxDataFile] | None
+) -> bool:
+    """Copy caller-supplied data files into ``{work}/data``.
+
+    Returns True when at least one file was copied (so the caller knows to set
+    ``ASSIGNMENT_DATA_DIR``). Silently skips entries whose source doesn't exist
+    — the sandbox should still run the student's code even if a teacher deletes
+    a file between upload and grading.
+    """
+    if not data_files:
+        return False
+    data_dir = work / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for raw_src, raw_name in data_files:
+        src = Path(raw_src)
+        if not src.is_file():
+            logger.warning("sandbox: skipping missing data file %s", src)
+            continue
+        dst_name = _safe_data_filename(raw_name) or src.name
+        dst = data_dir / dst_name
+        try:
+            shutil.copyfile(src, dst)
+            copied += 1
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.warning("sandbox: failed to copy data file %s -> %s (%s)", src, dst, exc)
+    return copied > 0
+
+
+def run_python_in_docker(
+    code: str,
+    timeout: float,
+    *,
+    data_files: Sequence[SandboxDataFile] | None = None,
+) -> dict[str, Any]:
     """Run `code` in a throwaway container: network none, read-only workdir mount.
 
     Stdin for ``input()`` is supplied via a file mounted into the container and shell
@@ -222,11 +286,19 @@ def run_python_in_docker(code: str, timeout: float) -> dict[str, Any]:
         if stdin_payload is not None:
             (Path(work) / "_stdin.txt").write_text(stdin_payload, encoding="utf-8")
 
+        has_data = _materialize_data_files(Path(work), data_files)
+
         # Shell runs inside the container so `<` attaches the file to Python's stdin reliably.
         if stdin_payload is None:
             inner_sh = "exec python /work/candidate.py"
         else:
             inner_sh = "exec python /work/candidate.py < /work/_stdin.txt"
+
+        env_args: list[str] = ["-e", "MPLBACKEND=Agg"]
+        if has_data:
+            # Students read attached resources via this env var (see Note banner on the
+            # submission page). The directory is read-only because the scratch mount is.
+            env_args.extend(["-e", f"{ASSIGNMENT_DATA_ENV_VAR}={_CONTAINER_DATA_DIR}"])
 
         cmd = [
             "docker",
@@ -234,8 +306,7 @@ def run_python_in_docker(code: str, timeout: float) -> dict[str, Any]:
             "--rm",
             "--name",
             container_name,
-            "-e",
-            "MPLBACKEND=Agg",
+            *env_args,
             "--network",
             "none",
             "--memory",
@@ -293,13 +364,32 @@ def run_python_in_docker(code: str, timeout: float) -> dict[str, Any]:
             pass
 
 
-def run_python_in_process(code: str, timeout: float) -> dict[str, Any]:
-    """UNSAFE: run temp file with same interpreter as API (legacy behavior)."""
+def run_python_in_process(
+    code: str,
+    timeout: float,
+    *,
+    data_files: Sequence[SandboxDataFile] | None = None,
+) -> dict[str, Any]:
+    """UNSAFE: run temp file with same interpreter as API (legacy behavior).
+
+    Supports the same ``ASSIGNMENT_DATA_DIR`` contract as the Docker sandbox so student
+    code that reads from ``os.environ["ASSIGNMENT_DATA_DIR"]`` works identically in the
+    dev fallback. The data directory is created as a sibling of the candidate script.
+    """
     temp_path: str | None = None
+    data_workdir: str | None = None
     try:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, encoding="utf-8") as handle:
             handle.write(code)
             temp_path = handle.name
+
+        env = os.environ.copy()
+        if data_files:
+            data_workdir = tempfile.mkdtemp(prefix="mentorapp_data_")
+            copied = _materialize_data_files(Path(data_workdir), data_files)
+            if copied:
+                env[ASSIGNMENT_DATA_ENV_VAR] = str(Path(data_workdir) / "data")
+
         stdin_payload = sandbox_stdin_payload()
         run_kw: dict[str, Any] = {
             "capture_output": True,
@@ -307,6 +397,7 @@ def run_python_in_process(code: str, timeout: float) -> dict[str, Any]:
             "encoding": "utf-8",
             "errors": "replace",
             "timeout": timeout,
+            "env": env,
         }
         if stdin_payload is not None:
             run_kw["input"] = stdin_payload
@@ -329,16 +420,29 @@ def run_python_in_process(code: str, timeout: float) -> dict[str, Any]:
     finally:
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
+        if data_workdir:
+            shutil.rmtree(data_workdir, ignore_errors=True)
 
 
-def execute_python_after_compile(code: str, timeout: float) -> dict[str, Any]:
-    """After successful `compile()`, run code and return runtime result dict."""
+def execute_python_after_compile(
+    code: str,
+    timeout: float,
+    *,
+    data_files: Sequence[SandboxDataFile] | None = None,
+) -> dict[str, Any]:
+    """After successful `compile()`, run code and return runtime result dict.
+
+    ``data_files`` is an optional list of ``(host_path, target_name)`` tuples to
+    expose to the student code via ``ASSIGNMENT_DATA_DIR``. Used for assignment-
+    attached documents/datasets the teacher uploaded in the Documents tab.
+    """
     if sandbox_docker_enabled() and _docker_socket_exists():
-        result = run_python_in_docker(code, timeout)
+        result = run_python_in_docker(code, timeout, data_files=data_files)
         _SANDBOX_LOG.info(
-            "sandbox exec mode=%s ok=%s",
+            "sandbox exec mode=%s ok=%s data_files=%s",
             result.get("mode"),
             result.get("ok"),
+            len(data_files) if data_files else 0,
             extra={
                 "wf_kind": "sandbox",
                 "wf_phase": "execute",
@@ -352,7 +456,7 @@ def execute_python_after_compile(code: str, timeout: float) -> dict[str, Any]:
         logger.warning(
             "SANDBOX_ALLOW_UNSAFE_FALLBACK=true: executing candidate code on API host (not isolated)."
         )
-        result = run_python_in_process(code, timeout)
+        result = run_python_in_process(code, timeout, data_files=data_files)
         _SANDBOX_LOG.warning(
             "sandbox unsafe fallback mode=%s",
             result.get("mode"),

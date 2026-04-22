@@ -26,7 +26,15 @@ export async function apiFetch(
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
-  if (!headers.has("Content-Type") && options.body) {
+  // Only default to JSON for *actual* JSON bodies. FormData (multipart uploads)
+  // must keep the browser-generated `multipart/form-data; boundary=...` header,
+  // otherwise FastAPI cannot parse the parts and reports "file Field required".
+  const body = options.body;
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+  const isBlob = typeof Blob !== "undefined" && body instanceof Blob;
+  const isUrlSearchParams =
+    typeof URLSearchParams !== "undefined" && body instanceof URLSearchParams;
+  if (!headers.has("Content-Type") && body && !isFormData && !isBlob && !isUrlSearchParams) {
     headers.set("Content-Type", "application/json");
   }
   return fetch(path, { ...options, headers });
@@ -151,6 +159,7 @@ export type DocumentRead = {
   file_type: string;
   file_size_bytes: number;
   assignment_id: string | null;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -215,12 +224,69 @@ export async function fetchSubmission(id: string): Promise<SubmissionRead> {
   return apiJson<SubmissionRead>(`/api/submissions/${id}`);
 }
 
-export async function fetchDocuments(): Promise<DocumentRead[]> {
-  return apiJson<DocumentRead[]>("/api/documents");
+export async function fetchDocuments(
+  opts: { includeArchived?: boolean } = {}
+): Promise<DocumentRead[]> {
+  const qs = opts.includeArchived ? "?include_archived=true" : "";
+  return apiJson<DocumentRead[]>(`/api/documents${qs}`);
 }
 
+export async function uploadDocument(
+  file: File,
+  meta: { title?: string; description?: string } = {}
+): Promise<DocumentRead> {
+  const form = new FormData();
+  form.append("file", file);
+  if (meta.title) form.append("title", meta.title);
+  if (meta.description) form.append("description", meta.description);
+  const res = await apiFetch("/api/documents/upload", { method: "POST", body: form });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const detail = (err as { detail?: unknown }).detail;
+    const msg =
+      typeof detail === "string"
+        ? detail
+        : Array.isArray(detail)
+          ? detail.map((d) => JSON.stringify(d)).join(", ")
+          : `Upload failed (${res.status})`;
+    throw new Error(msg);
+  }
+  return res.json() as Promise<DocumentRead>;
+}
+
+export async function updateDocumentMeta(
+  id: string,
+  body: { title?: string; description?: string }
+): Promise<DocumentRead> {
+  return apiJson<DocumentRead>(`/api/documents/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+/** Soft-delete: archives the document (still available to existing assignments). */
 export async function deleteDocument(id: string): Promise<void> {
   await apiJson(`/api/documents/${id}`, { method: "DELETE" });
+}
+
+export async function unarchiveDocument(id: string): Promise<DocumentRead> {
+  return apiJson<DocumentRead>(`/api/documents/${id}/unarchive`, { method: "POST" });
+}
+
+export async function fetchAssignmentDocuments(
+  assignmentId: string
+): Promise<DocumentRead[]> {
+  return apiJson<DocumentRead[]>(`/api/assignments/${assignmentId}/documents`);
+}
+
+export async function setAssignmentDocuments(
+  assignmentId: string,
+  documentIds: string[]
+): Promise<DocumentRead[]> {
+  return apiJson<DocumentRead[]>(`/api/assignments/${assignmentId}/documents`, {
+    method: "PUT",
+    body: JSON.stringify({ document_ids: documentIds }),
+  });
 }
 
 /** Admin API */

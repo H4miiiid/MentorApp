@@ -8,7 +8,12 @@ from .assignment import (
     AssignmentStudentRead,
     AssignmentUpdate,
 )
-from .document import DocumentCreate, DocumentRead, DocumentUpdate
+from .document import (
+    AssignmentDocumentsReplace,
+    DocumentCreate,
+    DocumentRead,
+    DocumentUpdate,
+)
 from .health import HealthResponse
 from .submission import SubmissionCreate, SubmissionRead, SubmissionUpdate
 from .user import UserCreate, UserRead, UserUpdate
@@ -29,6 +34,7 @@ __all__ = [
     "AssignmentStudentAdd",
     "AssignmentStudentRead",
     "AssignmentUpdate",
+    "AssignmentDocumentsReplace",
     "DocumentCreate",
     "DocumentRead",
     "DocumentUpdate",

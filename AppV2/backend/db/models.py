@@ -114,6 +114,27 @@ class Document(SQLModel, table=True):
     file_path: str = Field(max_length=1024)
     file_type: str = Field(default="", max_length=120)
     file_size_bytes: int = Field(default=0, ge=0)
+    # Legacy single-assignment FK. Superseded by the AssignmentDocument join table
+    # (N-to-N). Kept nullable for backward-compatible reads and one-time backfill on
+    # startup; new writes go through the join table only.
     assignment_id: Optional[str] = Field(default=None, foreign_key="assignments.id", index=True, max_length=36)
+    # Soft-delete timestamp. Archived documents stay attached to existing assignments
+    # (so historical grading still sees the file) but disappear from the teacher's
+    # library listings and the attachment picker.
+    archived_at: Optional[datetime] = Field(default=None, index=True)
     created_at: datetime = Field(default_factory=_utc_now)
     updated_at: datetime = Field(default_factory=_utc_now)
+
+
+class AssignmentDocument(SQLModel, table=True):
+    """N-to-N: a teacher-uploaded Document can be attached to multiple Assignments.
+
+    Replacing the single ``Document.assignment_id`` FK lets teachers reuse a single
+    uploaded dataset/reference across assignments without re-uploading.
+    """
+
+    __tablename__ = "assignment_documents"
+
+    assignment_id: str = Field(foreign_key="assignments.id", primary_key=True, max_length=36)
+    document_id: str = Field(foreign_key="documents.id", primary_key=True, max_length=36)
+    attached_at: datetime = Field(default_factory=_utc_now)

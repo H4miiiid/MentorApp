@@ -116,6 +116,23 @@ class WorkflowConfig:
     langsmith_endpoint: str = os.getenv("LANGCHAIN_ENDPOINT", "https://api.smith.langchain.com").strip()
     langsmith_enabled: bool = _bool_env("LANGSMITH_ENABLED", True)
 
+    # HF-era alias: admin/grading-status reads this name. The underlying base URL is
+    # shared regardless of whether the backend is Hugging Face or llama.cpp.
+    @property
+    def hf_inference_base_url(self) -> str:
+        return self.llama_server_url
+
+    @property
+    def sft_http_timeout_seconds(self) -> int:
+        return self.http_timeout_seconds
+
+    @property
+    def sft_max_retries(self) -> int:
+        try:
+            return int(os.getenv("SFT_MAX_RETRIES", "1"))
+        except ValueError:
+            return 1
+
 
 CFG = WorkflowConfig()
 

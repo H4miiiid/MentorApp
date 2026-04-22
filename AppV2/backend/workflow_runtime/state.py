@@ -67,6 +67,10 @@ class RepairState(TypedDict):
 
     workflow_context: WorkflowContext
 
+    # Assignment-attached data files to expose inside the sandbox via
+    # ``ASSIGNMENT_DATA_DIR``. Each entry is ``(host_path, target_filename)``.
+    data_files: list[tuple[str, str]]
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -249,6 +253,7 @@ def init_state(
     original_code: str,
     max_attempts: int = 6,
     workflow_context: WorkflowContext | None = None,
+    data_files: list[tuple[str, str]] | None = None,
 ) -> RepairState:
     wc: WorkflowContext = dict(workflow_context) if workflow_context else {}
     return RepairState(
@@ -291,4 +296,5 @@ def init_state(
         final_status="",
         final_code="",
         workflow_context=wc,
+        data_files=list(data_files or []),
     )

@@ -3,9 +3,13 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
+  import DocumentPicker from "$lib/components/DocumentPicker.svelte";
   import {
     createAssignment,
+    fetchDocuments,
     fetchUsers,
+    setAssignmentDocuments,
+    type DocumentRead,
     type UserRead,
   } from "$lib/api";
   import { PATH_TEACHER_HOME } from "$lib/paths";
@@ -20,6 +24,10 @@
   let loadingStudents = true;
   let submitting = false;
   let errorMsg = "";
+
+  let libraryDocs: DocumentRead[] = [];
+  let selectedDocIds: string[] = [];
+  let loadingDocs = true;
 
   $: me = $page.data.user;
 
@@ -37,14 +45,20 @@
 
   onMount(async () => {
     loadingStudents = true;
+    loadingDocs = true;
     errorMsg = "";
     try {
-      const all = await fetchUsers();
-      students = all.filter((u) => u.role === "student" && u.is_active);
+      const [allUsers, docs] = await Promise.all([
+        fetchUsers(),
+        fetchDocuments({ includeArchived: false }),
+      ]);
+      students = allUsers.filter((u) => u.role === "student" && u.is_active);
+      libraryDocs = docs;
     } catch (e) {
-      errorMsg = e instanceof Error ? e.message : "Failed to load students";
+      errorMsg = e instanceof Error ? e.message : "Failed to load form data";
     } finally {
       loadingStudents = false;
+      loadingDocs = false;
     }
   });
 
@@ -88,6 +102,16 @@
         due_date: dueDateIso(),
         student_ids: selectedIds,
       });
+      if (selectedDocIds.length > 0) {
+        try {
+          await setAssignmentDocuments(created.id, selectedDocIds);
+        } catch (docErr) {
+          errorMsg =
+            "Assignment created, but attaching documents failed: " +
+            (docErr instanceof Error ? docErr.message : "unknown error") +
+            ". You can attach them from the assignment page.";
+        }
+      }
       await goto(`/app/teacher/assignments/${created.id}`);
     } catch (e) {
       errorMsg = e instanceof Error ? e.message : "Could not create assignment";
@@ -193,6 +217,27 @@
             {/each}
           </div>
         </details>
+      {/if}
+    </div>
+
+    <div class="gh-field">
+      <span class="gh-label">Attached documents (optional)</span>
+      <p class="gh-subtitle" style="margin: 0 0 8px;">
+        Attach previously uploaded documents that students may download for this assignment. Attached
+        files are also made available inside the grading sandbox via
+        <code>$ASSIGNMENT_DATA_DIR</code>. Upload new files from the
+        <a href="/app/teacher/documents">Documents tab</a>.
+      </p>
+      {#if loadingDocs}
+        <p class="gh-muted" style="margin: 0;">Loading documents…</p>
+      {:else}
+        <DocumentPicker
+          documents={libraryDocs}
+          bind:selectedIds={selectedDocIds}
+          idPrefix="new-assn-doc"
+          summaryLabel="Select documents to attach"
+          emptyLabel="Your document library is empty. Upload files on the Documents tab first."
+        />
       {/if}
     </div>
 
