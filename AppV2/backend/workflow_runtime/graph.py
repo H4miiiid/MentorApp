@@ -159,6 +159,7 @@ def run_workflow(
     *,
     submission_id: str = "",
     assignment_id: str = "",
+    assignment_description: str = "",
     run_id: str = "",
     data_files: list[tuple[str, str]] | None = None,
 ) -> dict[str, Any]:
@@ -187,6 +188,7 @@ def run_workflow(
         original_code=original_code,
         max_attempts=max_attempts,
         workflow_context=ctx or None,
+        assignment_description=assignment_description,
         data_files=data_files,
     )
 
@@ -211,7 +213,8 @@ def run_workflow(
         }
 
     if state.get("check_result", {}).get("passed", False):
-        # First-pass success: no repair workflow needed.
+        # First-pass success: no completeness gate; full grade path.
+        success_stdout = (state.get("check_result") or {}).get("stdout") or ""
         state["final_status"] = "success"
         state["final_code"] = state["current_code"]
         state["route_history"].append("finalize_success_fastpath")
@@ -234,6 +237,8 @@ def run_workflow(
             "initial_error_explanation": state.get("initial_error_explanation", ""),
             "initial_stdout": state.get("initial_stdout", ""),
             "initial_stderr": state.get("initial_stderr", ""),
+            "first_pass_completeness": {},
+            "final_success_stdout": success_stdout,
         }
 
     app = build_graph()
@@ -257,6 +262,13 @@ def run_workflow(
             "sandbox_error": str(exc),
         }
 
+    last_check = final_state.get("check_result") or {}
+    final_success_stdout = (
+        (last_check.get("stdout") or "")
+        if (final_state.get("final_status") or "").lower() == "success" and last_check.get("passed")
+        else ""
+    )
+
     return {
         "final_code": final_state["final_code"],
         "final_status": final_state["final_status"],
@@ -279,4 +291,6 @@ def run_workflow(
         "initial_error_explanation": final_state.get("initial_error_explanation", ""),
         "initial_stdout": final_state.get("initial_stdout", ""),
         "initial_stderr": final_state.get("initial_stderr", ""),
+        "first_pass_completeness": final_state.get("first_pass_completeness", state.get("first_pass_completeness", {})),
+        "final_success_stdout": final_success_stdout,
     }

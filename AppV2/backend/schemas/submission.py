@@ -24,6 +24,7 @@ class SubmissionRead(BaseModel):
     status: SubmissionStatus
     stdout: str
     stderr: str
+    output: str
     feedback: str
     created_at: datetime
     updated_at: datetime
@@ -37,4 +38,5 @@ class SubmissionUpdate(BaseModel):
     status: SubmissionStatus | None = None
     stdout: str | None = None
     stderr: str | None = None
+    output: str | None = None
     feedback: str | None = None

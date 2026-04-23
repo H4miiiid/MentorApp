@@ -218,10 +218,10 @@
           <pre
             style="margin: 0; padding: 10px 12px; background: rgba(110,118,129,0.15); border-radius: 6px; white-space: pre-wrap; overflow-x: auto; font-size: 12px;"
           ><code>{`import os
+import pandas as pd
 
 data_dir = os.environ["ASSIGNMENT_DATA_DIR"]
-with open(os.path.join(data_dir, "${basename(resources[0]?.file_path || "file1.txt")}")) as f:
-    content = f.read()`}</code></pre>
+df = pd.read_csv(os.path.join(data_dir, "${basename(resources[0]?.file_path || "file1.csv")}"), sep=";")`}</code></pre>
         </div>
       </div>
     {/if}

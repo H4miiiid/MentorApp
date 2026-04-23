@@ -34,4 +34,6 @@ class GradingOutcome:
     diff: str = ""
     stdout: str = ""
     stderr: str = ""
+    # Sandbox program output from the final successful run (corrected code if repaired).
+    output: str = ""
     feedback: str = ""

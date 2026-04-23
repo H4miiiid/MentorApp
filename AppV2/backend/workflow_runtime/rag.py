@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from AppV2.backend.workflow_runtime.config import CFG
@@ -26,6 +27,15 @@ except Exception:  # pragma: no cover
 
 _chroma_collection = None
 _reranker = None
+logger = logging.getLogger(__name__)
+
+
+def _sanitize_doc_text(text: str) -> str:
+    if not isinstance(text, str):
+        return ""
+    cleaned = text.replace("\x00", " ")
+    cleaned = "".join(ch if (ord(ch) >= 32 or ch in "\n\t") else " " for ch in cleaned)
+    return cleaned.strip()
 
 
 def get_chroma_collection():
@@ -81,7 +91,17 @@ def retrieve_from_vector_db(query: str) -> list[tuple[str, dict[str, Any]]]:
         )
         docs = result.get("documents", [[]])[0]
         metas = result.get("metadatas", [[]])[0]
-        return list(zip(docs, metas))
+        if len(docs) != len(metas):
+            logger.warning("[rag-retrieve] docs/metadatas length mismatch docs=%s metas=%s", len(docs), len(metas))
+        size = min(len(docs), len(metas))
+        pairs: list[tuple[str, dict[str, Any]]] = []
+        for idx in range(size):
+            safe_doc = _sanitize_doc_text(docs[idx])
+            if not safe_doc:
+                continue
+            meta = metas[idx] if isinstance(metas[idx], dict) else {}
+            pairs.append((safe_doc, meta))
+        return pairs
     except Exception:
         return []
 
@@ -92,20 +112,20 @@ def rerank_docs(query: str, candidates: list[tuple[str, dict[str, Any]]]) -> lis
 
     reranker = get_reranker()
     if reranker is None:
-        return [(0.5, doc, meta) for doc, meta in candidates[: CFG.n_rerank]]
+        return [(0.5, _sanitize_doc_text(doc), meta if isinstance(meta, dict) else {}) for doc, meta in candidates[: CFG.n_rerank]]
 
     query_text = query[: CFG.max_query_len]
-    pairs = [(query_text, doc) for doc, _ in candidates]
+    pairs = [(query_text, _sanitize_doc_text(doc)) for doc, _ in candidates]
     try:
         scores = reranker.predict(pairs)
         scored = sorted(zip(scores, candidates), key=lambda item: item[0], reverse=True)
         return [
-            (float(score), doc, meta)
+            (float(score), _sanitize_doc_text(doc), meta if isinstance(meta, dict) else {})
             for score, (doc, meta) in scored[: CFG.n_rerank]
             if float(score) > 0.0
         ]
     except Exception:
-        return [(0.5, doc, meta) for doc, meta in candidates[: CFG.n_rerank]]
+        return [(0.5, _sanitize_doc_text(doc), meta if isinstance(meta, dict) else {}) for doc, meta in candidates[: CFG.n_rerank]]
 
 
 def web_search(query: str, max_results: int = 5) -> list[str]:
@@ -120,11 +140,15 @@ def web_search(query: str, max_results: int = 5) -> list[str]:
             results = list(ddgs.text(f"python {query} fix solution", max_results=max_results))
         snippets: list[str] = []
         for item in results:
-            title = item.get("title", "")
-            body = item.get("body", "")
+            title = _sanitize_doc_text(item.get("title", ""))
+            body = _sanitize_doc_text(item.get("body", ""))
             snippet = f"{title}: {body}" if title else body
             if snippet:
-                snippets.append(snippet[:300])
+                if len(snippet) > 300:
+                    clipped = snippet[:300]
+                    ws = clipped.rfind(" ")
+                    snippet = clipped[:ws] if ws > 120 else clipped
+                snippets.append(snippet)
         return snippets
     except Exception:
         return [

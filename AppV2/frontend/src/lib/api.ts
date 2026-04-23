@@ -139,6 +139,8 @@ export type SubmissionRead = {
   status: SubmissionStatus;
   stdout: string;
   stderr: string;
+  /** Final successful sandbox program output (from corrected code if repaired). */
+  output: string;
   feedback: string;
   created_at: string;
   updated_at: string;

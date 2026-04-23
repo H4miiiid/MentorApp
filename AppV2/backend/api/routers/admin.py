@@ -88,6 +88,7 @@ def _submission_read(s: Submission) -> SubmissionRead:
         status=s.status,
         stdout=s.stdout,
         stderr=s.stderr,
+        output=s.output,
         feedback=s.feedback,
         created_at=s.created_at,
         updated_at=s.updated_at,

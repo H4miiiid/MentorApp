@@ -47,6 +47,7 @@ def _apply_outcome(row: Submission, outcome: GradingOutcome) -> None:
     row.diff = outcome.diff
     row.stdout = outcome.stdout
     row.stderr = outcome.stderr
+    row.output = outcome.output
     row.feedback = outcome.feedback
     row.updated_at = _utc_now()
 

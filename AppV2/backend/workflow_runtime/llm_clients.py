@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 from typing import Any
@@ -14,6 +15,9 @@ from AppV2.backend.workflow_runtime.config import CFG, openrouter_headers
 from AppV2.backend.workflow_runtime.observability import setup_langsmith, traceable
 from AppV2.backend.workflow_runtime.server_manager import ensure_llama_server_running
 from AppV2.backend.workflow_runtime.state import extract_failure_signature
+
+
+logger = logging.getLogger(__name__)
 
 
 def llama_health_url_from_openai_base(openai_base_url: str) -> str:
@@ -228,6 +232,56 @@ RAG_SUMMARIZE_PROMPT = ChatPromptTemplate.from_messages(
     ]
 )
 
+COMPLETENESS_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a strict code completeness evaluator. Return raw JSON only with keys: "
+            "complete, rationale, missing_requirements, confidence. complete must be true or false.",
+        ),
+        (
+            "human",
+            "Assignment requirements:\n{assignment}\n\nStudent code:\n{code}",
+        ),
+    ]
+)
+
+COMPLETE_APPEND_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a Python teaching assistant. If code is incomplete, append the minimal missing lines "
+            "after the last line to satisfy assignment requirements. Do not edit existing lines. "
+            "Return only final code wrapped in <correct_code> tags.",
+        ),
+        (
+            "human",
+            "ASSIGNMENT_REQUIREMENTS:\n{assignment}\n\n"
+            "MISSING_REQUIREMENTS:\n{missing}\n\n"
+            "CURRENT_CODE:\n{code}\n\n<correct_code>",
+        ),
+    ]
+)
+
+SFT_COMPLETENESS_AND_APPEND_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a strict Python completeness checker and minimal patcher. "
+            "First, verify the code fully satisfies ALL assignment requirements. "
+            "If it already satisfies everything, return the EXACT same code unchanged. "
+            "If it is missing requirements, append ONLY the minimal missing lines AFTER the last line. "
+            "Do not edit, reorder, or rewrite existing lines. "
+            "Keep changes as small as possible. "
+            "Return ONLY the final code wrapped in <correct_code> tags.",
+        ),
+        (
+            "human",
+            "ASSIGNMENT_REQUIREMENTS:\n{assignment}\n\nCURRENT_CODE:\n{code}\n\n<correct_code>",
+        ),
+    ]
+)
+
 
 def extract_current_code_from_prompt(prompt: str) -> str:
     marker = "CURRENT_CODE:\n"
@@ -280,6 +334,60 @@ def heuristic_minimal_fix(code: str, context: str) -> str:
     return fixed
 
 
+def heuristic_first_pass_completeness(assignment_description: str, current_code: str) -> dict[str, Any]:
+    code = current_code or ""
+    lowered = code.lower()
+    non_comment_lines = [
+        line
+        for line in code.splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+    stub_markers = (
+        "pass",
+        "todo",
+        "fixme",
+        "notimplementederror",
+        "return none",
+        "return 0",
+        "return []",
+        "return {}",
+    )
+
+    if any(marker in lowered for marker in stub_markers):
+        return {
+            "complete": False,
+            "rationale": "Stub-like implementation detected.",
+            "missing_requirements": ["Implementation appears partial or placeholder."],
+            "confidence": 0.8,
+        }
+    if len(non_comment_lines) <= 3:
+        return {
+            "complete": False,
+            "rationale": "Very short implementation likely incomplete.",
+            "missing_requirements": ["Core logic appears missing."],
+            "confidence": 0.7,
+        }
+    return {
+        "complete": True,
+        "rationale": "No obvious incompleteness markers detected.",
+        "missing_requirements": [] if assignment_description.strip() else ["Assignment requirements missing."],
+        "confidence": 0.55,
+    }
+
+
+def _safe_single_line(text: str, max_len: int) -> str:
+    clean = " ".join((text or "").split())
+    return clean[:max_len]
+
+
+def _safe_doc_for_prompt(text: str) -> str:
+    if not isinstance(text, str):
+        return ""
+    sanitized = text.replace("\x00", " ")
+    sanitized = "".join(ch if (ord(ch) >= 32 or ch in "\n\t") else " " for ch in sanitized)
+    return sanitized.strip()
+
+
 @traceable(name="call_sft_model", run_type="llm")
 def call_sft_model(prompt: str) -> str:
     setup_langsmith()
@@ -318,6 +426,7 @@ def call_reflection_model(current_code: str, traceback_text: str, attempt_histor
     }
 
     if not CFG.openrouter_api_key:
+        logger.warning("[reflection] OPENROUTER_API_KEY missing; using heuristic fallback")
         return fallback
 
     try:
@@ -353,12 +462,106 @@ def call_reflection_model(current_code: str, traceback_text: str, attempt_histor
         return fallback
 
 
+@traceable(name="call_completeness_gate", run_type="llm")
+def call_completeness_gate(assignment_description: str, current_code: str) -> dict[str, Any]:
+    setup_langsmith()
+    fallback = heuristic_first_pass_completeness(assignment_description, current_code)
+
+    if not (assignment_description or "").strip():
+        return fallback
+
+    if not CFG.openrouter_api_key:
+        logger.warning("[completeness] OPENROUTER_API_KEY missing; using heuristic fallback")
+        return fallback
+
+    try:
+        chain = COMPLETENESS_PROMPT | get_reflection_llm() | StrOutputParser()
+        result = chain.invoke(
+            {"assignment": assignment_description, "code": current_code},
+            config={"run_name": "completeness_gate", "tags": ["mentorapp", "completeness", "workflow"]},
+        )
+        raw = (result or "").strip()
+        if not raw:
+            return fallback
+        raw = re.sub(r"^```(?:json)?\n|\n```$", "", raw.strip(), flags=re.IGNORECASE)
+        match = re.search(r"\{.*\}", raw, flags=re.DOTALL)
+        parsed = json.loads(match.group(0) if match else raw)
+        if not isinstance(parsed, dict):
+            return fallback
+        parsed.setdefault("complete", fallback["complete"])
+        parsed.setdefault("rationale", fallback["rationale"])
+        parsed.setdefault("missing_requirements", fallback["missing_requirements"])
+        parsed.setdefault("confidence", fallback["confidence"])
+        parsed["complete"] = bool(parsed.get("complete"))
+        if not isinstance(parsed.get("missing_requirements"), list):
+            parsed["missing_requirements"] = fallback["missing_requirements"]
+        return parsed
+    except Exception:
+        return fallback
+
+
+@traceable(name="call_sft_append_completion", run_type="llm")
+def call_sft_append_completion(
+    assignment_description: str,
+    current_code: str,
+    missing_requirements: list[str] | None = None,
+) -> str:
+    setup_langsmith()
+    if not (assignment_description or "").strip():
+        return current_code
+
+    missing = missing_requirements or []
+    missing_text = "\n".join(f"- {item}" for item in missing if isinstance(item, str) and item.strip())
+    if not missing_text:
+        missing_text = "- Fill missing implementation details to satisfy assignment requirements."
+
+    try:
+        chain = COMPLETE_APPEND_PROMPT | get_sft_llm().bind(stop=["</correct_code>"]) | StrOutputParser()
+        result = chain.invoke(
+            {
+                "assignment": assignment_description,
+                "missing": missing_text,
+                "code": current_code,
+            },
+            config={"run_name": "sft_append_completion", "tags": ["mentorapp", "completeness", "sft"]},
+        )
+        candidate = extract_code_block(result)
+        return candidate or current_code
+    except Exception:
+        return current_code
+
+
+@traceable(name="call_sft_completeness_and_append", run_type="llm")
+def call_sft_completeness_and_append(
+    assignment_description: str,
+    current_code: str,
+) -> str:
+    setup_langsmith()
+    if not (assignment_description or "").strip():
+        return current_code
+
+    try:
+        chain = SFT_COMPLETENESS_AND_APPEND_PROMPT | get_sft_llm().bind(stop=["</correct_code>"]) | StrOutputParser()
+        result = chain.invoke(
+            {
+                "assignment": assignment_description,
+                "code": current_code,
+            },
+            config={"run_name": "sft_completeness_and_append", "tags": ["mentorapp", "completeness", "sft"]},
+        )
+        candidate = extract_code_block(result)
+        return candidate or current_code
+    except Exception:
+        return current_code
+
+
 @traceable(name="call_external_model", run_type="llm")
 def call_external_model(prompt: str) -> str:
     setup_langsmith()
     original_code = extract_current_code_from_prompt(prompt)
 
     if not CFG.openrouter_api_key:
+        logger.warning("[external] OPENROUTER_API_KEY missing; using heuristic fallback")
         return heuristic_minimal_fix(original_code, prompt)
 
     traceback_text = ""
@@ -389,22 +592,28 @@ def summarize_docs_to_hints(reranked_docs: list[tuple[float, str, dict[str, Any]
         return ""
 
     if not CFG.openrouter_api_key:
+        logger.warning("[summarize] OPENROUTER_API_KEY missing; using heuristic fallback")
         bullets = []
         for _, doc, _ in reranked_docs[:3]:
-            first_line = doc.strip().splitlines()[0] if doc.strip() else ""
+            safe_doc = _safe_doc_for_prompt(doc)
+            first_line = safe_doc.splitlines()[0] if safe_doc else ""
             if first_line:
-                bullets.append(f"- {first_line[:150]}")
+                bullets.append(f"- {_safe_single_line(first_line, 150)}")
         return "\n".join(bullets[:3])
 
-    docs_text = "\n---\n".join(
-        [
-            f"[{meta.get('library', 'unknown')} v{meta.get('version', '?')} score={score:.2f}]\n{doc}"
-            for score, doc, meta in reranked_docs
-        ]
-    )
+    docs_text_parts: list[str] = []
+    for score, doc, meta in reranked_docs:
+        safe_doc = _safe_doc_for_prompt(doc)
+        if not safe_doc:
+            continue
+        safe_meta = meta if isinstance(meta, dict) else {}
+        docs_text_parts.append(
+            f"[{safe_meta.get('library', 'unknown')} v{safe_meta.get('version', '?')} score={float(score):.2f}]\n{safe_doc}"
+        )
+    docs_text = "\n---\n".join(docs_text_parts)
 
     error_lines = [line.strip() for line in error_text.splitlines() if line.strip()]
-    error_line = error_lines[-1] if error_lines else error_text[:200]
+    error_line = error_lines[-1] if error_lines else _safe_single_line(error_text, 200)
 
     try:
         chain = RAG_SUMMARIZE_PROMPT | get_summarizer_llm() | StrOutputParser()
@@ -412,7 +621,7 @@ def summarize_docs_to_hints(reranked_docs: list[tuple[float, str, dict[str, Any]
             {"error": error_line, "docs": docs_text},
             config={"run_name": "rag_summarize", "tags": ["mentorapp", "rag", "workflow"]},
         )
-        bullets = [line.strip() for line in content.split("\n") if line.strip().startswith("- ")][:3]
+        bullets = [line.strip() for line in content.split("\n") if line.strip().startswith("- ")][:4]
         return "\n".join(bullets) if bullets else content.strip()
     except Exception:
-        return ""
+        return "- Focus on the final traceback line and fix only the root cause."

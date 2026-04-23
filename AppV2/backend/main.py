@@ -67,11 +67,31 @@ def _check_sandbox_available() -> None:
     )
 
 
+def _check_openrouter_configured() -> None:
+    from .workflow_runtime.config import CFG
+
+    if CFG.openrouter_api_key:
+        logger.info(
+            "[openrouter] configured | reflection=%s external=%s summarizer=%s base=%s",
+            CFG.reflection_model,
+            CFG.external_model,
+            CFG.summarizer_model,
+            CFG.openrouter_base_url,
+        )
+        return
+
+    logger.warning(
+        "[openrouter] OPENROUTER_API_KEY missing. Reflection, external expert, and summarization "
+        "will use heuristic fallback logic."
+    )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
     ensure_default_admin()
     _check_sandbox_available()
+    _check_openrouter_configured()
     try:
         ensure_grading_models_bootstrapped()
     except Exception as e:

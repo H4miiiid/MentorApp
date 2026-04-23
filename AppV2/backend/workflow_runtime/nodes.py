@@ -341,9 +341,11 @@ def assess_local_context(state: RepairState) -> RepairState:
     reranked = rerank_docs(query, candidates)
     state["local_docs"] = reranked
 
-    if reranked and len(reranked) >= 2:
-        avg_score = sum(score for score, _, _ in reranked) / len(reranked)
-        state["local_context_quality"] = "good" if avg_score > 0.3 else "weak"
+    if reranked:
+        scores = [float(score) for score, _, _ in reranked]
+        best_score = max(scores)
+        avg_score = sum(scores) / len(scores)
+        state["local_context_quality"] = "good" if (best_score > 0.35 or avg_score > 0.3) else "weak"
     else:
         state["local_context_quality"] = "weak"
 
@@ -371,14 +373,18 @@ def summarize_context(state: RepairState) -> RepairState:
         hints = summarize_docs_to_hints(local_docs, traceback_text)
     else:
         chunks: list[str] = []
-        if local_docs:
-            if isinstance(local_docs[0], tuple):
-                chunks.extend([doc for doc, _ in local_docs])
-            else:
-                chunks.extend(local_docs)
+        for item in local_docs:
+            if isinstance(item, tuple):
+                doc = item[0] if len(item) > 0 else ""
+                if isinstance(doc, str) and doc.strip():
+                    chunks.append(doc)
+            elif isinstance(item, str) and item.strip():
+                chunks.append(item)
         chunks.extend(state.get("web_docs", []))
         bullets = []
         for chunk in chunks[:6]:
+            if not isinstance(chunk, str):
+                continue
             first_line = chunk.strip().splitlines()[0] if chunk.strip() else ""
             if first_line:
                 bullets.append(f"- {first_line[:180]}")

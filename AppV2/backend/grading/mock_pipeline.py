@@ -82,6 +82,7 @@ class MockGradingPipeline(GradingPipeline):
             diff=diff_text if diff_text.strip() else "(no diff — identical)\n",
             stdout=stdout,
             stderr=stderr,
+            output="[mock] final sandbox stdout (simulated)\n",
             feedback=(
                 f"Mock autograder: review stderr for simulated errors, corrected code, and diff. "
                 f"Submission {submission.id[:8]}… scored {grade}."

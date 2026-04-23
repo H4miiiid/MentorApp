@@ -39,6 +39,14 @@ services:
       MENTOR_APP_VECTOR_COLLECTION: ${MENTOR_APP_VECTOR_COLLECTION:-library_docs}
       # Default OpenAI-compatible model id for DB bootstrap when grading_models is empty.
       HF_OPENAI_MODEL: ${HF_OPENAI_MODEL:-hf-endpoint-model}
+      # OpenRouter models for reflection, external expert, and RAG summarization.
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      OPENROUTER_REFLECTION_MODEL: ${OPENROUTER_REFLECTION_MODEL:-anthropic/claude-sonnet-4.6}
+      OPENROUTER_EXTERNAL_MODEL: ${OPENROUTER_EXTERNAL_MODEL:-anthropic/claude-opus-4.6}
+      OPENROUTER_SUMMARIZER_MODEL: ${OPENROUTER_SUMMARIZER_MODEL:-openai/gpt-oss-120b}
+      OPENROUTER_HTTP_REFERER: ${OPENROUTER_HTTP_REFERER:-}
+      OPENROUTER_X_TITLE: ${OPENROUTER_X_TITLE:-MentorApp}
       # LangSmith tracing for LangGraph workflow monitoring.
       LANGSMITH_ENABLED: ${LANGSMITH_ENABLED:-true}
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY:-}

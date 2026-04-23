@@ -82,6 +82,7 @@ class Submission(SQLModel, table=True):
     status: SubmissionStatus = Field(default=SubmissionStatus.pending, index=True)
     stdout: str = Field(default="")
     stderr: str = Field(default="")
+    output: str = Field(default="")
     feedback: str = Field(default="")
     created_at: datetime = Field(default_factory=_utc_now)
     updated_at: datetime = Field(default_factory=_utc_now)

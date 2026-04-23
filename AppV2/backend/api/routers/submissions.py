@@ -33,6 +33,7 @@ def _to_read(s: Submission) -> SubmissionRead:
         status=s.status,
         stdout=s.stdout,
         stderr=s.stderr,
+        output=s.output,
         feedback=s.feedback,
         created_at=s.created_at,
         updated_at=s.updated_at,
@@ -163,6 +164,7 @@ def update_submission(
         "status",
         "stdout",
         "stderr",
+        "output",
         "feedback",
     ):
         if key in data and data[key] is not None:

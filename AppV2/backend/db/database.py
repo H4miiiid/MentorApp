@@ -50,6 +50,7 @@ def _apply_light_migrations(engine) -> None:
     1. Add ``documents.archived_at`` column when missing (pre-existing SQLite DBs).
     2. Backfill legacy ``documents.assignment_id`` values into the new
        ``assignment_documents`` join table so attachments survive the N-to-N move.
+    3. Add ``submissions.output`` for final sandbox program output.
     """
     inspector = inspect(engine)
     try:
@@ -60,6 +61,14 @@ def _apply_light_migrations(engine) -> None:
     if "archived_at" not in doc_columns:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE documents ADD COLUMN archived_at TIMESTAMP"))
+
+    try:
+        sub_columns = {col["name"] for col in inspector.get_columns("submissions")}
+    except Exception:
+        sub_columns = set()
+    if sub_columns and "output" not in sub_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE submissions ADD COLUMN output VARCHAR DEFAULT ''"))
 
     try:
         with Session(engine) as session:

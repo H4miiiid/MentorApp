@@ -10,6 +10,40 @@ def test_success_is_full_marks() -> None:
     assert g == 100.0
 
 
+def test_success_incomplete_first_pass_is_full_marks_after_rollback() -> None:
+    g = _grade_from_result(
+        "a",
+        "a",
+        {
+            "final_status": "success",
+            "attempt_count": 0,
+            "first_pass_completeness": {
+                "complete": False,
+                "rationale": "Stub-like implementation detected.",
+            },
+        },
+        grading_max_attempts=6,
+    )
+    assert g == 100.0
+
+
+def test_success_complete_first_pass_remains_100() -> None:
+    g = _grade_from_result(
+        "a",
+        "a",
+        {
+            "final_status": "success",
+            "attempt_count": 0,
+            "first_pass_completeness": {
+                "complete": True,
+                "rationale": "Looks complete.",
+            },
+        },
+        grading_max_attempts=6,
+    )
+    assert g == 100.0
+
+
 def test_failure_varies_by_category_not_only_attempts() -> None:
     base = {
         "final_status": "failure",

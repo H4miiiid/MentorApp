@@ -142,6 +142,16 @@
         <pre class="gh-code-block gh-code-block-python">{submission.stdout?.trim() || "—"}</pre>
       </div>
 
+      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Output</h2>
+      <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
+        Program output from the sandbox for the final successful run (uses corrected code when the grader
+        applied a fix).
+      </p>
+      <div class="gh-code-view-shell">
+        <div class="gh-code-editor-toolbar">Sandbox output</div>
+        <pre class="gh-code-block gh-code-block-python">{submission.output?.trim() || "—"}</pre>
+      </div>
+
       <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Grader feedback</h2>
       <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">
         Workflow path, repair attempts, and stop reason from the LangGraph autograder.

@@ -13,7 +13,7 @@ from sqlmodel import Session, select
 
 from ..core.config import Settings
 from ..db.database import get_engine
-from ..db.models import AssignmentDocument, Document, SubmissionStatus
+from ..db.models import Assignment, AssignmentDocument, Document, SubmissionStatus
 from ..workflow_runtime.graph import run_workflow
 from .pipeline import GradingPipeline
 from .types import GradingOutcome, SubmissionSnapshot
@@ -292,6 +292,17 @@ def _collect_assignment_data_files(settings: Settings, assignment_id: str) -> li
     return files
 
 
+def _load_assignment_description(assignment_id: str) -> str:
+    if not assignment_id:
+        return ""
+    engine = get_engine()
+    with Session(engine) as session:
+        row = session.get(Assignment, assignment_id)
+        if row is None:
+            return ""
+        return (row.description or "").strip()
+
+
 class LangGraphGradingPipeline(GradingPipeline):
     """Runs the LangGraph repair workflow in a thread pool (blocking `invoke`)."""
 
@@ -312,6 +323,7 @@ class LangGraphGradingPipeline(GradingPipeline):
         )
 
         data_files = _collect_assignment_data_files(self._settings, submission.assignment_id)
+        assignment_description = _load_assignment_description(submission.assignment_id)
         if data_files:
             logger.info(
                 "[grading-langgraph] attached_documents=%s | submission=%s",
@@ -325,6 +337,7 @@ class LangGraphGradingPipeline(GradingPipeline):
                 max_attempts=self._settings.grading_max_attempts,
                 submission_id=submission.id,
                 assignment_id=submission.assignment_id,
+                assignment_description=assignment_description,
                 run_id=submission.id,
                 data_files=data_files or None,
             )
@@ -347,6 +360,7 @@ class LangGraphGradingPipeline(GradingPipeline):
                 status=SubmissionStatus.failed,
                 corrected_code=submission.code,
                 stderr=str(e),
+                output="",
                 feedback="LangGraph workflow raised an exception.",
             )
 
@@ -355,6 +369,9 @@ class LangGraphGradingPipeline(GradingPipeline):
         diff = _unified_diff(original, final_code) if final_code != original else ""
         final_status = (result.get("final_status") or "failure").lower()
         status = SubmissionStatus.completed if final_status == "success" else SubmissionStatus.failed
+        final_output = (
+            (result.get("final_success_stdout") or "").strip() if final_status == "success" else ""
+        )
         grade = _grade_from_result(
             submission.code,
             final_code,
@@ -390,6 +407,7 @@ class LangGraphGradingPipeline(GradingPipeline):
                 diff="",
                 stdout="",
                 stderr=stderr_text,
+                output="",
                 feedback=_feedback_blob(result, original_code=original, final_code=original),
             )
 
@@ -426,5 +444,6 @@ class LangGraphGradingPipeline(GradingPipeline):
             diff=diff,
             stdout="",
             stderr="\n\n".join(stderr_parts) if stderr_parts else "",
+            output=final_output,
             feedback=_feedback_blob(result, original_code=submission.code, final_code=final_code),
         )

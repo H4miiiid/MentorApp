@@ -66,6 +66,8 @@ class RepairState(TypedDict):
     final_code: str
 
     workflow_context: WorkflowContext
+    assignment_description: str
+    first_pass_completeness: dict[str, Any]
 
     # Assignment-attached data files to expose inside the sandbox via
     # ``ASSIGNMENT_DATA_DIR``. Each entry is ``(host_path, target_filename)``.
@@ -254,6 +256,7 @@ def init_state(
     max_attempts: int = 6,
     workflow_context: WorkflowContext | None = None,
     data_files: list[tuple[str, str]] | None = None,
+    assignment_description: str = "",
 ) -> RepairState:
     wc: WorkflowContext = dict(workflow_context) if workflow_context else {}
     return RepairState(
@@ -296,5 +299,7 @@ def init_state(
         final_status="",
         final_code="",
         workflow_context=wc,
+        assignment_description=assignment_description or "",
+        first_pass_completeness={},
         data_files=list(data_files or []),
     )
