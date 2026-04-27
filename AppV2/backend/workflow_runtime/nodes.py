@@ -13,7 +13,9 @@ from AppV2.backend.workflow_runtime.sandbox import (
 from AppV2.backend.workflow_runtime.llm_clients import (
     call_external_model,
     call_reflection_model,
+    call_requirement_completion_model,
     call_sft_model,
+    dispatch_completeness_check,
     summarize_docs_to_hints,
 )
 from AppV2.backend.workflow_runtime.rag import rerank_docs, retrieve_from_vector_db, web_search
@@ -251,6 +253,9 @@ def diagnose_failure(state: RepairState) -> RepairState:
         state["repeated_failure_count"] += 1
     else:
         state["repeated_failure_count"] = 0
+        last_route = (state.get("attempt_history") or [{}])[-1].get("route", "")
+        if last_route == "attempt_sft_with_traceback":
+            state["used_traceback"] = False
     if signature:
         state["previous_failure_signature"] = signature
 
@@ -277,13 +282,28 @@ def choose_next_strategy(state: RepairState) -> RepairState:
         return state
 
     category = state.get("error_category", "api_library_error")
+    history = state.get("attempt_history", [])
+    rag_attempts = sum(1 for attempt in history if attempt.get("route") == "attempt_sft_with_rag")
+    traceback_attempts = sum(1 for attempt in history if attempt.get("route") == "attempt_sft_with_traceback")
+    reflection_attempts = sum(1 for attempt in history if attempt.get("route") == "attempt_sft_with_reflection")
+    last_route = history[-1].get("route", "") if history else ""
+    same_error_repeated = int(state.get("repeated_failure_count", 0) or 0) > 0
+    remaining_attempts = max(0, int(state.get("max_attempts", 0) or 0) - int(state.get("attempt_count", 0) or 0))
+
+    # Keep OpenRouter/external as the true last resort. The local SFT gets at least
+    # repeated direct attempts (RAG for API/library errors, traceback otherwise).
+    # If the same error persists after a direct local SFT attempt, ask reflection to
+    # guide the next local SFT repair; if the error changes, try local SFT directly again.
+    if remaining_attempts <= 1 and not state["used_external"]:
+        state["next_strategy"] = "external_expert"
+        return state
 
     if category == "api_library_error":
-        if not state["used_rag"]:
+        if last_route == "attempt_sft_with_rag" and same_error_repeated and reflection_attempts < 2:
+            state["next_strategy"] = "reflection_critic"
+        elif rag_attempts < 2 or (not same_error_repeated and reflection_attempts < 2):
             state["next_strategy"] = "local_rag"
-        elif not state["used_traceback"]:
-            state["next_strategy"] = "traceback_sft"
-        elif not state["used_reflection"]:
+        elif reflection_attempts < 2:
             state["next_strategy"] = "reflection_critic"
         elif not state["used_external"]:
             state["next_strategy"] = "external_expert"
@@ -293,10 +313,12 @@ def choose_next_strategy(state: RepairState) -> RepairState:
             state["stop_reason"] = "all_strategies_exhausted"
         return state
 
-    if category in ("syntax_error", "name_error", "timeout", "stdin_eof"):
-        if not state["used_traceback"]:
+    if category != "api_library_error":
+        if last_route == "attempt_sft_with_traceback" and same_error_repeated and reflection_attempts < 2:
+            state["next_strategy"] = "reflection_critic"
+        elif traceback_attempts < 2 or (not same_error_repeated and reflection_attempts < 2):
             state["next_strategy"] = "traceback_sft"
-        elif not state["used_reflection"]:
+        elif reflection_attempts < 2:
             state["next_strategy"] = "reflection_critic"
         elif not state["used_external"]:
             state["next_strategy"] = "external_expert"
@@ -458,6 +480,81 @@ def external_expert_repair(state: RepairState) -> RepairState:
     state["used_external"] = True
     state["current_code"] = candidate
     record_attempt(state, "external_expert_repair", before, candidate, prompt)
+    return state
+
+
+@traceable(name="verify_completeness", run_type="chain")
+def verify_completeness(state: RepairState) -> RepairState:
+    """Check whether the current (runnable) code satisfies all assignment requirements."""
+    push_route(state, "verify_completeness")
+    description = state.get("assignment_description", "")
+    code = state["current_code"]
+    result = dispatch_completeness_check(description, code)
+    if not state.get("original_code_completeness"):
+        state["original_code_completeness"] = result
+    state["first_pass_completeness"] = result
+    logger.info(
+        "[verify_completeness] complete=%s provider=%s confidence=%.2f missing=%d",
+        result.get("complete"),
+        result.get("provider", "?"),
+        result.get("confidence", 0),
+        len(result.get("missing_requirements", [])),
+    )
+    return state
+
+
+@traceable(name="verify_original_completeness", run_type="chain")
+def verify_original_completeness(state: RepairState) -> RepairState:
+    """Check the student's submitted code once inside the LangGraph run."""
+    push_route(state, "verify_original_completeness")
+    description = state.get("assignment_description", "")
+    result = dispatch_completeness_check(description, state.get("original_code", ""))
+    state["original_code_completeness"] = result
+    if state.get("check_result", {}).get("passed", False):
+        state["first_pass_completeness"] = result
+    logger.info(
+        "[verify_original_completeness] complete=%s provider=%s confidence=%.2f missing=%d",
+        result.get("complete"),
+        result.get("provider", "?"),
+        result.get("confidence", 0),
+        len(result.get("missing_requirements", [])),
+    )
+    return state
+
+
+@traceable(name="attempt_requirement_completion", run_type="chain")
+def attempt_requirement_completion(state: RepairState) -> RepairState:
+    """Add only evaluator-listed missing requirements to code that already runs."""
+    push_route(state, "attempt_requirement_completion")
+    before = state["current_code"]
+    completeness = state.get("first_pass_completeness") or {}
+    if completeness.get("complete", False) or completeness.get("model_complete", False):
+        logger.info("[requirement-completion] skipped because completeness gate marked code complete")
+        return state
+    missing_reqs = [
+        str(r.get("text", ""))
+        for r in (completeness.get("requirements") or [])
+        if isinstance(r, dict) and str(r.get("status", "")).strip().lower() == "missing"
+    ] or completeness.get("missing_requirements", [])
+
+    if not missing_reqs:
+        logger.info("[requirement-completion] no truly missing requirements; skipping")
+        return state
+
+    prompt_preview = (
+        "Add missing assignment requirements only.\n"
+        f"MISSING_REQUIREMENTS:\n{missing_reqs}\n\n"
+        f"CURRENT_CODE:\n{before}\n"
+    )
+    candidate = call_requirement_completion_model(
+        assignment_description=state.get("assignment_description", ""),
+        current_code=before,
+        completeness=completeness,
+    )
+    state["current_code"] = candidate
+    state["used_requirement_repair"] = True
+    state["requirement_repair_count"] = int(state.get("requirement_repair_count", 0)) + 1
+    record_attempt(state, "attempt_requirement_completion", before, candidate, prompt_preview)
     return state
 
 

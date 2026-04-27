@@ -15,6 +15,7 @@ from ..core.config import Settings
 from ..db.database import get_engine
 from ..db.models import Assignment, AssignmentDocument, Document, SubmissionStatus
 from ..workflow_runtime.graph import run_workflow
+from ..workflow_runtime.llm_clients import infer_requirement_severity
 from .pipeline import GradingPipeline
 from .types import GradingOutcome, SubmissionSnapshot
 
@@ -37,14 +38,82 @@ MISTAKE_WEIGHT_BY_CATEGORY: dict[str, float] = {
     "syntax_error": 1.0,
     "name_error": 1.0,
     "stdin_eof": 1.0,
-    "local_reasoning_error": 1.8,
-    "api_library_error": 2.0,
-    "timeout": 2.2,
+    "local_reasoning_error": 1.25,
+    "api_library_error": 1.35,
+    "timeout": 1.5,
     "sandbox_unavailable": 0.0,
 }
 
-INFERRED_FIX_UNIT_WEIGHT = 0.9
+INFERRED_FIX_UNIT_WEIGHT = 0.4
 MAX_INFERRED_FIX_UNITS = 4
+
+# Requirement penalties are intentionally moderate: the UI explains missing work,
+# while the score should still reward runnable partial solutions.
+_COMPLETENESS_SEVERITY_WEIGHT: dict[str, float] = {"critical": 10.0, "medium": 4.0, "minor": 1.5}
+_COMPLETENESS_PARTIAL_FACTOR = 0.25
+_MAX_COMPLETENESS_PENALTY = 40.0
+_MIN_GRADE_INCOMPLETE_FIRST_PASS = 55.0
+_PASS_GRADE_THRESHOLD = 70.0
+
+
+def _completeness_penalty_from_dict(completeness: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+    """Weighted penalty points for missing/partial requirements; capped."""
+    requirements = completeness.get("requirements") or []
+    breakdown_items: list[dict[str, Any]] = []
+    penalty = 0.0
+    for r in requirements:
+        if not isinstance(r, dict):
+            continue
+        status = (r.get("status") or "").lower()
+        if status not in ("missing", "partial"):
+            continue
+        sev = (r.get("severity") or "medium").lower()
+        if sev not in _COMPLETENESS_SEVERITY_WEIGHT:
+            sev = "medium"
+        unit = _COMPLETENESS_SEVERITY_WEIGHT[sev]
+        if status == "partial":
+            unit *= _COMPLETENESS_PARTIAL_FACTOR
+        penalty += unit
+        breakdown_items.append(
+            {
+                "text": str(r.get("text", "")).strip(),
+                "status": status,
+                "severity": sev,
+                "penalty_points": round(unit, 2),
+            }
+        )
+
+    if penalty == 0.0 and not completeness.get("complete", True):
+        for m in completeness.get("missing_requirements") or []:
+            if not isinstance(m, str):
+                continue
+            mt = m.strip()
+            if not mt:
+                continue
+            sev = infer_requirement_severity(mt)
+            unit = float(_COMPLETENESS_SEVERITY_WEIGHT.get(sev, 10.0))
+            penalty += unit
+            breakdown_items.append(
+                {
+                    "text": mt,
+                    "status": "missing",
+                    "severity": sev,
+                    "penalty_points": round(unit, 2),
+                }
+            )
+
+    penalty = min(_MAX_COMPLETENESS_PENALTY, penalty)
+    details = {
+        "items": breakdown_items,
+        "total_penalty": round(penalty, 2),
+        "penalty_cap": _MAX_COMPLETENESS_PENALTY,
+    }
+    return penalty, details
+
+
+def _grade_first_pass_incomplete(completeness: dict[str, Any]) -> float:
+    penalty, _ = _completeness_penalty_from_dict(completeness)
+    return max(_MIN_GRADE_INCOMPLETE_FIRST_PASS, round(100.0 - penalty, 1))
 
 
 def _is_meaningful_code_line(line: str) -> bool:
@@ -67,9 +136,10 @@ def _infer_repair_fix_units(original_code: str, final_code: str) -> int:
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         if tag == "equal":
             continue
-        changed_lines = before[i1:i2] + after[j1:j2]
-        if any(_is_meaningful_code_line(line) for line in changed_lines):
-            units += 1
+        before_changed = [line for line in before[i1:i2] if _is_meaningful_code_line(line)]
+        after_changed = [line for line in after[j1:j2] if _is_meaningful_code_line(line)]
+        if before_changed or after_changed:
+            units += max(len(before_changed), len(after_changed), 1)
 
     return min(MAX_INFERRED_FIX_UNITS, units)
 
@@ -138,12 +208,12 @@ def _grade_repaired_success(*, attempts: int, max_attempts: int, weighted_units:
 
     budget = max(max_attempts, 2)
     extra_attempts = max(0, attempts - 1)
-    attempt_penalty = 2.5 * extra_attempts + 6.0 * (extra_attempts / budget)
-    mistake_penalty = 5.5 * max(1.0, weighted_units)
-    multiplicity_penalty = max(0, mistake_count - 1) * 2.0
+    attempt_penalty = 0.9 * extra_attempts + 2.0 * (extra_attempts / budget)
+    mistake_penalty = 2.5 * max(1.0, weighted_units)
+    multiplicity_penalty = max(0, mistake_count - 1) * 0.6
 
     score = 100.0 - mistake_penalty - attempt_penalty - multiplicity_penalty
-    score = max(60.0, min(98.0, score))
+    score = max(75.0, min(99.0, score))
     return round(score, 1)
 
 
@@ -163,14 +233,21 @@ def _grade_from_result(
     mistake_count = int(profile["mistake_count"])
 
     if status == "success":
+        completeness = result.get("original_code_completeness") or result.get("first_pass_completeness") or {}
         if attempts <= 0:
+            if not completeness.get("complete", True):
+                return _grade_first_pass_incomplete(completeness)
             return 100.0
-        return _grade_repaired_success(
+        repair_grade = _grade_repaired_success(
             attempts=attempts,
             max_attempts=max_a,
             weighted_units=weighted_units,
             mistake_count=mistake_count,
         )
+        if not completeness.get("complete", True):
+            comp_penalty, _ = _completeness_penalty_from_dict(completeness)
+            repair_grade = max(_MIN_GRADE_INCOMPLETE_FIRST_PASS, round(repair_grade - comp_penalty, 1))
+        return repair_grade
     if status == "sandbox_unavailable":
         # Infra failure — do not punish the student. Grade stays at 0 only because
         # we never ran the code; status/feedback make clear it was not their fault
@@ -183,18 +260,18 @@ def _grade_from_result(
 
     # Failure outcomes still get partial credit based on weighted mistakes and progress.
     budget_ratio = attempts / max(max_a, 1)
-    score = 82.0
-    score -= 7.0 * max(1.0, weighted_units)
-    score -= 5.0 * budget_ratio
-    score -= min(8.0, nmc * 2.0)
-    score -= min(8.0, rep * 2.0)
+    score = 92.0
+    score -= 3.5 * max(1.0, weighted_units)
+    score -= 2.5 * budget_ratio
+    score -= min(3.5, nmc * 1.0)
+    score -= min(3.5, rep * 1.0)
 
     if stop == "no_meaningful_change":
-        score -= 4.0
+        score -= 1.5
     elif stop == "max_attempts_reached":
-        score -= 2.0
+        score -= 1.0
     elif stop == "all_strategies_exhausted":
-        score -= 3.0
+        score -= 1.25
 
     # Small boost when there is evidence of real edits toward a fix.
     orig = original_code or ""
@@ -204,9 +281,9 @@ def _grade_from_result(
         score += min(6.0, (1.0 - sim) * 30.0)
 
     if mistake_count >= 3:
-        score -= 2.0 * (mistake_count - 2)
+        score -= 0.75 * (mistake_count - 2)
 
-    return max(20.0, min(95.0, round(score, 1)))
+    return max(45.0, min(97.0, round(score, 1)))
 
 
 def _was_repaired(result: dict[str, Any]) -> bool:
@@ -215,6 +292,20 @@ def _was_repaired(result: dict[str, Any]) -> bool:
     return (result.get("final_status") or "").lower() == "success" and int(
         result.get("attempt_count") or 0
     ) > 0
+
+
+def _used_requirement_repair(result: dict[str, Any]) -> bool:
+    return bool(result.get("used_requirement_repair")) or int(result.get("requirement_repair_count") or 0) > 0
+
+
+def _submission_status_from_grade(final_status: str, grade: float) -> SubmissionStatus:
+    """Map workflow success + numeric grade to pass/fail submission status.
+
+    Policy: grade >= 75 is pass (completed); otherwise fail.
+    """
+    if (final_status or "").lower() != "success":
+        return SubmissionStatus.failed
+    return SubmissionStatus.completed if float(grade) >= _PASS_GRADE_THRESHOLD else SubmissionStatus.failed
 
 
 def _initial_error_snippet(result: dict[str, Any], max_chars: int = 1200) -> str:
@@ -247,6 +338,10 @@ def _feedback_blob(result: dict[str, Any], *, original_code: str = "", final_cod
         # Exposed so the frontend FeedbackPanel can show a "Repaired by assistant"
         # banner + original error preview whenever attempt_count > 0.
         "repaired": _was_repaired(result),
+        "requirement_repaired": _used_requirement_repair(result),
+        "requirement_repair_count": result.get("requirement_repair_count", 0),
+        "max_requirement_repairs": result.get("max_requirement_repairs", 1),
+        "requirement_repair_exhausted": result.get("requirement_repair_exhausted", False),
         "initial_error_category": result.get("initial_error_category") or "",
         "initial_error_type": result.get("initial_error_type") or "",
         "initial_error_explanation": result.get("initial_error_explanation") or "",
@@ -254,6 +349,31 @@ def _feedback_blob(result: dict[str, Any], *, original_code: str = "", final_cod
     }
     if result.get("sandbox_error"):
         payload["sandbox_error"] = result["sandbox_error"]
+
+    completeness = result.get("original_code_completeness") or result.get("first_pass_completeness") or {}
+    if completeness:
+        _, grading_breakdown = _completeness_penalty_from_dict(completeness)
+        payload["completeness"] = {
+            "complete": completeness.get("complete"),
+            "provider": completeness.get("provider", ""),
+            "confidence": completeness.get("confidence", 0),
+            "rationale": completeness.get("rationale", ""),
+            "missing_requirements": completeness.get("missing_requirements", []),
+            "requirements": completeness.get("requirements", []),
+            "grading_breakdown": grading_breakdown,
+        }
+
+    final_completeness = result.get("first_pass_completeness") or {}
+    if final_completeness and final_completeness != completeness:
+        payload["final_completeness"] = {
+            "complete": final_completeness.get("complete"),
+            "provider": final_completeness.get("provider", ""),
+            "confidence": final_completeness.get("confidence", 0),
+            "rationale": final_completeness.get("rationale", ""),
+            "missing_requirements": final_completeness.get("missing_requirements", []),
+            "requirements": final_completeness.get("requirements", []),
+        }
+
     return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
@@ -368,7 +488,6 @@ class LangGraphGradingPipeline(GradingPipeline):
         original = submission.code
         diff = _unified_diff(original, final_code) if final_code != original else ""
         final_status = (result.get("final_status") or "failure").lower()
-        status = SubmissionStatus.completed if final_status == "success" else SubmissionStatus.failed
         final_output = (
             (result.get("final_success_stdout") or "").strip() if final_status == "success" else ""
         )
@@ -378,6 +497,7 @@ class LangGraphGradingPipeline(GradingPipeline):
             result,
             grading_max_attempts=self._settings.grading_max_attempts,
         )
+        status = _submission_status_from_grade(final_status, grade)
 
         logger.info(
             "[grading-langgraph] done | submission=%s final_status=%s grade=%s",
@@ -425,15 +545,27 @@ class LangGraphGradingPipeline(GradingPipeline):
             cat = (result.get("initial_error_category") or "").strip() or "error"
             err_type = (result.get("initial_error_type") or "").strip()
             first_tb = _initial_error_snippet(result)
-            header = (
-                "Your original submission did not run. The grading assistant repaired it for you; "
-                "the corrected version is in the diff panel below. The full grade is capped when "
-                "auto-repair is needed — please study the original error so the same issue does not "
-                "repeat on the next assignment."
-            )
-            label = f"Original error ({cat}{f', {err_type}' if err_type else ''}):"
+            if first_tb or result.get("initial_error_category"):
+                header = (
+                    "Your original submission did not run. The grading assistant repaired it for you; "
+                    "the corrected version is in the diff panel below. The full grade is capped when "
+                    "auto-repair is needed — please study the original error so the same issue does not "
+                    "repeat on your next submission."
+                )
+            elif _used_requirement_repair(result):
+                header = (
+                    "Your original submission ran, but it did not satisfy every assignment requirement. "
+                    "The grading assistant added the missing requirement work; the completed version is "
+                    "shown in the corrected-code and diff panels below."
+                )
+            else:
+                header = (
+                    "The grading assistant changed the code before final validation; review the corrected "
+                    "version and diff below."
+                )
             stderr_parts.append(header)
             if first_tb:
+                label = f"Original error ({cat}{f', {err_type}' if err_type else ''}):"
                 stderr_parts.append(label)
                 stderr_parts.append(first_tb)
 

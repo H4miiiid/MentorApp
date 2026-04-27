@@ -16,6 +16,7 @@ from .models import (  # noqa: F401
     GradingModel,
     Submission,
     User,
+    WorkflowSetting,
 )
 
 _engine = None

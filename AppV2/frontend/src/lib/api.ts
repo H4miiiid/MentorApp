@@ -320,6 +320,24 @@ export async function fetchAdminConfig(): Promise<AdminConfigResponse> {
   return apiJson<AdminConfigResponse>("/api/admin/config");
 }
 
+/** Completeness provider toggle (admin). */
+export type CompletenessProviderResponse = {
+  provider: "local_sft" | "openrouter";
+};
+
+export async function fetchCompletenessProvider(): Promise<CompletenessProviderResponse> {
+  return apiJson<CompletenessProviderResponse>("/api/admin/completeness-provider");
+}
+
+export async function updateCompletenessProvider(
+  provider: "local_sft" | "openrouter"
+): Promise<CompletenessProviderResponse> {
+  return apiJson<CompletenessProviderResponse>("/api/admin/completeness-provider", {
+    method: "PUT",
+    body: JSON.stringify({ provider }),
+  });
+}
+
 /** Grading models catalog + endpoint health (admin). */
 export type GradingModelRead = {
   id: string;

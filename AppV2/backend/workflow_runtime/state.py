@@ -67,7 +67,12 @@ class RepairState(TypedDict):
 
     workflow_context: WorkflowContext
     assignment_description: str
+    original_code_completeness: dict[str, Any]
     first_pass_completeness: dict[str, Any]
+    requirement_repair_count: int
+    max_requirement_repairs: int
+    used_requirement_repair: bool
+    requirement_repair_exhausted: bool
 
     # Assignment-attached data files to expose inside the sandbox via
     # ``ASSIGNMENT_DATA_DIR``. Each entry is ``(host_path, target_filename)``.
@@ -300,6 +305,11 @@ def init_state(
         final_code="",
         workflow_context=wc,
         assignment_description=assignment_description or "",
+        original_code_completeness={},
         first_pass_completeness={},
+        requirement_repair_count=0,
+        max_requirement_repairs=1,
+        used_requirement_repair=False,
+        requirement_repair_exhausted=False,
         data_files=list(data_files or []),
     )

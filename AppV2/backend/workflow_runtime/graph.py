@@ -10,6 +10,7 @@ from AppV2.backend.workflow_runtime.observability import setup_langsmith
 from AppV2.backend.workflow_runtime.sandbox import SandboxUnavailableError
 from AppV2.backend.workflow_runtime.nodes import (
     assess_local_context,
+    attempt_requirement_completion,
     attempt_sft_with_rag,
     attempt_sft_with_reflection,
     attempt_sft_with_traceback,
@@ -22,6 +23,8 @@ from AppV2.backend.workflow_runtime.nodes import (
     retrieve_local_docs,
     run_checks,
     summarize_context,
+    verify_completeness,
+    verify_original_completeness,
     web_search_docs,
 )
 from AppV2.backend.workflow_runtime.state import RepairState, init_state
@@ -50,6 +53,34 @@ def route_local_context(state: RepairState) -> str:
     return "web" if state.get("local_context_quality") == "weak" else "summarize"
 
 
+def _has_truly_missing_requirements(completeness: dict) -> bool:
+    """Return True only if at least one requirement has status 'missing' (not partial)."""
+    requirements = completeness.get("requirements") or []
+    if isinstance(requirements, list):
+        for item in requirements:
+            if isinstance(item, dict) and str(item.get("status", "")).strip().lower() == "missing":
+                return True
+    missing_list = completeness.get("missing_requirements") or []
+    return bool(missing_list)
+
+
+def route_after_completeness(state: RepairState) -> str:
+    completeness = state.get("first_pass_completeness") or {}
+    if completeness.get("complete", True) or completeness.get("model_complete", False):
+        return "finalize_success"
+
+    if not _has_truly_missing_requirements(completeness):
+        return "finalize_success"
+
+    used = int(state.get("requirement_repair_count", 0))
+    budget = int(state.get("max_requirement_repairs", 1))
+    if used < budget:
+        return "attempt_requirement_completion"
+
+    state["requirement_repair_exhausted"] = True
+    return "finalize_success"
+
+
 def bootstrap(state: RepairState) -> RepairState:
     return state
 
@@ -58,9 +89,31 @@ def route_bootstrap(state: RepairState) -> str:
     check = state.get("check_result") or {}
     if not check:
         return "check"
-    if check.get("passed", False):
-        return "success"
-    return "diagnose"
+    if not check.get("passed", False):
+        return "diagnose"
+    if not state.get("original_code_completeness"):
+        return "verify_original_completeness"
+    completeness = state.get("first_pass_completeness") or {}
+    if (
+        completeness
+        and not completeness.get("complete", True)
+        and not completeness.get("model_complete", False)
+        and _has_truly_missing_requirements(completeness)
+    ):
+        return "requirement_completion"
+    return "success"
+
+
+def route_after_original_completeness(state: RepairState) -> str:
+    check = state.get("check_result") or {}
+    if not check.get("passed", False):
+        return "diagnose"
+    completeness = state.get("original_code_completeness") or {}
+    if completeness.get("complete", True) or completeness.get("model_complete", False):
+        return "finalize_success"
+    if not _has_truly_missing_requirements(completeness):
+        return "finalize_success"
+    return "attempt_requirement_completion"
 
 
 def build_graph():
@@ -79,6 +132,9 @@ def build_graph():
     builder.add_node("reflection_critic", reflection_critic)
     builder.add_node("attempt_sft_with_reflection", attempt_sft_with_reflection)
     builder.add_node("external_expert_repair", external_expert_repair)
+    builder.add_node("verify_original_completeness", verify_original_completeness)
+    builder.add_node("verify_completeness", verify_completeness)
+    builder.add_node("attempt_requirement_completion", attempt_requirement_completion)
     builder.add_node("finalize_success", finalize_success)
     builder.add_node("finalize_failure", finalize_failure)
 
@@ -90,7 +146,19 @@ def build_graph():
         {
             "check": "run_checks",
             "diagnose": "diagnose_failure",
-            "success": "finalize_success",
+            "success": "verify_completeness",
+            "requirement_completion": "attempt_requirement_completion",
+            "verify_original_completeness": "verify_original_completeness",
+        },
+    )
+
+    builder.add_conditional_edges(
+        "verify_original_completeness",
+        route_after_original_completeness,
+        {
+            "diagnose": "diagnose_failure",
+            "attempt_requirement_completion": "attempt_requirement_completion",
+            "finalize_success": "finalize_success",
         },
     )
 
@@ -106,11 +174,21 @@ def build_graph():
         "run_checks",
         route_after_checks,
         {
-            "success": "finalize_success",
+            "success": "verify_completeness",
             "diagnose": "diagnose_failure",
             "external_failed": "finalize_failure",
         },
     )
+
+    builder.add_conditional_edges(
+        "verify_completeness",
+        route_after_completeness,
+        {
+            "attempt_requirement_completion": "attempt_requirement_completion",
+            "finalize_success": "finalize_success",
+        },
+    )
+    builder.add_edge("attempt_requirement_completion", "run_checks")
 
     builder.add_conditional_edges(
         "diagnose_failure",
@@ -212,35 +290,6 @@ def run_workflow(
             "sandbox_error": str(exc),
         }
 
-    if state.get("check_result", {}).get("passed", False):
-        # First-pass success: no completeness gate; full grade path.
-        success_stdout = (state.get("check_result") or {}).get("stdout") or ""
-        state["final_status"] = "success"
-        state["final_code"] = state["current_code"]
-        state["route_history"].append("finalize_success_fastpath")
-        return {
-            "final_code": state["final_code"],
-            "final_status": state["final_status"],
-            "attempt_count": 0,
-            "max_attempts": max_attempts,
-            "route_history": state["route_history"],
-            "attempt_history": state["attempt_history"],
-            "error_category": "",
-            "stop_reason": "",
-            "no_meaningful_change_count": 0,
-            "repeated_failure_count": 0,
-            "error_events": state.get("error_events", []),
-            "mistake_count": 0,
-            "initial_traceback": state.get("initial_traceback", ""),
-            "initial_error_category": state.get("initial_error_category", ""),
-            "initial_error_type": state.get("initial_error_type", ""),
-            "initial_error_explanation": state.get("initial_error_explanation", ""),
-            "initial_stdout": state.get("initial_stdout", ""),
-            "initial_stderr": state.get("initial_stderr", ""),
-            "first_pass_completeness": {},
-            "final_success_stdout": success_stdout,
-        }
-
     app = build_graph()
     try:
         final_state = app.invoke(state)
@@ -282,6 +331,10 @@ def run_workflow(
         "repeated_failure_count": final_state.get("repeated_failure_count", 0),
         "error_events": final_state.get("error_events", []),
         "mistake_count": final_state.get("mistake_count", 0),
+        "requirement_repair_count": final_state.get("requirement_repair_count", 0),
+        "max_requirement_repairs": final_state.get("max_requirement_repairs", 1),
+        "used_requirement_repair": final_state.get("used_requirement_repair", False),
+        "requirement_repair_exhausted": final_state.get("requirement_repair_exhausted", False),
         # Snapshot of the student's ORIGINAL failing run. These survive LLM repairs and let
         # the grader + UI distinguish a clean first-try pass from a "we had to fix it for you"
         # pass, and let the student see the actual mistake in their own code.
@@ -291,6 +344,7 @@ def run_workflow(
         "initial_error_explanation": final_state.get("initial_error_explanation", ""),
         "initial_stdout": final_state.get("initial_stdout", ""),
         "initial_stderr": final_state.get("initial_stderr", ""),
+        "original_code_completeness": final_state.get("original_code_completeness", state.get("original_code_completeness", {})),
         "first_pass_completeness": final_state.get("first_pass_completeness", state.get("first_pass_completeness", {})),
         "final_success_stdout": final_success_stdout,
     }

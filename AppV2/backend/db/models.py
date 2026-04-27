@@ -127,6 +127,16 @@ class Document(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=_utc_now)
 
 
+class WorkflowSetting(SQLModel, table=True):
+    """Global key-value runtime settings for the grading workflow (admin-managed)."""
+
+    __tablename__ = "workflow_settings"
+
+    key: str = Field(primary_key=True, max_length=120)
+    value: str = Field(default="", max_length=500)
+    updated_at: datetime = Field(default_factory=_utc_now)
+
+
 class AssignmentDocument(SQLModel, table=True):
     """N-to-N: a teacher-uploaded Document can be attached to multiple Assignments.
 

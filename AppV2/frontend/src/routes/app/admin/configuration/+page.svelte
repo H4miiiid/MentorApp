@@ -8,9 +8,12 @@
     createGradingModel,
     activateGradingModel,
     deleteGradingModel,
+    fetchCompletenessProvider,
+    updateCompletenessProvider,
     type AdminConfigResponse,
     type GradingModelRead,
     type GradingStatusResponse,
+    type CompletenessProviderResponse,
   } from "$lib/api";
   import { PATH_ADMIN_HOME } from "$lib/paths";
 
@@ -19,6 +22,8 @@
   let models: GradingModelRead[] = [];
   let errorMsg = "";
   let loading = true;
+
+  let completenessProvider: CompletenessProviderResponse | null = null;
 
   let newName = "";
   let newNotes = "";
@@ -30,10 +35,11 @@
     loading = true;
     errorMsg = "";
     try {
-      [cfg, status, models] = await Promise.all([
+      [cfg, status, models, completenessProvider] = await Promise.all([
         fetchAdminConfig(),
         fetchGradingStatus(),
         fetchGradingModels(),
+        fetchCompletenessProvider(),
       ]);
     } catch (e) {
       errorMsg = e instanceof Error ? e.message : "Failed to load";
@@ -66,6 +72,18 @@
       await load();
     } catch (e) {
       errorMsg = e instanceof Error ? e.message : "Delete failed";
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function onToggleProvider(target: "local_sft" | "openrouter") {
+    busy = true;
+    errorMsg = "";
+    try {
+      completenessProvider = await updateCompletenessProvider(target);
+    } catch (e) {
+      errorMsg = e instanceof Error ? e.message : "Failed to switch provider";
     } finally {
       busy = false;
     }
@@ -177,6 +195,39 @@
           </dd>
         </dl>
         <p class="gh-muted" style="margin-bottom: 0; font-size: 13px;">{status.note}</p>
+      </div>
+    {/if}
+
+    {#if completenessProvider}
+      <div class="gh-card" style="max-width: none; margin-bottom: 20px;">
+        <h2 class="gh-title" style="font-size: 18px; margin-top: 0;">Completeness check provider</h2>
+        <p class="gh-muted" style="margin-top: 0;">
+          Controls which model verifies whether runnable student code satisfies all assignment
+          requirements. Switch live without restarting.
+        </p>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button
+            type="button"
+            class="gh-btn gh-btn-sm"
+            class:gh-btn-primary={completenessProvider.provider === "local_sft"}
+            disabled={busy || completenessProvider.provider === "local_sft"}
+            on:click={() => onToggleProvider("local_sft")}
+          >
+            Local SFT
+          </button>
+          <button
+            type="button"
+            class="gh-btn gh-btn-sm"
+            class:gh-btn-primary={completenessProvider.provider === "openrouter"}
+            disabled={busy || completenessProvider.provider === "openrouter"}
+            on:click={() => onToggleProvider("openrouter")}
+          >
+            OpenRouter GPT-5.4-mini
+          </button>
+          <span class="gh-muted" style="margin-left: 8px;">
+            Active: <strong>{completenessProvider.provider === "local_sft" ? "Local SFT" : "OpenRouter GPT-5.4-mini"}</strong>
+          </span>
+        </div>
       </div>
     {/if}
 

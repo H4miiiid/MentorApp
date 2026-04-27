@@ -102,7 +102,7 @@
     {#if !gradingDone}
       <p class="gh-muted" style="margin: 20px 0 0; font-size: 14px;">
         Grading is still running. When it finishes, <strong>errors (stderr)</strong>,
-        <strong>corrected code</strong>, <strong>diff</strong>, and test output will appear below. Refresh if needed.
+        <strong>corrected code</strong>, <strong>diff</strong>, and sandbox output will appear below. Refresh if needed.
       </p>
     {:else}
       <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Errors (stderr)</h2>
@@ -128,12 +128,6 @@
         Unified diff between your submission and the corrected version.
       </p>
       <UnifiedDiffView diff={submission.diff ?? ""} />
-
-      <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Stdout</h2>
-      <div class="gh-code-view-shell">
-        <div class="gh-code-editor-toolbar">Stdout</div>
-        <pre class="gh-code-block gh-code-block-python">{submission.stdout?.trim() || "—"}</pre>
-      </div>
 
       <h2 class="gh-title" style="font-size: 15px; margin: 24px 0 8px;">Output</h2>
       <p class="gh-muted" style="margin: 0 0 10px; font-size: 13px;">

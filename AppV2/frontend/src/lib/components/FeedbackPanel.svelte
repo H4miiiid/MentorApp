@@ -10,6 +10,20 @@
     prompt_preview?: string;
   };
 
+  type Completeness = {
+    complete?: boolean;
+    provider?: string;
+    confidence?: number;
+    rationale?: string;
+    missing_requirements?: string[];
+    requirements?: { text: string; status: string; evidence?: string; severity?: string }[];
+    grading_breakdown?: {
+      items?: { text: string; status: string; severity: string; penalty_points: number }[];
+      total_penalty?: number;
+      penalty_cap?: number;
+    };
+  };
+
   type Parsed = {
     final_status?: string;
     attempt_count?: number;
@@ -29,10 +43,16 @@
     // banner with the original error so the student can learn from the mistake
     // instead of silently benefiting from "grade = 100".
     repaired?: boolean;
+    requirement_repaired?: boolean;
+    requirement_repair_count?: number;
+    max_requirement_repairs?: number;
+    requirement_repair_exhausted?: boolean;
     initial_error_category?: string;
     initial_error_type?: string;
     initial_error_explanation?: string;
     initial_traceback?: string;
+    completeness?: Completeness;
+    final_completeness?: Completeness;
   };
 
   let parsed: Parsed | null = null;
@@ -55,6 +75,8 @@
   // A "repaired" run is still a success, but the student didn't earn it on their own,
   // so we treat it as its own visual state (amber, not green) to make that obvious.
   $: isRepaired = final === "success" && !!parsed?.repaired;
+  $: isRequirementRepaired = final === "success" && !!parsed?.requirement_repaired;
+  $: hasOriginalError = !!(parsed?.initial_traceback || parsed?.initial_error_category);
   $: isSuccess = final === "success" && !isRepaired;
   $: isSandboxInfra = final === "sandbox_unavailable";
   $: isFailure = !isRepaired && !isSuccess && !isSandboxInfra && !!final;
@@ -66,6 +88,27 @@
   $: attemptPct =
     maxAttempts > 0 ? Math.min(100, Math.round((attempts / maxAttempts) * 100)) : 0;
 
+  $: completeness = parsed?.completeness ?? null;
+  $: finalCompleteness = parsed?.final_completeness ?? null;
+  $: isIncomplete = completeness != null && completeness.complete === false;
+  $: finalIncomplete = finalCompleteness != null ? finalCompleteness.complete === false : isIncomplete;
+  $: completenessRequirementsSorted =
+    completeness &&
+    Array.isArray(completeness.requirements) &&
+    completeness.requirements.length > 0
+      ? [...completeness.requirements].sort(
+          (a, b) => requirementSortKey(a.status) - requirementSortKey(b.status)
+        )
+      : [];
+  $: visibleRequirements = completenessRequirementsSorted.filter(
+    (r) => !isHeuristicPlaceholderRequirement(r.text)
+  );
+  $: hasOnlyPlaceholderRequirements =
+    completenessRequirementsSorted.length > 0 && visibleRequirements.length === 0;
+  $: visibleMissingRequirements =
+    completeness?.missing_requirements?.filter(
+      (r) => !isHeuristicPlaceholderRequirement(r)
+    ) ?? [];
   $: routeHistory = parsed?.route_history ?? [];
   $: attemptHistory = parsed?.attempt_history_tail ?? [];
 
@@ -85,7 +128,12 @@
       reflection_critic: "Reflect",
       attempt_sft_with_reflection: "Repair w/ reflection",
       external_expert_repair: "Expert repair",
+      verify_completeness: "Verify completeness",
+      attempt_requirement_completion: "Add missing requirements",
+      verify_completeness_fastpath: "Verify completeness (fast-path)",
+      first_pass_success: "First-pass success",
       finalize_success: "Finalize ✓",
+      finalize_success_fastpath: "Finalize ✓ (fast-path)",
       finalize_failure: "Finalize ✗",
     };
     return map[node] ?? node.replace(/_/g, " ");
@@ -99,6 +147,8 @@
   }
 
   function repairedStatusLabel(): string {
+    if (isRequirementRepaired && hasOriginalError) return "Passed — after repair and completion";
+    if (isRequirementRepaired) return "Passed — after assistant completion";
     return "Passed — after assistant repair";
   }
 
@@ -139,6 +189,61 @@
       return iso;
     }
   }
+
+  function requirementSortKey(status: string | undefined): number {
+    const s = (status ?? "").toLowerCase();
+    if (s === "missing") return 0;
+    if (s === "partial") return 1;
+    if (s === "present") return 2;
+    return 3;
+  }
+
+  /** Human-readable label for model status: present | partial | missing */
+  function requirementStatusTitle(status: string | undefined): string {
+    const s = (status ?? "").toLowerCase();
+    if (s === "present") return "Satisfied";
+    if (s === "partial") return "Partially satisfied";
+    if (s === "missing") return "Not satisfied";
+    return (status || "Unknown").replace(/_/g, " ");
+  }
+
+  function requirementStatusHint(status: string | undefined): string {
+    const s = (status ?? "").toLowerCase();
+    if (s === "present")
+      return "This part of the assignment looks covered in your code.";
+    if (s === "partial")
+      return "Started or incomplete — needs more work to fully meet the requirement.";
+    if (s === "missing")
+      return "Not found or not implemented in a way that meets this requirement.";
+    return "";
+  }
+
+  function severityShortLabel(sev: string | undefined): string {
+    const s = (sev ?? "").toLowerCase();
+    if (s === "critical") return "Core";
+    if (s === "medium") return "Supporting";
+    if (s === "minor") return "Minor";
+    return (sev || "").replace(/_/g, " ");
+  }
+
+  function isHeuristicPlaceholderRequirement(text: string | undefined): boolean {
+    const t = (text ?? "").trim().toLowerCase();
+    return (
+      t === "implementation appears partial or placeholder." ||
+      t === "core logic appears missing." ||
+      t === "satisfy all stated assignment requirements in code."
+    );
+  }
+
+  function requirementDisplayText(text: string | undefined): string {
+    const raw = (text ?? "").trim();
+    if (!raw) return "";
+    // Keep the original value for grading payloads; prettify display only.
+    if (/^[a-z0-9_]+$/.test(raw)) {
+      return raw.replace(/_/g, " ");
+    }
+    return raw;
+  }
 </script>
 
 {#if !parsed}
@@ -170,8 +275,33 @@
           {#if isRepaired}{repairedStatusLabel()}{:else}{statusLabel(final)}{/if}
         </div>
         <div class="fb-banner-sub">
-          {#if isSuccess}
+          {#if isSuccess && isIncomplete}
+            Your code ran without errors, but it does not satisfy all assignment
+            requirements. The grade has been reduced — see the
+            <strong>Completeness analysis</strong> below for each requirement’s status
+            (satisfied / partially satisfied / not satisfied).
+          {:else if isSuccess}
             Your code ran and passed every sandbox check.
+          {:else if isRepaired && isRequirementRepaired && !hasOriginalError && finalIncomplete}
+            Your code ran, but it was missing assignment requirements. The
+            assistant tried to add them (see the <strong>Changes</strong> diff),
+            but some requirements are still missing — see
+            <strong>Completeness analysis</strong> below.
+          {:else if isRepaired && isRequirementRepaired && !hasOriginalError}
+            Your code ran, but it did not satisfy every assignment requirement.
+            The assistant added the missing requirement work (see the
+            <strong>Changes</strong> diff). The grade reflects that assistant
+            completion was needed.
+          {:else if isRepaired && isRequirementRepaired && finalIncomplete}
+            Your original submission did not run — the assistant repaired it so it
+            passes the sandbox, then tried to add missing requirements (see the
+            <strong>Changes</strong> diff). The grade reflects both that repair
+            and any requirements still missing — see
+            <strong>Completeness analysis</strong> below.
+          {:else if isRepaired && isRequirementRepaired}
+            Your original submission did not run — the assistant repaired it and
+            added missing requirement work (see the <strong>Changes</strong>
+            diff). The grade reflects that assistant help was needed.
           {:else if isRepaired}
             Your original submission did not run — the grading assistant applied a
             minimal fix (see the <strong>Changes</strong> diff below) and the
@@ -281,6 +411,127 @@
         </div>
       {/if}
     </div>
+
+    <!-- Completeness analysis -->
+    {#if completeness}
+      <div class="fb-section">
+        <div class="fb-section-head">
+          <span class="fb-heading">Original submission requirements</span>
+          <span class="gh-muted fb-section-hint">
+            Checked by <strong>{completeness.provider === "local_sft" ? "Local SFT" : completeness.provider === "openrouter" ? "OpenRouter GPT-5.4-mini" : completeness.provider || "—"}</strong>
+            {#if completeness.confidence != null}
+              · confidence {Math.round((completeness.confidence ?? 0) * 100)}%
+            {/if}
+          </span>
+        </div>
+
+        <div class="fb-completeness-status" class:fb-completeness-ok={completeness.complete} class:fb-completeness-warn={!completeness.complete}>
+          {completeness.complete ? "Original code meets all requirements" : "Original code is missing requirements"}
+        </div>
+
+        {#if completeness.rationale}
+          <p class="fb-completeness-rationale">{completeness.rationale}</p>
+        {/if}
+
+        {#if visibleRequirements.length > 0}
+          <div class="fb-req-checklist">
+            <span class="fb-meta-label">Assignment requirements in original code</span>
+            <p class="fb-req-legend gh-muted">
+              Each row uses the grader’s labels:
+              <span class="fb-req-legend-pill fb-req-pill-present">Satisfied</span>
+              (met),
+              <span class="fb-req-legend-pill fb-req-pill-partial">Partially satisfied</span>
+              (incomplete),
+              <span class="fb-req-legend-pill fb-req-pill-missing">Not satisfied</span>
+              (missing).
+            </p>
+            <ul class="fb-req-list">
+              {#each visibleRequirements as r}
+                <li
+                  class="fb-req-row"
+                  class:fb-req-row-present={(r.status ?? "").toLowerCase() === "present"}
+                  class:fb-req-row-partial={(r.status ?? "").toLowerCase() === "partial"}
+                  class:fb-req-row-missing={(r.status ?? "").toLowerCase() === "missing"}
+                >
+                  <div class="fb-req-row-top">
+                    <span
+                      class="fb-req-status-pill"
+                      class:fb-req-pill-present={(r.status ?? "").toLowerCase() === "present"}
+                      class:fb-req-pill-partial={(r.status ?? "").toLowerCase() === "partial"}
+                      class:fb-req-pill-missing={(r.status ?? "").toLowerCase() === "missing"}
+                    >
+                      {requirementStatusTitle(r.status)}
+                    </span>
+                    {#if r.severity}
+                      <span class="fb-req-severity" title="How important this requirement is for grading">
+                        {severityShortLabel(r.severity)}
+                      </span>
+                    {/if}
+                  </div>
+                  <div class="fb-req-text">{requirementDisplayText(r.text)}</div>
+                  <div class="fb-req-hint">{requirementStatusHint(r.status)}</div>
+                  {#if (r.evidence ?? "").trim()}
+                    <div class="fb-req-evidence" class:fb-req-evidence-student={studentView}>
+                      <span class="fb-req-evidence-label">What the grader noticed</span>
+                      <span class="fb-req-evidence-body">{r.evidence}</span>
+                    </div>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {:else if visibleMissingRequirements.length > 0}
+          <div class="fb-completeness-missing">
+            <span class="fb-meta-label">Requirements not satisfied</span>
+            <ul>
+              {#each visibleMissingRequirements as req}
+                <li>
+                  <span class="fb-req-status-pill fb-req-pill-missing">Not satisfied</span>
+                  <span class="fb-req-inline-text">{requirementDisplayText(req)}</span>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {:else if hasOnlyPlaceholderRequirements}
+          <div class="fb-completeness-warning">
+            <span class="fb-meta-label">Completeness warning</span>
+            <p>
+              The grader detected that the implementation is incomplete, but it could not
+              reliably extract a detailed requirement-by-requirement list from the model output.
+            </p>
+          </div>
+        {/if}
+
+        {#if completeness.grading_breakdown?.items?.length}
+          <div class="fb-completeness-grading">
+            <span class="fb-meta-label">
+              Score impact (completeness)
+              {#if completeness.grading_breakdown.total_penalty != null}
+                — −{completeness.grading_breakdown.total_penalty} pts (cap
+                {completeness.grading_breakdown.penalty_cap ?? "—"})
+              {/if}
+            </span>
+            <ul class="fb-completeness-penalty-list">
+              {#each completeness.grading_breakdown.items ?? [] as it}
+                <li>
+                  <span
+                    class="fb-req-status-pill fb-req-pill-compact"
+                    class:fb-req-pill-present={(it.status ?? "").toLowerCase() === "present"}
+                    class:fb-req-pill-partial={(it.status ?? "").toLowerCase() === "partial"}
+                    class:fb-req-pill-missing={(it.status ?? "").toLowerCase() === "missing"}
+                  >
+                    {requirementStatusTitle(it.status)}
+                  </span>
+                  <span class="fb-chip fb-chip-severity">{severityShortLabel(it.severity)}</span>
+                  <span class="fb-penalty-amount">−{it.penalty_points}</span>
+                  <span class="fb-penalty-text">{requirementDisplayText(it.text)}</span>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+      </div>
+    {/if}
 
     <!-- Route history -->
     {#if routeHistory.length > 0}
@@ -747,6 +998,306 @@
     word-break: break-word;
     max-height: 160px;
     overflow: auto;
+  }
+
+  .fb-completeness-status {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .fb-completeness-ok {
+    color: #3fb950;
+    background: rgba(63, 185, 80, 0.1);
+    border: 1px solid rgba(63, 185, 80, 0.3);
+  }
+
+  .fb-completeness-warn {
+    color: #d29922;
+    background: rgba(210, 153, 34, 0.1);
+    border: 1px solid rgba(210, 153, 34, 0.3);
+  }
+
+  .fb-completeness-rationale {
+    font-size: 13px;
+    color: var(--gh-text-muted);
+    margin: 4px 0 8px;
+  }
+
+  .fb-req-checklist {
+    margin: 12px 0 14px;
+  }
+
+  .fb-req-legend {
+    font-size: 12px;
+    line-height: 1.55;
+    margin: 6px 0 12px;
+  }
+
+  .fb-req-legend-pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 0 2px;
+    vertical-align: middle;
+  }
+
+  .fb-req-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fb-req-row {
+    border: 1px solid var(--gh-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: var(--gh-bg);
+    border-left-width: 4px;
+  }
+
+  .fb-req-row-present {
+    border-left-color: rgba(63, 185, 80, 0.85);
+    background: rgba(63, 185, 80, 0.04);
+  }
+
+  .fb-req-row-partial {
+    border-left-color: rgba(210, 153, 34, 0.9);
+    background: rgba(210, 153, 34, 0.06);
+  }
+
+  .fb-req-row-missing {
+    border-left-color: rgba(248, 81, 73, 0.85);
+    background: rgba(248, 81, 73, 0.05);
+  }
+
+  .fb-req-row-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .fb-req-status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+  }
+
+  .fb-req-pill-compact {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+
+  .fb-req-pill-present {
+    color: #3fb950;
+    background: rgba(63, 185, 80, 0.14);
+    border-color: rgba(63, 185, 80, 0.45);
+  }
+
+  .fb-req-pill-partial {
+    color: #d29922;
+    background: rgba(210, 153, 34, 0.16);
+    border-color: rgba(210, 153, 34, 0.45);
+  }
+
+  .fb-req-pill-missing {
+    color: #f85149;
+    background: rgba(248, 81, 73, 0.12);
+    border-color: rgba(248, 81, 73, 0.45);
+  }
+
+  .fb-req-severity {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gh-text-muted);
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--gh-bg-secondary);
+    border: 1px solid var(--gh-border);
+  }
+
+  .fb-req-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gh-text);
+    line-height: 1.45;
+  }
+
+  .fb-req-hint {
+    font-size: 12px;
+    color: var(--gh-text-muted);
+    margin-top: 6px;
+    line-height: 1.45;
+  }
+
+  .fb-req-evidence {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--gh-border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fb-req-evidence-student .fb-req-evidence-body {
+    font-size: 12px;
+  }
+
+  .fb-req-evidence-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gh-text-muted);
+  }
+
+  .fb-req-evidence-body {
+    font-size: 13px;
+    color: var(--gh-text);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .fb-req-inline-text {
+    margin-left: 8px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .fb-completeness-missing {
+    margin-top: 10px;
+  }
+
+  .fb-completeness-missing ul {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fb-completeness-missing li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    list-style: none;
+    margin-left: 0;
+  }
+
+  .fb-completeness-warning {
+    margin-top: 10px;
+    border: 1px solid rgba(210, 153, 34, 0.45);
+    background: rgba(210, 153, 34, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .fb-completeness-warning p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--gh-text);
+    line-height: 1.45;
+  }
+
+  .fb-chip-severity {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .fb-penalty-amount {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 700;
+    color: #f85149;
+    font-size: 12px;
+    min-width: 3.2em;
+  }
+
+  .fb-penalty-text {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .fb-completeness-grading {
+    margin: 8px 0 10px;
+    font-size: 13px;
+  }
+
+  .fb-completeness-penalty-list {
+    margin: 8px 0 0;
+    padding: 0;
+    color: var(--gh-text);
+  }
+
+  .fb-completeness-penalty-list li {
+    margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 10px;
+    list-style: none;
+    margin-left: 0;
+  }
+
+  .fb-completeness-details {
+    margin-top: 10px;
+  }
+
+  .fb-completeness-details summary {
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--gh-text-muted);
+    list-style: none;
+  }
+
+  .fb-completeness-details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .fb-completeness-details summary::before {
+    content: "▸ ";
+    font-size: 10px;
+  }
+
+  .fb-completeness-details[open] summary::before {
+    content: "▾ ";
+  }
+
+  .fb-completeness-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  .fb-completeness-table th,
+  .fb-completeness-table td {
+    padding: 6px 8px;
+    border: 1px solid var(--gh-border);
+    text-align: left;
+  }
+
+  .fb-completeness-table th {
+    background: var(--gh-bg-secondary);
+    color: var(--gh-text-muted);
+    font-weight: 600;
   }
 
   .fb-raw-toggle {

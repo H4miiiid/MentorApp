@@ -19,6 +19,8 @@ from ...schemas import AssignmentRead, SubmissionRead, UserRead
 from ...schemas.admin import (
     AdminConfigResponse,
     AdminUserInsightsResponse,
+    CompletenessProviderResponse,
+    CompletenessProviderUpdate,
     StudentEnrollmentItem,
 )
 from ...schemas.grading_model import (
@@ -27,6 +29,7 @@ from ...schemas.grading_model import (
     GradingModelUpdate,
     GradingStatusResponse,
 )
+from ...grading.workflow_settings_service import get_completeness_provider, set_completeness_provider
 from ...workflow_runtime.config import CFG
 from ...workflow_runtime.llm_clients import endpoint_health_url_from_openai_base
 
@@ -212,6 +215,25 @@ def delete_grading_model(
         )
     session.delete(m)
     session.commit()
+
+
+@router.get("/completeness-provider", response_model=CompletenessProviderResponse)
+def get_completeness_provider_endpoint(
+    _: Annotated[User, Depends(require_admin)],
+) -> CompletenessProviderResponse:
+    return CompletenessProviderResponse(provider=get_completeness_provider())
+
+
+@router.put("/completeness-provider", response_model=CompletenessProviderResponse)
+def update_completeness_provider_endpoint(
+    body: CompletenessProviderUpdate,
+    _: Annotated[User, Depends(require_admin)],
+) -> CompletenessProviderResponse:
+    try:
+        value = set_completeness_provider(body.provider)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return CompletenessProviderResponse(provider=value)
 
 
 @router.get("/config", response_model=AdminConfigResponse)

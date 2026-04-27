@@ -33,3 +33,11 @@ class AdminUserInsightsResponse(BaseModel):
     teacher_assignments: list[AssignmentRead] | None = None
     student_enrollments: list[StudentEnrollmentItem] | None = None
     student_submissions: list[SubmissionRead] | None = None
+
+
+class CompletenessProviderResponse(BaseModel):
+    provider: str
+
+
+class CompletenessProviderUpdate(BaseModel):
+    provider: str

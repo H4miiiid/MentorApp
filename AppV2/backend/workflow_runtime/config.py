@@ -86,6 +86,10 @@ class WorkflowConfig:
     external_model: str = os.getenv("OPENROUTER_EXTERNAL_MODEL", "anthropic/claude-opus-4.6").strip()
     summarizer_model: str = os.getenv("OPENROUTER_SUMMARIZER_MODEL", "openai/gpt-oss-120b").strip()
 
+    openrouter_completeness_model: str = os.getenv(
+        "OPENROUTER_COMPLETENESS_MODEL", "openai/gpt-5.4-mini"
+    ).strip()
+
     openrouter_http_referer: str = os.getenv("OPENROUTER_HTTP_REFERER", "").strip()
     openrouter_x_title: str = os.getenv("OPENROUTER_X_TITLE", "MentorApp").strip()
 
