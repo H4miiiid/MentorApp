@@ -10,6 +10,7 @@
     fetchAssignmentDocuments,
     fetchSubmissions,
     fetchUsers,
+    removeSubmissionFromMyList,
     type AssignmentRead,
     type DocumentRead,
     type SubmissionRead,
@@ -36,6 +37,31 @@
   let resources: DocumentRead[] = [];
   let busyDocId: string | null = null;
   let resourceError = "";
+  let removeBusyId: string | null = null;
+
+  async function removeFromList(submissionId: string, e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (
+      !confirm(
+        "Remove this submission from your list? It stays in the system for your teacher and grading records."
+      )
+    ) {
+      return;
+    }
+    if (!assignment || !me) return;
+    removeBusyId = submissionId;
+    resourceError = "";
+    try {
+      await removeSubmissionFromMyList(submissionId);
+      mySubmissions = mySubmissions.filter((x) => x.id !== submissionId);
+    } catch (err) {
+      resourceError =
+        err instanceof Error ? err.message : "Could not remove submission";
+    } finally {
+      removeBusyId = null;
+    }
+  }
 
   function basename(path: string): string {
     const parts = (path || "").replace(/\\/g, "/").split("/");
@@ -303,6 +329,7 @@ df = pd.read_csv(os.path.join(data_dir, "${basename(resources[0]?.file_path || "
               <th>Status</th>
               <th>Grade</th>
               <th>Updated</th>
+              <th class="gh-muted" style="text-align: right; width: 1%; white-space: nowrap;">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -319,6 +346,18 @@ df = pd.read_csv(os.path.join(data_dir, "${basename(resources[0]?.file_path || "
                 <td><SubmissionStatusBadge status={s.status} /></td>
                 <td>{formatSubmissionGrade(s.grade, s.status)}</td>
                 <td class="gh-muted">{formatDateTime(s.updated_at)}</td>
+                <td style="text-align: right;" on:click|stopPropagation>
+                  <button
+                    type="button"
+                    class="gh-btn gh-btn-sm"
+                    disabled={removeBusyId === s.id}
+                    title="Remove from your list (submission is kept for records)"
+                    aria-label="Remove submission from list"
+                    on:click={(e) => removeFromList(s.id, e)}
+                  >
+                    {removeBusyId === s.id ? "…" : "Remove"}
+                  </button>
+                </td>
               </tr>
             {/each}
           </tbody>

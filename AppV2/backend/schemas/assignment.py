@@ -22,6 +22,7 @@ class AssignmentRead(BaseModel):
     due_date: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
+    removed_from_lists_at: Optional[datetime] = None
 
 
 class AssignmentStudentAdd(BaseModel):
@@ -40,3 +41,5 @@ class AssignmentUpdate(BaseModel):
     title: str | None = Field(None, min_length=1, max_length=300)
     description: str | None = None
     due_date: Optional[datetime] = None
+    # True: hide from teacher/student lists (keeps DB row). False: restore (teacher owner or admin).
+    remove_from_lists: bool | None = None

@@ -72,6 +72,31 @@ def test_normalize_completeness_result_keeps_partial_and_missing_rows() -> None:
     assert normalized.get("complete") is False
 
 
+def test_normalize_structured_requirements_ignore_extra_missing_flat_strings() -> None:
+    """Model may list sub-gaps under missing_requirements; if requirements[] exists, do not duplicate."""
+    normalized = normalize_completeness_result(
+        {
+            "complete": False,
+            "requirements": [
+                {
+                    "text": "Explore and understand the data",
+                    "status": "partial",
+                    "severity": "medium",
+                    "evidence": "Basic split only.",
+                },
+            ],
+            "missing_requirements": [
+                "Data exploration and understanding",
+                "Visualization of data distributions",
+            ],
+        }
+    )
+    reqs = normalized.get("requirements") or []
+    assert len(reqs) == 1
+    assert reqs[0].get("status") == "partial"
+    assert normalized.get("missing_requirements") == []
+
+
 def test_normalize_completeness_result_prefers_structured_rows_over_placeholder_missing() -> None:
     normalized = normalize_completeness_result(
         {

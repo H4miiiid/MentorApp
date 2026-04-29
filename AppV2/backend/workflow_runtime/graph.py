@@ -50,7 +50,9 @@ def route_strategy(state: RepairState) -> str:
 
 
 def route_local_context(state: RepairState) -> str:
-    return "web" if state.get("local_context_quality") == "weak" else "summarize"
+    # Prefer Chroma retrieve + rerank + summarize whenever we have local hits; web only if empty.
+    local = state.get("local_docs") or []
+    return "summarize" if local else "web"
 
 
 def _has_truly_missing_requirements(completeness: dict) -> bool:

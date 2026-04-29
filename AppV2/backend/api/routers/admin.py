@@ -59,6 +59,7 @@ def _assignment_read(a: Assignment) -> AssignmentRead:
         due_date=a.due_date,
         created_at=a.created_at,
         updated_at=a.updated_at,
+        removed_from_lists_at=getattr(a, "removed_from_lists_at", None),
     )
 
 
@@ -95,6 +96,7 @@ def _submission_read(s: Submission) -> SubmissionRead:
         feedback=s.feedback,
         created_at=s.created_at,
         updated_at=s.updated_at,
+        hidden_from_student=bool(getattr(s, "hidden_from_student", False)),
     )
 
 

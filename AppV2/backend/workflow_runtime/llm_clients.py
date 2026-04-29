@@ -371,6 +371,11 @@ def normalize_completeness_result(data: dict[str, Any]) -> dict[str, Any]:
     if "model_complete" not in out:
         out["model_complete"] = bool(data.get("complete", True))
     raw_reqs = out.get("requirements")
+    # If the model returned structured rows, treat them as canonical; do not merge
+    # duplicate / sub-item strings from `missing_requirements` (avoids double-counting partials).
+    trust_structured_requirements = isinstance(raw_reqs, list) and any(
+        isinstance(x, dict) for x in raw_reqs
+    )
     requirements: list[dict[str, Any]] = []
     if isinstance(raw_reqs, list):
         for item in raw_reqs:
@@ -419,7 +424,7 @@ def normalize_completeness_result(data: dict[str, Any]) -> dict[str, Any]:
     _append_flat_requirements("partially_satisfied_requirements", "partial")
 
     missing_flat = out.get("missing_requirements")
-    if isinstance(missing_flat, list):
+    if isinstance(missing_flat, list) and not trust_structured_requirements:
         for m in missing_flat:
             if not isinstance(m, str):
                 continue

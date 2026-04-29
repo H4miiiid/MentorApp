@@ -7,8 +7,10 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "noEmit": true,
     "sourceMap": true,
     "strict": true,
+    "module": "ESNext",
     "moduleResolution": "bundler"
   }
 }

@@ -1,0 +1,81 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/admin/login": [
+		"src/routes/+layout.ts"
+	],
+	"/app": [
+		"src/routes/app/+page.ts",
+		"src/routes/+layout.ts"
+	],
+	"/app/admin": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/app/admin/configuration": [
+		"src/routes/+layout.ts"
+	],
+	"/app/admin/documents": [
+		"src/routes/+layout.ts"
+	],
+	"/app/admin/monitoring": [
+		"src/routes/+layout.ts"
+	],
+	"/app/admin/submissions/[submissionId]": [
+		"src/routes/+layout.ts"
+	],
+	"/app/admin/users": [
+		"src/routes/+layout.ts"
+	],
+	"/app/admin/users/[userId]": [
+		"src/routes/+layout.ts"
+	],
+	"/app/student": [
+		"src/routes/app/student/+page.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/app/student/assignments": [
+		"src/routes/+layout.ts"
+	],
+	"/app/student/assignments/[assignmentId]": [
+		"src/routes/+layout.ts"
+	],
+	"/app/student/profile": [
+		"src/routes/+layout.ts"
+	],
+	"/app/student/submissions": [
+		"src/routes/+layout.ts"
+	],
+	"/app/student/submissions/[submissionId]": [
+		"src/routes/+layout.ts"
+	],
+	"/app/teacher": [
+		"src/routes/app/teacher/+page.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/app/teacher/assignments": [
+		"src/routes/+layout.ts"
+	],
+	"/app/teacher/assignments/new": [
+		"src/routes/+layout.ts"
+	],
+	"/app/teacher/assignments/[assignmentId]": [
+		"src/routes/+layout.ts"
+	],
+	"/app/teacher/documents": [
+		"src/routes/+layout.ts"
+	],
+	"/app/teacher/profile": [
+		"src/routes/+layout.ts"
+	],
+	"/app/teacher/submissions/[submissionId]": [
+		"src/routes/+layout.ts"
+	],
+	"/auth": [
+		"src/routes/+layout.ts"
+	]
+}

@@ -50,10 +50,14 @@ def _to_read(a: Assignment) -> AssignmentRead:
         due_date=a.due_date,
         created_at=a.created_at,
         updated_at=a.updated_at,
+        removed_from_lists_at=getattr(a, "removed_from_lists_at", None),
     )
 
 
 def _can_view_assignment(session: Session, a: Assignment, u: User) -> bool:
+    """Admins may open removed assignments; others only if still listed (not soft-removed)."""
+    if getattr(a, "removed_from_lists_at", None) is not None and u.role != UserRole.admin:
+        return False
     if u.role == UserRole.admin:
         return True
     if u.role == UserRole.teacher and a.teacher_id == u.id:
@@ -93,7 +97,10 @@ def list_assignments(
     elif current.role == UserRole.teacher:
         rows = session.exec(
             select(Assignment)
-            .where(Assignment.teacher_id == current.id)
+            .where(
+                Assignment.teacher_id == current.id,
+                Assignment.removed_from_lists_at.is_(None),
+            )
             .order_by(Assignment.created_at.desc())
         ).all()
     else:
@@ -104,7 +111,8 @@ def list_assignments(
                     select(AssignmentStudent.assignment_id).where(
                         AssignmentStudent.student_id == current.id
                     )
-                )
+                ),
+                Assignment.removed_from_lists_at.is_(None),
             )
             .order_by(Assignment.created_at.desc())
         ).all()
@@ -171,6 +179,11 @@ def update_assignment(
     if not _can_manage_assignment(a, current):
         raise HTTPException(status_code=403, detail="Not allowed to update this assignment")
     data = body.model_dump(exclude_unset=True)
+    if "remove_from_lists" in data and data["remove_from_lists"] is not None:
+        if data["remove_from_lists"]:
+            a.removed_from_lists_at = _now()
+        else:
+            a.removed_from_lists_at = None
     if "title" in data and data["title"] is not None:
         a.title = data["title"].strip()
     if "description" in data and data["description"] is not None:

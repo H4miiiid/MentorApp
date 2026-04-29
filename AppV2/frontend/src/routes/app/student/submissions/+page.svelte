@@ -4,6 +4,7 @@
   import {
     fetchAssignments,
     fetchSubmissions,
+    removeSubmissionFromMyList,
     type AssignmentRead,
     type SubmissionRead,
   } from "$lib/api";
@@ -16,8 +17,9 @@
   let assignmentsById = new Map<string, AssignmentRead>();
   let errorMsg = "";
   let loading = true;
+  let removeBusyId: string | null = null;
 
-  onMount(async () => {
+  async function load() {
     loading = true;
     errorMsg = "";
     try {
@@ -29,7 +31,33 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(() => {
+    void load();
   });
+
+  async function removeFromList(submissionId: string, e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (
+      !confirm(
+        "Remove this submission from your list? It stays in the system for your teacher and grading records."
+      )
+    ) {
+      return;
+    }
+    removeBusyId = submissionId;
+    errorMsg = "";
+    try {
+      await removeSubmissionFromMyList(submissionId);
+      submissions = submissions.filter((x) => x.id !== submissionId);
+    } catch (err) {
+      errorMsg = err instanceof Error ? err.message : "Could not remove submission";
+    } finally {
+      removeBusyId = null;
+    }
+  }
 
   function assignmentTitle(id: string): string {
     return assignmentsById.get(id)?.title ?? id.slice(0, 8) + "…";
@@ -65,6 +93,7 @@
             <th>Status</th>
             <th>Grade</th>
             <th>Updated</th>
+            <th scope="col" class="gh-muted" style="text-align: right; width: 1%; white-space: nowrap;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -81,6 +110,18 @@
               <td><SubmissionStatusBadge status={s.status} /></td>
               <td>{formatSubmissionGrade(s.grade, s.status)}</td>
               <td class="gh-muted">{formatDateTime(s.updated_at)}</td>
+              <td style="text-align: right;" on:click|stopPropagation>
+                <button
+                  type="button"
+                  class="gh-btn gh-btn-sm"
+                  disabled={removeBusyId === s.id}
+                  title="Remove from your list (submission is kept for records)"
+                  aria-label="Remove submission from list"
+                  on:click={(e) => removeFromList(s.id, e)}
+                >
+                  {removeBusyId === s.id ? "…" : "Remove"}
+                </button>
+              </td>
             </tr>
           {/each}
         </tbody>

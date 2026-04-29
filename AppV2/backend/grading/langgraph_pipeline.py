@@ -49,8 +49,8 @@ MAX_INFERRED_FIX_UNITS = 4
 
 # Requirement penalties are intentionally moderate: the UI explains missing work,
 # while the score should still reward runnable partial solutions.
-_COMPLETENESS_SEVERITY_WEIGHT: dict[str, float] = {"critical": 10.0, "medium": 4.0, "minor": 1.5}
-_COMPLETENESS_PARTIAL_FACTOR = 0.25
+_COMPLETENESS_SEVERITY_WEIGHT: dict[str, float] = {"critical": 10.0, "medium": 5.0, "minor": 2.0}
+_COMPLETENESS_PARTIAL_FACTOR = 1.0
 _MAX_COMPLETENESS_PENALTY = 40.0
 _MIN_GRADE_INCOMPLETE_FIRST_PASS = 55.0
 _PASS_GRADE_THRESHOLD = 70.0
@@ -175,7 +175,14 @@ def _extract_mistake_profile(
 
     categories = sorted({item["category"] for item in by_signature.values() if item.get("category")})
     mistake_lines = [item.get("line", "") for item in by_signature.values() if item.get("line")][:8]
-    observed_weighted_units = sum(MISTAKE_WEIGHT_BY_CATEGORY.get(cat, 1.6) for cat in categories)
+    # Per distinct error signature (not per unique category): two API errors both count.
+    observed_weighted_units = sum(
+        MISTAKE_WEIGHT_BY_CATEGORY.get(
+            (item.get("category") or "").strip() or "api_library_error",
+            1.6,
+        )
+        for item in by_signature.values()
+    )
     # Use computed signatures first; fallback to workflow-provided aggregate when available.
     observed_mistake_count = len(by_signature) or int(result.get("mistake_count") or 0)
 

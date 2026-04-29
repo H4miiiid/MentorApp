@@ -110,6 +110,8 @@ export type AssignmentRead = {
   due_date: string | null;
   created_at: string;
   updated_at: string;
+  /** Set when teacher removed assignment from lists; hidden from teacher/student UIs. */
+  removed_from_lists_at?: string | null;
 };
 
 export type AssignmentCreateBody = {
@@ -144,6 +146,8 @@ export type SubmissionRead = {
   feedback: string;
   created_at: string;
   updated_at: string;
+  /** True when the student removed this from their lists; row remains in DB. */
+  hidden_from_student?: boolean;
 };
 
 export type SubmissionCreateBody = {
@@ -191,6 +195,29 @@ export async function fetchAssignment(id: string): Promise<AssignmentRead> {
   return apiJson<AssignmentRead>(`/api/assignments/${id}`);
 }
 
+export type AssignmentUpdateBody = {
+  title?: string;
+  description?: string | null;
+  due_date?: string | null;
+  /** True hides from teacher + student assignment lists (DB row kept). False restores (teacher/admin). */
+  remove_from_lists?: boolean;
+};
+
+export async function updateAssignment(
+  assignmentId: string,
+  body: AssignmentUpdateBody
+): Promise<AssignmentRead> {
+  return apiJson<AssignmentRead>(`/api/assignments/${assignmentId}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+/** Teacher: soft-remove assignment from your list and students’ lists (data retained). */
+export async function removeAssignmentFromLists(assignmentId: string): Promise<AssignmentRead> {
+  return updateAssignment(assignmentId, { remove_from_lists: true });
+}
+
 export async function fetchAssignmentStudents(
   assignmentId: string
 ): Promise<AssignmentStudentRead[]> {
@@ -224,6 +251,11 @@ export async function createSubmission(body: SubmissionCreateBody): Promise<Subm
 
 export async function fetchSubmission(id: string): Promise<SubmissionRead> {
   return apiJson<SubmissionRead>(`/api/submissions/${id}`);
+}
+
+/** Student only: removes submission from your lists; data is kept for teachers and exports. */
+export async function removeSubmissionFromMyList(submissionId: string): Promise<void> {
+  await apiJson<void>(`/api/submissions/${submissionId}`, { method: "DELETE" });
 }
 
 export async function fetchDocuments(

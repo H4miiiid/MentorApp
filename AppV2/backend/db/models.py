@@ -57,6 +57,8 @@ class Assignment(SQLModel, table=True):
     due_date: Optional[datetime] = None
     created_at: datetime = Field(default_factory=_utc_now)
     updated_at: datetime = Field(default_factory=_utc_now)
+    # Hidden from teacher/student assignment lists; row kept for admin, grading history, exports.
+    removed_from_lists_at: Optional[datetime] = Field(default=None, index=True)
 
 
 class AssignmentStudent(SQLModel, table=True):
@@ -86,6 +88,8 @@ class Submission(SQLModel, table=True):
     feedback: str = Field(default="")
     created_at: datetime = Field(default_factory=_utc_now)
     updated_at: datetime = Field(default_factory=_utc_now)
+    # Student hides from their lists; row stays in DB for teachers, grading exports, datasets.
+    hidden_from_student: bool = Field(default=False, index=True)
 
 
 class GradingModel(SQLModel, table=True):

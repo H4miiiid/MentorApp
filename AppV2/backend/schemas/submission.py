@@ -28,6 +28,7 @@ class SubmissionRead(BaseModel):
     feedback: str
     created_at: datetime
     updated_at: datetime
+    hidden_from_student: bool = False
 
 
 class SubmissionUpdate(BaseModel):
@@ -40,3 +41,4 @@ class SubmissionUpdate(BaseModel):
     stderr: str | None = None
     output: str | None = None
     feedback: str | None = None
+    hidden_from_student: bool | None = None

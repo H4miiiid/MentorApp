@@ -34,7 +34,7 @@ RUN pip install --upgrade pip \
     && pip install -r /tmp/sandbox-requirements.txt \
     && rm /tmp/sandbox-requirements.txt \
     # Smoke-test: catch broken wheels at build time instead of inside a student's grading run.
-    && python -c "import numpy, pandas, scipy, sklearn, matplotlib, seaborn, openpyxl, pyarrow, lxml, bs4, PIL, requests, sympy, networkx, statsmodels, tqdm; print('sandbox stack ok')"
+    && python -c "import numpy,pandas,scipy,sklearn,matplotlib,seaborn,openpyxl,pyarrow,lxml,bs4,PIL,requests,sympy,networkx,statsmodels,tqdm,polars,cv2,skimage,xgboost,lightgbm,numba,imblearn,category_encoders,torch,torchvision; print('sandbox stack ok')"
 
 # No default command — workflow_runtime/sandbox.py launches `python /work/candidate.py`
 # inside an ephemeral `docker run --rm` container.

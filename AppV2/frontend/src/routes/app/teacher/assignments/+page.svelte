@@ -1,7 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
-  import { fetchAssignments, type AssignmentRead } from "$lib/api";
+  import {
+    fetchAssignments,
+    removeAssignmentFromLists,
+    type AssignmentRead,
+  } from "$lib/api";
   import { formatDateTime } from "$lib/format";
   import { tableRowClick, tableRowKeydown } from "$lib/tableRowNav";
   import { PATH_TEACHER_HOME, PATH_TEACHER_NEW_ASSIGNMENT } from "$lib/paths";
@@ -9,8 +13,9 @@
   let rows: AssignmentRead[] = [];
   let errorMsg = "";
   let loading = true;
+  let removeBusyId: string | null = null;
 
-  onMount(async () => {
+  async function load() {
     loading = true;
     errorMsg = "";
     try {
@@ -20,7 +25,33 @@
     } finally {
       loading = false;
     }
+  }
+
+  onMount(() => {
+    void load();
   });
+
+  async function removeFromLists(assignmentId: string, e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (
+      !confirm(
+        "Remove this assignment from your list and from all students’ assignment lists? Past submissions and grades stay in the system."
+      )
+    ) {
+      return;
+    }
+    removeBusyId = assignmentId;
+    errorMsg = "";
+    try {
+      await removeAssignmentFromLists(assignmentId);
+      rows = rows.filter((r) => r.id !== assignmentId);
+    } catch (err) {
+      errorMsg = err instanceof Error ? err.message : "Could not remove assignment";
+    } finally {
+      removeBusyId = null;
+    }
+  }
 </script>
 
 <section>
@@ -64,6 +95,7 @@
             <th>Title</th>
             <th>Due</th>
             <th>Updated</th>
+            <th scope="col" class="gh-muted" style="text-align: right; width: 1%; white-space: nowrap;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -79,6 +111,18 @@
               <td><strong>{a.title}</strong></td>
               <td class="gh-muted">{formatDateTime(a.due_date)}</td>
               <td class="gh-muted">{formatDateTime(a.updated_at)}</td>
+              <td style="text-align: right;" on:click|stopPropagation>
+                <button
+                  type="button"
+                  class="gh-btn gh-btn-sm"
+                  disabled={removeBusyId === a.id}
+                  title="Remove from your list and students’ lists (assignment data is kept)"
+                  aria-label="Remove assignment from lists"
+                  on:click={(e) => removeFromLists(a.id, e)}
+                >
+                  {removeBusyId === a.id ? "…" : "Remove"}
+                </button>
+              </td>
             </tr>
           {/each}
         </tbody>

@@ -18,6 +18,11 @@ from .api.routers import admin, assignments, auth, documents, submissions, users
 from .bootstrap_admin import ensure_default_admin
 from .grading.grading_model_service import ensure_grading_models_bootstrapped
 from .core.config import settings
+from .workflow_runtime.observability import setup_langsmith
+
+# Before importing grading/LangGraph: LangSmith LRU-caches env reads; tracing must see API key + TRACING_V2.
+setup_langsmith()
+
 from .db.database import init_db
 from .grading import GradingWorker, create_grading_pipeline
 from .schemas import HealthResponse

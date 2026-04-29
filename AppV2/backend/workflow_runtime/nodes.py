@@ -363,14 +363,7 @@ def assess_local_context(state: RepairState) -> RepairState:
     reranked = rerank_docs(query, candidates)
     state["local_docs"] = reranked
 
-    if reranked:
-        scores = [float(score) for score, _, _ in reranked]
-        best_score = max(scores)
-        avg_score = sum(scores) / len(scores)
-        state["local_context_quality"] = "good" if (best_score > 0.35 or avg_score > 0.3) else "weak"
-    else:
-        state["local_context_quality"] = "weak"
-
+    state["local_context_quality"] = "good" if reranked else "weak"
     return state
 
 

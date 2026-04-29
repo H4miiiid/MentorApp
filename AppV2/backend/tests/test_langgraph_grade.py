@@ -2,8 +2,15 @@
 
 from __future__ import annotations
 
+import pytest
+
 from AppV2.backend.db.models import SubmissionStatus
-from AppV2.backend.grading.langgraph_pipeline import _grade_from_result, _submission_status_from_grade
+from AppV2.backend.grading.langgraph_pipeline import (
+    MISTAKE_WEIGHT_BY_CATEGORY,
+    _extract_mistake_profile,
+    _grade_from_result,
+    _submission_status_from_grade,
+)
 
 
 def test_success_is_full_marks() -> None:
@@ -95,7 +102,8 @@ def test_incomplete_critical_penalizes_more_than_minor() -> None:
     assert g_min <= 100.0
 
 
-def test_incomplete_partial_counts_less_than_full_missing() -> None:
+def test_incomplete_partial_same_penalty_as_missing_when_partial_factor_one() -> None:
+    """With _COMPLETENESS_PARTIAL_FACTOR=1.0, partial uses full severity weight (same as missing)."""
     g_full = _grade_from_result(
         "a",
         "a",
@@ -136,7 +144,7 @@ def test_incomplete_partial_counts_less_than_full_missing() -> None:
         },
         grading_max_attempts=6,
     )
-    assert g_partial > g_full
+    assert g_partial == g_full
 
 
 def test_success_complete_first_pass_remains_100() -> None:
@@ -154,6 +162,40 @@ def test_success_complete_first_pass_remains_100() -> None:
         grading_max_attempts=6,
     )
     assert g == 100.0
+
+
+def test_mistake_weight_sums_per_signature_not_per_category() -> None:
+    """Two distinct API/library errors both add full category weight each."""
+    api_w = MISTAKE_WEIGHT_BY_CATEGORY["api_library_error"]
+    one = _extract_mistake_profile(
+        {
+            "error_events": [
+                {
+                    "signature": "ImportError: sklearn foo",
+                    "category": "api_library_error",
+                    "error_line": "ImportError",
+                },
+            ],
+        }
+    )
+    two = _extract_mistake_profile(
+        {
+            "error_events": [
+                {
+                    "signature": "ImportError: sklearn foo",
+                    "category": "api_library_error",
+                    "error_line": "ImportError",
+                },
+                {
+                    "signature": "ValueError: shapes",
+                    "category": "api_library_error",
+                    "error_line": "ValueError",
+                },
+            ],
+        }
+    )
+    assert one["weighted_units"] == pytest.approx(api_w)
+    assert two["weighted_units"] == pytest.approx(2 * api_w)
 
 
 def test_failure_varies_by_category_not_only_attempts() -> None:

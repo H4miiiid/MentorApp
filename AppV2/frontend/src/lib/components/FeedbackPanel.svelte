@@ -480,7 +480,7 @@
               {/each}
             </ul>
           </div>
-        {:else if visibleMissingRequirements.length > 0}
+        {:else if visibleRequirements.length === 0 && visibleMissingRequirements.length > 0}
           <div class="fb-completeness-missing">
             <span class="fb-meta-label">Requirements not satisfied</span>
             <ul>

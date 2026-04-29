@@ -1,5 +1,5 @@
 <script lang="ts">
-  export type Crumb = { label: string; href?: string };
+  type Crumb = { label: string; href?: string };
 
   /** Last item is current page (no link unless you pass href for all). */
   export let items: Crumb[];

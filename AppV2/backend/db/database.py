@@ -52,6 +52,8 @@ def _apply_light_migrations(engine) -> None:
     2. Backfill legacy ``documents.assignment_id`` values into the new
        ``assignment_documents`` join table so attachments survive the N-to-N move.
     3. Add ``submissions.output`` for final sandbox program output.
+    4. Add ``submissions.hidden_from_student`` for soft-remove from student UI only.
+    5. Add ``assignments.removed_from_lists_at`` when missing (soft-hide for teacher/student lists).
     """
     inspector = inspect(engine)
     try:
@@ -70,6 +72,24 @@ def _apply_light_migrations(engine) -> None:
     if sub_columns and "output" not in sub_columns:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE submissions ADD COLUMN output VARCHAR DEFAULT ''"))
+
+    try:
+        sub_cols2 = {col["name"] for col in inspector.get_columns("submissions")}
+    except Exception:
+        sub_cols2 = set()
+    if sub_cols2 and "hidden_from_student" not in sub_cols2:
+        with engine.begin() as conn:
+            conn.execute(
+                text("ALTER TABLE submissions ADD COLUMN hidden_from_student BOOLEAN DEFAULT 0")
+            )
+
+    try:
+        asg_columns = {col["name"] for col in inspector.get_columns("assignments")}
+    except Exception:
+        asg_columns = set()
+    if asg_columns and "removed_from_lists_at" not in asg_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE assignments ADD COLUMN removed_from_lists_at TIMESTAMP"))
 
     try:
         with Session(engine) as session:

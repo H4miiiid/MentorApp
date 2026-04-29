@@ -1,38 +1,49 @@
 # Curated student-runtime stack for grading sandbox (`SANDBOX_PYTHON_IMAGE`).
-# Install order is just "what the student may `import`"; versions are loose to
-# pick up manylinux wheels for python:3.13-slim-bookworm.
-#
-# If you add a library here, rebuild the sandbox image:
+# Target: python:3.13-slim-bookworm, CPU-only (no GPU mounts). Versions are
+# pinned for reproducible builds; rebuild after edits:
 #   docker compose -f AppV2/docker-compose.yml build sandbox-image
-# (or `docker compose up --build`, which rebuilds everything).
+
+# --- PyTorch (CPU wheels; do not replace default PyPI index) ---
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0+cpu
+torchvision==0.26.0+cpu
 
 # --- Core numerics / dataframes ---
-numpy>=1.26
-pandas>=2.2
-scipy>=1.13
+numpy==2.4.4
+pandas==3.0.2
+polars==1.40.1
+scipy==1.17.1
 
 # --- Classical ML / stats ---
-scikit-learn>=1.5
-statsmodels>=0.14
-joblib>=1.4
+scikit-learn==1.8.0
+statsmodels==0.14.6
+imbalanced-learn==0.14.1
+category-encoders==2.9.0
+xgboost==2.1.4
+lightgbm==4.6.0
+numba==0.65.1
+joblib==1.5.3
+
+# --- Vision / imaging (headless OpenCV; no display in sandbox) ---
+opencv-python-headless==4.13.0.92
+scikit-image==0.26.0
 
 # --- Plotting (matplotlib runs headless via MPLBACKEND=Agg) ---
-matplotlib>=3.9
-seaborn>=0.13
+matplotlib==3.10.8
+seaborn==0.13.2
 
 # --- IO formats commonly used in coursework ---
-openpyxl>=3.1        # .xlsx
-xlrd>=2.0            # legacy .xls (read-only)
-pyarrow>=15.0        # .parquet, .feather
-lxml>=5.2            # fast XML / HTML parser
-beautifulsoup4>=4.12 # HTML scraping exercises
-Pillow>=10.3         # image IO (PIL) — pairs well with matplotlib
+openpyxl==3.1.5
+xlrd==2.0.2
+pyarrow==22.0.0
+lxml==6.0.2
+beautifulsoup4==4.14.3
+Pillow==12.2.0
 
-# --- Networking / HTTP clients (sandbox disables --network by default, but
-# students may still import these for offline examples and unit tests) ---
-requests>=2.32
+# --- Networking / HTTP (sandbox may run with --network none) ---
+requests==2.32.5
 
 # --- Misc teaching conveniences ---
-sympy>=1.13          # symbolic math / calculus assignments
-networkx>=3.3        # graph exercises
-tqdm>=4.66           # progress bars in loops
+sympy==1.14.0
+networkx==3.6.1
+tqdm==4.67.1

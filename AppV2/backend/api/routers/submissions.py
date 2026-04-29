@@ -37,6 +37,7 @@ def _to_read(s: Submission) -> SubmissionRead:
         feedback=s.feedback,
         created_at=s.created_at,
         updated_at=s.updated_at,
+        hidden_from_student=bool(getattr(s, "hidden_from_student", False)),
     )
 
 
@@ -78,16 +79,23 @@ def list_submissions(
         rows = session.exec(stmt).all()
     elif current.role == UserRole.teacher:
         rows = session.exec(
-            select(Submission).where(
-                Submission.assignment_id.in_(
-                    select(Assignment.id).where(Assignment.teacher_id == current.id)
-                )
-            ).order_by(Submission.created_at.desc())
+            select(Submission)
+            .join(Assignment, Submission.assignment_id == Assignment.id)
+            .where(
+                Assignment.teacher_id == current.id,
+                Assignment.removed_from_lists_at.is_(None),
+            )
+            .order_by(Submission.created_at.desc())
         ).all()
     else:
         rows = session.exec(
             select(Submission)
-            .where(Submission.student_id == current.id)
+            .join(Assignment, Submission.assignment_id == Assignment.id)
+            .where(
+                Submission.student_id == current.id,
+                Submission.hidden_from_student == False,  # noqa: E712
+                Assignment.removed_from_lists_at.is_(None),
+            )
             .order_by(Submission.created_at.desc())
         ).all()
     return [_to_read(r) for r in rows]
@@ -103,7 +111,8 @@ def create_submission(
         raise HTTPException(status_code=403, detail="Only students submit work")
     if current.role == UserRole.student and body.student_id != current.id:
         raise HTTPException(status_code=403, detail="Cannot submit for another student")
-    if session.get(Assignment, body.assignment_id) is None:
+    sub_a = session.get(Assignment, body.assignment_id)
+    if sub_a is None or getattr(sub_a, "removed_from_lists_at", None) is not None:
         raise HTTPException(status_code=400, detail="Assignment not found")
     st = session.get(User, body.student_id)
     if st is None or st.role != UserRole.student:
@@ -140,6 +149,8 @@ def get_submission(
         raise HTTPException(status_code=404, detail="Submission not found")
     if not _can_view_submission(session, s, current):
         raise HTTPException(status_code=403, detail="Not allowed to view this submission")
+    if current.role == UserRole.student and getattr(s, "hidden_from_student", False):
+        raise HTTPException(status_code=404, detail="Submission not found")
     return _to_read(s)
 
 
@@ -156,6 +167,21 @@ def update_submission(
     if not _can_edit_submission(session, s, current):
         raise HTTPException(status_code=403, detail="Not allowed to update this submission")
     data = body.model_dump(exclude_unset=True)
+    if "hidden_from_student" in data and data["hidden_from_student"] is not None:
+        hid = bool(data["hidden_from_student"])
+        if current.role == UserRole.student:
+            if s.student_id != current.id:
+                raise HTTPException(status_code=403, detail="Not allowed")
+            if hid is not True:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Students can only remove submissions from their list (set hidden).",
+                )
+            s.hidden_from_student = True
+        else:
+            # Teacher / admin: toggle visibility for the student
+            s.hidden_from_student = hid
+
     for key in (
         "code",
         "corrected_code",
@@ -187,5 +213,14 @@ def delete_submission(
         raise HTTPException(status_code=404, detail="Submission not found")
     if not _can_edit_submission(session, s, current):
         raise HTTPException(status_code=403, detail="Not allowed to delete this submission")
+    # Student: soft-remove from UI only (keep row for teachers / analytics / exports).
+    if current.role == UserRole.student:
+        if s.student_id != current.id:
+            raise HTTPException(status_code=403, detail="Not allowed to delete this submission")
+        s.hidden_from_student = True
+        s.updated_at = _now()
+        session.add(s)
+        session.commit()
+        return None
     session.delete(s)
     session.commit()

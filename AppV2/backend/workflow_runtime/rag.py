@@ -119,11 +119,13 @@ def rerank_docs(query: str, candidates: list[tuple[str, dict[str, Any]]]) -> lis
     try:
         scores = reranker.predict(pairs)
         scored = sorted(zip(scores, candidates), key=lambda item: item[0], reverse=True)
-        return [
-            (float(score), _sanitize_doc_text(doc), meta if isinstance(meta, dict) else {})
-            for score, (doc, meta) in scored[: CFG.n_rerank]
-            if float(score) > 0.0
-        ]
+        out: list[tuple[float, str, dict[str, Any]]] = []
+        for score, (doc, meta) in scored[: CFG.n_rerank]:
+            text = _sanitize_doc_text(doc)
+            if not text:
+                continue
+            out.append((float(score), text, meta if isinstance(meta, dict) else {}))
+        return out
     except Exception:
         return [(0.5, _sanitize_doc_text(doc), meta if isinstance(meta, dict) else {}) for doc, meta in candidates[: CFG.n_rerank]]
 
